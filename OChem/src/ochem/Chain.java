@@ -10,7 +10,7 @@ package ochem;
 public class Chain {
 	//Attributes
 	private int size; //side of the side chain
-	private int location; //location on the main chain 
+	private int location; //location on the main chain
 	
 	/*
 	 * Creates a new chain with a size and location
