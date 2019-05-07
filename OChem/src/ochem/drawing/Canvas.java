@@ -33,7 +33,7 @@ public class Canvas extends JComponent {
 		g2.fillRect(0, 0, width, height);
 		
 		drawNodes(g2);
-	}
+	} 
 	
 	private void createNodes() {
 		nodes = new Node[10][6];
