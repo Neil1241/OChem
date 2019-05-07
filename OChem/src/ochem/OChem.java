@@ -1,24 +1,22 @@
 package ochem;
 
-/*
- * OChem
- * Created by: Neil Balaskandarajah
- * Last modified: 05/04/2019
- * An application where users can enter the name of an organic compound
- * 		or draw it on the screen and see the opposite form. Also has a
- * 		random quiz generation feature.
- */
+import java.awt.Toolkit;
 
-import java.io.PrintStream;
-import java.util.Scanner;
+import ochem.drawing.DrawingGUI;
 
 public class OChem {
+	public static int width;
+	public static int height;
 	
 	/*
 	 * Instantiate the View, Model and show the frame
 	 * (Currently a test platform for the Interpreter)
 	 */
 	public static void main(String[] args) {
+		width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+		height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+		
+		/*
 		Scanner in = new Scanner(System.in);
 		PrintStream out = System.out;
 		
@@ -27,7 +25,10 @@ public class OChem {
 		
 		Compound compound = Interpreter.compoundFromName(cmpnd);
 		
-//		out.println(compound.toString());
+		out.println(compound.toString());
+		*/
+		
+		View view = new View();
 	} //end main
 
 } //end OChem

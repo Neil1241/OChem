@@ -1,4 +1,4 @@
-package ochem;
+package ochem.organic;
 
 /*
  * OrganicUtil
