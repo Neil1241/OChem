@@ -9,14 +9,19 @@ package ochem;
  */
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class Interpreter {
 	//Attributes
-	private static StringBuffer compoundName; //name of the compound
+	private static StringTokenizer compoundName; //name of the compound
 	private static Compound compound; //compound to be created
 	
 	private static int main; //size of the main chain
-	private static ArrayList<String> chains; //all the side chains
+	
+	private static ArrayList<String> chainNames; //all the side chains
+	private static ArrayList<Integer> chainLocations; //locations of the side chains
+	
+	private static String originalName; //original name of String
 	
 	/*
 	 * Create a Compound object from a text name
@@ -24,113 +29,73 @@ public class Interpreter {
 	 * return compound - compound object from Compound
 	 */
 	public static Compound compoundFromName(String name) {
-		compoundName = new StringBuffer(name); //Create StringBuffer for ease of manipulation
+		originalName = name;
 		
-		removeHyphens(); //remove all the hyphens in the String
-		splitChains(); //split up into all of the chains
+		splitChains(); //remove all the hyphens in the String
+		addLocations(); //add the locations of the chains to the locations list
 		
-		compound = new Compound(main); //create the compound with a main chain size
-		addChains(); //add the side chains to the compound
+		//print out the elements in the array
+		/*for(int i = 0; i < chainNames.size(); i++) {
+			System.out.println(chainNames.get(i)); //dbg
+		}*/
 		
-		return compound;
+		return new Compound(0);
 	} //end compoundFromName
 	
 	/*
-	 * Remove all hyphens from the compound name
+	 * Split the text form of the name into the side chains and locations
 	 */
-	private static void removeHyphens() {
+	private static void splitChains() {		
+		compoundName = new StringTokenizer(originalName); //Create StringTokenizer for ease of manipulation
 		
-		//loop through the name String deleted all hyphens
-		for (int i = 0; i < compoundName.length(); i++) {
-			
-			if (compoundName.charAt(i) == '-') {
-				compoundName.deleteCharAt(i);
-			} //if
-			
+		chainNames = new ArrayList<String>();
+		
+		while (compoundName.hasMoreTokens()) { //delimit by the hyphen and add it to the list
+			chainNames.add(compoundName.nextToken("-"));
 		} //loop
 		
-		//dbg
-		System.out.println("----------");
-		System.out.println("dehyphenated: ");
-		System.out.println(compoundName.toString());
-		System.out.println("----------");
-	} //end removeHyphens
+		splitLastChain(); //split the last chain and add it to the list
+	} //end splitChains()
 	
 	/*
-	 * Split the de-hyphenated name into multiple Strings representing the side chains
-	 * TO-DO: Find and store the locations of each side chain 
-	 * 		- currently the first char in each chain besides the final main chain is an int with its location
+	 * Split the last chain into its elements
 	 */
-	private static void splitChains() {
-		ArrayList<Integer> numIndices = new ArrayList<Integer>(); //list of all the positions numbers are found
-		chains = new ArrayList<String>(); //initialize list for all the chain names
+	private static void splitLastChain() {
+		StringTokenizer lastChain = new StringTokenizer(chainNames.get(chainNames.size() - 1)); //last element in list
+		chainNames.remove(chainNames.get(chainNames.size() - 1)); //remove last element
 		
-		System.out.println("number locations in string and numbers"); //dbg
-		
-		//loop through the entire String finding the index of each number in the String and saving it to a list
-		for (int i = 0; i < compoundName.length(); i++) {
-			char num = compoundName.charAt(i);
-			
-			for (int j = 0; j < OrganicUtil.NUMBERS.length(); j++) { //loop through the String of numbers to see if a number matches
-				if (num == OrganicUtil.NUMBERS.charAt(j)) {
-					numIndices.add(i);
-					System.out.println(i +" "+ OrganicUtil.NUMBERS.charAt(j)); //dbg
-				} //if
-				
-			} //inner loop
-			
-		} //outer loop
-		
-		//dbg
-		System.out.println("----------");
-		System.out.println("split chains: ");
-		
-		//get the chain names and add them to the list
-		for (int k = 0; k < numIndices.size()-1; k++) {
-			//split up the original dehyphenated name into separate chains
-			String chainName = compoundName.substring(numIndices.get(k), numIndices.get(k+1)); 
-			chains.add(chainName);
-			
-			System.out.println(k +" "+ chains.get(k)); //dbg
-		}
-		//add the leftovers to the list
-		chains.add(compoundName.substring(numIndices.get(numIndices.size()-1), compoundName.length()));
-		
-		//leftovers is a side chain and main chain, split them up
-		String lastChain = chains.get(chains.size()-1);
-		System.out.println("last chain: " + lastChain); //dbg
-		
-		//loop through the string to split it using the side chain signifier
-		for (int l = 0; l < lastChain.length() - OrganicUtil.ALKYL_SIDE_CHAIN.length() - 1; l++) {
-			
-			//if the substring found is the side chain signifier ("yl")
-			if (lastChain.substring(l, l + OrganicUtil.ALKYL_SIDE_CHAIN.length()).equals(OrganicUtil.ALKYL_SIDE_CHAIN)) {
-				//remove the leftovers
-				chains.remove(chains.size() - 1);
-				
-				//and add the side and main chains
-				chains.add(lastChain.substring(0, l + OrganicUtil.ALKYL_SIDE_CHAIN.length()));
-				chains.add(lastChain.substring(l + OrganicUtil.ALKYL_SIDE_CHAIN.length(), lastChain.length()));
-			} //if
-			
+		while(lastChain.hasMoreTokens()) {
+			chainNames.add(lastChain.nextToken(OrganicUtil.ALKYL_SIDE_CHAIN) + OrganicUtil.ALKYL_SIDE_CHAIN); //delimit by side chain signifier (will be changed later)
 		} //loop
 		
-		//dbg
-		System.out.println("----------");
-		System.out.println("all chains: ");
+		//create the last chain to remove the yl
+		String mainChain = chainNames.get(chainNames.size() - 1);
+		chainNames.remove(chainNames.size() - 1); //remove last element
 		
-		//print out all the chains
-		for (int i = 0; i < chains.size(); i++) {
-			System.out.println(chains.get(i)); //dbg
+		chainNames.add(mainChain.substring(0, mainChain.length() - OrganicUtil.ALKYL_SIDE_CHAIN.length()));
+	} //end splitLastChain
+	
+	/*
+	 * Remove the locations from the chain names list and add it to locations list
+	 */
+	private static void addLocations() {
+		ArrayList<Integer> numIndices = new ArrayList<Integer>(); //indices for all the numbers to remove later
+		chainLocations = new ArrayList<Integer>();
+		
+		for (int i = 0; i < chainNames.size(); i++) {
+			if (isStringNumber(chainNames.get(i))) {
+				chainLocations.add(Integer.parseInt(chainNames.get(i))); //add it to the locations list
+				numIndices.add(i); //remove it from the list
+				System.out.println("i " + i +" "+ chainNames.get(i));
+			} //if
+		} //loop
+		
+		for (int j = 0; j < numIndices.size(); j++) {
+			System.out.println(j +" "+ chainNames.get(numIndices.get(j)));
+			chainNames.remove(chainNames.get(numIndices.get(j)));
 		}
 		
-		//set the main chain size
-		main = chainToNumber(chains.get(chains.size()-1));
-		
-		//dbg
-		System.out.println("----------");
-		
-	} //end splitChains
+	} //end addLocation
 	
 	/*
 	 * Add the side chains to the compound
@@ -138,8 +103,8 @@ public class Interpreter {
 	 */
 	private static void addChains() {
 		//loop through the list of the text forms of the chains, convert them and add them
-		for (int i = 0; i < chains.size(); i++) {
-			compound.addSideChain(chainToNumber(chains.get(i)), 0);
+		for (int i = 0; i < chainNames.size(); i++) {
+			compound.addSideChain(chainToNumber(chainNames.get(i)), 0);
 		} //loop
 		
 	} //end addChains
@@ -186,5 +151,19 @@ public class Interpreter {
 		
 		return size;
 	} //end chainToNumber
+	
+	/*
+	 * Checks whether a String is a number
+	 */
+	private static boolean isStringNumber(String str) {
+		try {
+			Integer.parseInt(str);
+			
+			return true;
+			
+		} catch (NumberFormatException n) {
+			return false;
+		}
+	} //end stringIsNumber
 	
 } //end Interpreter

@@ -27,7 +27,7 @@ public class OChem {
 		
 		Compound compound = Interpreter.compoundFromName(cmpnd);
 		
-		out.println(compound.toString());
+//		out.println(compound.toString());
 	} //end main
 
 } //end OChem
