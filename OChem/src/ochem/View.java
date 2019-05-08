@@ -1,5 +1,12 @@
 package ochem;
 
+/*
+ * View
+ * Created by: Neil Balaskandarajah
+ * Last modified: 05/07/2019
+ * View class holding all panels that the program passes through
+ */
+
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
@@ -7,11 +14,16 @@ import javax.swing.JFrame;
 import ochem.drawing.DrawingGUI;
 
 public class View extends JFrame {	
-	private int width;
-	private int height;
+	//Attributes
+	private int width; //width of frame
+	private int height; //hwight of frame
 	
-	private DrawingGUI draw;
+	//Panels
+	private DrawingGUI draw; 
 	
+	/*
+	 * Create a frame with a view proportional to the 
+	 */
 	public View() {
 		width = (int) (0.75 * OChem.width);
 		height = (int) (0.5 * OChem.height);

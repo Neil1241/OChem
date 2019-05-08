@@ -1,16 +1,30 @@
 package ochem.drawing;
 
+/*
+ * CanvasController
+ * Created by: Neil Balaskandarajah
+ * Last modified: 05/08/2019
+ * Controller for the canvas that updates all nodes
+ */
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import ochem.drawing.Node.NodeType;
+
 public class CanvasController implements MouseListener {
-	private Canvas canvas;
+	//Attributes
+	private Canvas canvas; //instance of the Canvas to be updated
 	
+	/*
+	 * Creates a canvas controller
+	 * Canvas canvas - instance of the canvas to be updated
+	 */
 	public CanvasController(Canvas canvas) {
 		super();
 		
 		this.canvas = canvas;
-	}
+	} //end constructor
 	
 	@Override
 	public void mouseClicked(MouseEvent m) {
@@ -29,16 +43,61 @@ public class CanvasController implements MouseListener {
 		
 	}
 
-	@Override
+	/*
+	 *	Updates nodes based on when its clicked
+	 */
 	public void mousePressed(MouseEvent m) {
-		System.out.println("CanvasController: " + m.getX() +" "+ m.getY());
+		Node[][] nodes = canvas.getNodes();
+		
+		//get mouse coordinates
+		int x = m.getX();
+		int y = m.getY();
+		
+		//loop through all nodes to check if the click was on one of them
+		boolean breakOut = false; //break out of both loops is this is true
+		for (int i = 0; i < nodes.length; i++) {
+			for (int j = 0; j < nodes[0].length; j++) {
+				Node current = nodes[i][j];
+				
+				//if the click is on a node
+				if (isWithinBounds(x, y, current.getX(), current.getY(), current.getRad())) {
+					current.setType(NodeType.SINGLE_BOND); //set type
+					
+					//break out of the loop
+					breakOut = true;
+					break;
+				} //if
+			} //inner
+			
+			if (breakOut) {
+				break;
+			} //if
+ 		} //outer 
+		
 		canvas.update();
 	}
-
-	@Override
+	
 	public void mouseReleased(MouseEvent m) {
 		// TODO Auto-generated method stub
 		
 	}
 
-}
+	/*
+	 * Check whether one point is within a radius around a target point 
+	 * int x1 - current point x
+	 * int y1 - current point y
+	 * int x2 - goal point x
+	 * int y2 - goal point y
+	 * int range - distance to check within
+	 */
+	private boolean isWithinBounds(int x1, int y1, int x2, int y2, int range) {
+		double xDiff = Math.abs(x2 - x1);
+		double yDiff = Math.abs(y2 - y1);
+		
+		if(xDiff < range && yDiff < range) {
+			return true;
+		} else {
+			return false;
+		} //if
+	} //end isWithinBounds
+} //end class
