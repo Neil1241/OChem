@@ -9,6 +9,7 @@ package ochem.drawing;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import ochem.drawing.Node.NodeType;
 
@@ -56,12 +57,13 @@ public class CanvasController implements MouseListener {
 		//loop through all nodes to check if the click was on one of them
 		boolean breakOut = false; //break out of both loops is this is true
 		for (int i = 0; i < nodes.length; i++) {
-			for (int j = 0; j < nodes[0].length; j++) {
+			for (int j = 0; j < nodes[i].length; j++) {
 				Node current = nodes[i][j];
 				
 				//if the click is on a node
 				if (isWithinBounds(x, y, current.getX(), current.getY(), current.getRad())) {
-					current.setType(NodeType.SINGLE_BOND); //set type
+					current.setType(canvas.getSelectedType()); //update the node type
+					canvas.getBonds(canvas.getSelectedType()).add(current); //add it to the list
 					
 					//break out of the loop
 					breakOut = true;

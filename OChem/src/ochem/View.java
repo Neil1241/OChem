@@ -28,13 +28,14 @@ public class View extends JFrame {
 		width = (int) (0.75 * OChem.width);
 		height = (int) (0.5 * OChem.height);
 		
-		this.setPreferredSize(new Dimension(width, height));
+//		this.setPreferredSize(new Dimension(width, height));
 		
 		layoutView();
 		
 		this.setContentPane(draw);
 		this.pack();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setResizable(false);
 		this.setVisible(true);
 	}
 	

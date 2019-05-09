@@ -23,22 +23,26 @@ public class Canvas extends JComponent {
 	//Attributes
 	private int width; //width of component
 	private int height; //height of component
+	private Palette palette; //instance of the palette
 
 	private Node[][] nodes; //all the nodes on the screen
 	private final int NODE_RADIUS; //node radius
 	public static Color BACKGROUND_COLOR;
+	
+	private ArrayList<Node> singleBonds; //all the nodes in a single array
 	
 	/*
 	 * Create a canvas with its parent's width and height
 	 * int parentWidth - width of the parent panel
 	 * int parentHeight - height of the parent panel
 	 */
-	public Canvas(int parentWidth, int parentHeight) {
+	public Canvas(int width, int height, Palette palette) {
 		super();
-		this.width = (int) (parentWidth * 0.8);
-		this.height = (int) (parentHeight);
+		this.width = width;
+		this.height = height;
+		this.palette = palette;
 		
-		this.setPreferredSize(new Dimension(width, height));
+		this.setPreferredSize(new Dimension(this.width, this.height));
 		
 		NODE_RADIUS = 20;
 		createNodes();
@@ -70,15 +74,21 @@ public class Canvas extends JComponent {
 	 * Create all the nodes in the array
 	 */
 	private void createNodes() {
-		nodes = new Node[10][6];
+		//all regular arrays
+		nodes = new Node[6][10];
 		int widthChunk = (width - 100) / (nodes.length+1);
-		int heightChunk = (height - 50) / (nodes[0].length+1);
+		int heightChunk = (height - 50) / (nodes.length+1);
 		
 		for (int i = 0; i < nodes.length; i++) {
 			for (int j = 0; j < nodes[i].length; j++) {
-				nodes[i][j] = new Node(widthChunk * (i+1), heightChunk * (j+1), NODE_RADIUS);
-			} //inner
+				int x = widthChunk * (i+1);
+				int y = heightChunk * (j+1);
+				
+				nodes[i][j] = new Node(x, y, NODE_RADIUS);
+			}
 		} //outer
+		
+		singleBonds = new ArrayList<Node>();
 	} //end createNodes
 	
 	/*
@@ -100,7 +110,7 @@ public class Canvas extends JComponent {
 		for (int i = 0; i < nodes.length; i++) {
 			for (int j = 0; j < nodes[i].length; j++) {
 				drawNode(g2, nodes[i][j]);
-			} //inner
+			}
 		} //outer
 	} //end drawNodes
 	
@@ -108,23 +118,22 @@ public class Canvas extends JComponent {
 	 * Draw all bonds to the screen
 	 */
 	private void drawBonds(Graphics2D g2) {
-		ArrayList<Node> bondedNodes = new ArrayList<Node>();
-		
-		for (int i = 0; i < nodes.length; i++) {
+		/*for (int i = 0; i < nodes.length; i++) {
 			for (int j = 0; j < nodes[i].length; j++) {
-				
 				//if a bond type, add it to the bonded nodes list
 				if (nodes[i][j].getType() == NodeType.SINGLE_BOND) {
-					bondedNodes.add(nodes[i][j]);
+					singleBonds.add(nodes[i][j]);
 				} //if
-			} //inner
+			}
 		} //outer
+		 */		
 		
 		g2.setStroke(new BasicStroke(10.0F));
 		g2.setColor(Color.BLACK);
-		for (int d = 0; d < bondedNodes.size()-1; d++) {
-			g2.drawLine(bondedNodes.get(d).getX(), bondedNodes.get(d).getY(), 
-						bondedNodes.get(d+1).getX(), bondedNodes.get(d+1).getY());
+		//draw lines between everything in the single bonds list
+		for (int d = 0; d < singleBonds.size()-1; d++) { 
+			g2.drawLine(singleBonds.get(d).getX(), singleBonds.get(d).getY(), 
+					singleBonds.get(d+1).getX(), singleBonds.get(d+1).getY());
 		} //loop
 	} //end drawBonds
 	
@@ -143,10 +152,47 @@ public class Canvas extends JComponent {
 		this.addMouseListener(cc);
 	} //end registerControllers
 	
+	//NODES
+	
 	/*
-	 * Get all the nodes
+	 * Get all the nodes in the canvas
+	 * return nodes - nodes in the canvas
 	 */
 	public Node[][] getNodes() {
 		return nodes;
 	} //end getNodes
+	
+	/*
+	 * Get all the bonded nodes depending on the type passed
+	 * NodeType type - type of bonds to return
+	 * return output - list of nodes depending on the type
+	 */
+	public ArrayList<Node> getBonds(NodeType type) {
+		ArrayList<Node> output = new ArrayList<Node>();
+		switch (type) {
+			case SINGLE_BOND:
+				output = singleBonds;
+				break;
+			
+			case DOUBLE_BOND:
+				
+				break;
+			
+			case TRIPLE_BOND:
+				
+				break;
+		} //switch
+		
+		return output;
+	} //end getNodes
+	
+	/*
+	 * Get the selected node type
+	 * return - palette's selected type
+	 */
+	public NodeType getSelectedType() {
+		return palette.getSelectedType();
+	}
+	
+	
 } //end class

@@ -22,7 +22,6 @@ public class Node {
 	 */
 	public static enum NodeType {
 		BLANK,
-		SELECTED,
 		SINGLE_BOND,
 		DOUBLE_BOND,
 		TRIPLE_BOND
@@ -101,11 +100,6 @@ public class Node {
 		//blank case
 		case BLANK: 
 			color = Color.GRAY;
-			break;
-			
-		//selected case
-		case SELECTED:
-			color = Color.BLACK;
 			break;
 		
 		//single bond case
