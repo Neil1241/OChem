@@ -1,4 +1,4 @@
-package ochem.organic;
+package ochem;
 
 /*
  * Compound
@@ -24,6 +24,10 @@ public class Compound {
 		sideChains = new ArrayList<Chain>(); //initialize sideChains list
 	} //end constructor
 	
+	public Chain getMainChain() {
+		return this.mainChain;
+	}
+	
 	/*
 	 * Set the size of the main chain
 	 * int main - size of the main chain
@@ -45,11 +49,12 @@ public class Compound {
 	 * int size - size of the side chain
 	 * int location - location of the side chain on the main chain
 	 */
-	public void addSideChain(int size, int location) {
+	public void addSideChain(int size, int location,boolean cyclo) {
 		if (location < 0) { //cannot have negative location
 			throw new IllegalArgumentException("Negative numbers not valid as location of side chain");
 		} else { //zero or greater integer
 			sideChains.add(new Chain(size, location));
+			sideChains.get(sideChains.size()-1).setCyclo(cyclo);
 		} //if
 	} //end addSideChain
 	
@@ -79,7 +84,7 @@ public class Compound {
 		
 		//loop through all side chains
 		for (int i = 0; i < sideChains.size(); i++) {
-			s.concat("Side chain " + i + " of: " + sideChains.get(i) + "\n");
+			s=s.concat("Side chain " + i + " of size: " + sideChains.get(i).getSize() + " and location: "+sideChains.get(i).getLocation()+"\n");
 		} //loop
 		
 		return s;

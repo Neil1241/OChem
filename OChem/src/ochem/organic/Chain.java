@@ -1,4 +1,4 @@
-package ochem.organic;
+package ochem;
 
 /*
  * Chain
@@ -11,6 +11,7 @@ public class Chain {
 	//Attributes
 	private int size; //side of the side chain
 	private int location; //location on the main chain
+	private boolean cyclo=false;
 	
 	/*
 	 * Creates a new chain with a size and location
@@ -55,4 +56,11 @@ public class Chain {
 		return location;
 	} //end getLocation
 	
+	public void setCyclo(boolean b) {
+		this.cyclo=b;
+	}
+	
+	public boolean getCyclo() {
+		return this.cyclo;
+	}
 } //end Chain

@@ -16,7 +16,7 @@ public class Interpreter {
 	private static Compound compound; //compound to be created
 	private static String suffix=""; //compound suffix made more general for future use
 	private static int error=0; //counter to use for checking suffix
-	
+	private static String front="";
 	private static ArrayList<String> chainNames; //all the side chains
 	private static ArrayList<Integer> chainLocations; //locations of the side chains
 	
@@ -38,7 +38,9 @@ public class Interpreter {
 			System.out.println(chainNames.get(i)); //dbg
 		}*/
 		
-		compound=new Compound(mainChainToNumber(chainNames.get(chainNames.size()-1),suffix));
+		compound=new Compound(chainToNumber(chainNames.get(chainNames.size()-1),suffix,front));
+		if (front.equalsIgnoreCase(OrganicUtil.PREFIX[9]))
+			compound.getMainChain().setCyclo(true);
 		addChains();
 		
 		
@@ -49,7 +51,7 @@ public class Interpreter {
 	 * Split the text form of the name into the side chains and locations
 	 */
 	private static void splitChains() {		
-		compoundName = new StringTokenizer(originalName,"-,"); //Create StringTokenizer for ease of manipulation
+		compoundName = new StringTokenizer(originalName,"-, "); //Create StringTokenizer for ease of manipulation
 		
 		chainNames = new ArrayList<String>();
 		
@@ -57,62 +59,61 @@ public class Interpreter {
 			chainNames.add(compoundName.nextToken());
 		} //loop
 		
+		
+		
 		splitLastChain(); //split the last chain and add it to the list
 	} //end splitChains()
+	
 	
 	/*
 	 * Split the last chain into its elements
 	 */
 	private static void splitLastChain() {
+		//local variables
 		String last=chainNames.get(chainNames.size() - 1);
 		int length=0;
-		chainNames.remove(chainNames.get(chainNames.size() - 1)); //remove last element
+		
+		//try to find attached sidechain and if found, remove the last element within the arraylist and change it to be two elements
 		length=last.indexOf(OrganicUtil.ALKYL_SIDE_CHAIN);
-		
-		
-		//try to find attached sidechain, if it fails just add the entire compound
 		if (length != -1) {
-			length += 2;
-			chainNames.add(last.substring(0, length));
-			chainNames.add(last.substring(length));
-		} 
-		else {
-			chainNames.add(last);
-		}
+			chainNames.remove(chainNames.get(chainNames.size() - 1)); //remove last element
+			chainNames.add(last.substring(0, length+2));
+			chainNames.add(last.substring(length+2));
+		}//end if
+		last=chainNames.get(chainNames.size() - 1);
 		
-		//create the last chain to remove the yl
-		String mainChain = chainNames.get(chainNames.size() - 1);
 		
-		suffix=ending(mainChain);
-		chainNames.remove(chainNames.size() - 1); //remove last element
 		
-		chainNames.add(mainChain);
+		if (last.length()>=5)
+			if (last.substring(0,5).equalsIgnoreCase(OrganicUtil.PREFIX[9]))
+				front=OrganicUtil.PREFIX[9];
+		
+		//create the last chain to determine suffix
+		suffix = mainChainEnding(chainNames.get(chainNames.size() - 1));
+		
 	} //end splitLastChain
 	
-	private static String ending(String mainChain)
+	
+	//method tries to obtain the ending suffix of the mainChain and returns it found
+	private static String mainChainEnding(String mainChain)
 	{
 		//string to hold the suffix and to be returned at the end
 		String ending="";
 		try
 		{
 			//based on the error counter at the beginning, determine the type of suffix
-			if (error==0)
-				ending=mainChain.substring(mainChain.indexOf(OrganicUtil.ALKANE));
-			else if (error==1)
-				ending=mainChain.substring(mainChain.indexOf(OrganicUtil.ALKENE));
-			else if (error==2)
-				ending=mainChain.substring(mainChain.indexOf(OrganicUtil.ALKYNE));
-			//end if
+			ending = mainChain.substring(mainChain.indexOf(OrganicUtil.SUFFIX[error]));
+			
 			return ending;
 		}
 		catch (StringIndexOutOfBoundsException e)
-		{ 
+		{
 			//if error is thrown, add one to the error counter and then run itself again
 			error++;
-			ending=ending(mainChain);
+			ending=mainChainEnding(mainChain);
 			return ending;
 		}
-	}//end ending
+	}//end mainChainEnding
 	
 	/*
 	 * Remove the locations from the chain names list and add it to locations list
@@ -123,18 +124,72 @@ public class Interpreter {
 		for (int i = 0; i < chainNames.size(); i++) {
 			if (isStringNumber(chainNames.get(i))) {
 				chainLocations.add(Integer.parseInt(chainNames.get(i))); //add it to the locations list
+				
 				chainNames.remove(i);
+				i--;
 			} //if
 		} //loop
+		
+
 		
 	} //end addLocation
 	
 
 	//Add the side chains to the compound
 	private static void addChains() {
+		int location=0;
+		for(int i = 0; i < chainNames.size(); i++)
+			System.out.println(chainNames.get(i));
+		
 		//loop through the list of the text forms of the chains, convert them and add them
-		for (int i = 0; i < chainLocations.size(); i++) {
-			compound.addSideChain(chainToNumber(chainNames.get(i)),chainLocations.get(i));
+		for (int i = 0; i < chainNames.size()-1; i++) {
+			//temp variables
+			String prefix="";
+			int additional=0;
+			boolean cyclo=false;
+			
+			//loop for the length of the size of the organicUtil array
+			for (int j = 0; j <OrganicUtil.PREFIX.length; j++) {
+				String temp = chainNames.get(i);
+				//check if 
+				if (temp.length() >= OrganicUtil.PREFIX[j].length()) 
+				{
+					if (temp.substring(0, OrganicUtil.PREFIX[j].length()).equalsIgnoreCase(OrganicUtil.PREFIX[j]))
+					{
+						if (temp.length()>=OrganicUtil.PREFIX[j].length()+OrganicUtil.PREFIX[9].length())
+						{
+							if (temp.substring(0, OrganicUtil.PREFIX[j].length()+OrganicUtil.PREFIX[9].length()).equalsIgnoreCase(OrganicUtil.PREFIX[j]+OrganicUtil.PREFIX[9]))
+							{
+								prefix=OrganicUtil.PREFIX[j]+OrganicUtil.PREFIX[9];
+								cyclo=true;
+							}
+							else
+							{
+								prefix=OrganicUtil.PREFIX[j];
+							}
+						}
+						else	
+							prefix = OrganicUtil.PREFIX[j];
+						
+						if (j!=9)
+							additional=j+1;
+						
+						break;
+					}//end if
+					
+				}//end if
+			}//end for loop
+			System.out.println("--------------------------------------");
+			System.out.println(chainNames.get(i));
+			System.out.println(prefix);
+			System.out.println(chainToNumber(chainNames.get(i),OrganicUtil.ALKYL_SIDE_CHAIN,prefix));
+			compound.addSideChain(chainToNumber(chainNames.get(i),OrganicUtil.ALKYL_SIDE_CHAIN,prefix),chainLocations.get(location),cyclo);
+			
+			for (int j=0;j<additional;j++)
+			{
+				location++;
+				compound.addSideChain(chainToNumber(chainNames.get(i),OrganicUtil.ALKYL_SIDE_CHAIN,prefix),chainLocations.get(location),cyclo);
+			}
 		} //loop
 		
 	} //end addChains
@@ -144,83 +199,53 @@ public class Interpreter {
 	 * String chain - the text form of the chain to be converted
 	 * return size - numerical form of the chain
 	 */
-	private static int chainToNumber(String chain) {
-		int size = 0;
-		
-		//compare the String to each of the main chain Strings and set the size accordingly
-		if (chain.equals(OrganicUtil.ONE_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //meth
-			size = 1;
-			
-		}  else if (chain.equals(OrganicUtil.TWO_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //eth
-			size = 2;
-			
-		} else if (chain.equals(OrganicUtil.THREE_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //prop
-			size = 3;
-			
-		} else if (chain.equals(OrganicUtil.FOUR_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //but
-			size = 4;
-			
-		} else if (chain.equals(OrganicUtil.FIVE_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //pent
-			size = 5;
-				
-		} else if (chain.equals(OrganicUtil.SIX_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //hex
-			size = 6;
-			
-		} else if (chain.equals(OrganicUtil.SEVEN_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //hept
-			size = 7;
-			
-		} else if (chain.equals(OrganicUtil.EIGHT_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //oct
-			size = 8;
-			
-		} else if (chain.equals(OrganicUtil.NINE_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //non
-			size = 9;
-			
-		} else if (chain.equals(OrganicUtil.TEN_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //dec
-			size = 10;
-		} //(gigantic) if
-		
-		return size;
-	} //end chainToNumber
-	
-	
-	private static int mainChainToNumber(String chain, String suffix) {
+	/*private static int chainToNumber(String chain, String suffix) {
 		int size = 0;
 
 		// compare the String to each of the main chain Strings and set the size
 		// accordingly
-		if (chain.equals(OrganicUtil.ONE_CHAIN + suffix)) { // methane
-			size = 1;
+		for (int i=0;i<10;i++)
+		{
+			if (chain.equalsIgnoreCase(OrganicUtil.CHAIN[i] + suffix)) { // methane
+				size = i+1;
+				break;
+			}//end if
+		}//end for
+		return size;
+	}*/
+	
+	//PROB DON'T NEED THIS
+	/*private static int prefixToNumber(String prefix)
+	{
+		int size=0;
+		for (int j = 0; j < 9; j++) {
+			if (prefix.length() >= OrganicUtil.PREFIX[j].length()) {
+				if (prefix.substring(0, OrganicUtil.PREFIX[j].length()).equalsIgnoreCase(OrganicUtil.PREFIX[j]))
+				{
+					size=j+2;
+					break;
+				}//end if
+			}//end if
+		}//end for loop
+		return size;
+	}*/
+	
+	private static int chainToNumber(String chain, String suffix, String prefix) {
+		int size = 0;
 
-		} else if (chain.equals(OrganicUtil.TWO_CHAIN + suffix)) { // ethane
-			size = 2;
-
-		} else if (chain.equals(OrganicUtil.THREE_CHAIN + suffix)) { // propane
-			size = 3;
-
-		} else if (chain.equals(OrganicUtil.FOUR_CHAIN + suffix)) { // butane
-			size = 4;
-
-		} else if (chain.equals(OrganicUtil.FIVE_CHAIN + suffix)) { // pentane
-			size = 5;
-
-		} else if (chain.equals(OrganicUtil.SIX_CHAIN + suffix)) { // hexane
-			size = 6;
-
-		} else if (chain.equals(OrganicUtil.SEVEN_CHAIN + suffix)) { // heptane
-			size = 7;
-
-		} else if (chain.equals(OrganicUtil.EIGHT_CHAIN + suffix)) { // octane
-			size = 8;
-
-		} else if (chain.equals(OrganicUtil.NINE_CHAIN + suffix)) { // nonane
-			size = 9;
-
-		} else if (chain.equals(OrganicUtil.TEN_CHAIN+suffix)) { // decane
-			size = 10;
-		} // (gigantic) if
+		// compare the String to each of the main chain Strings and set the size
+		// accordingly
+		for (int i=0;i<10;i++)
+		{
+			if (chain.equalsIgnoreCase(prefix + OrganicUtil.CHAIN[i] + suffix)) { // methane
+				size = i+1;
+				break;
+			}//end if
+		}//end for
 
 		return size;
 	}
+	
 	/*
 	 * Checks whether a String is a number
 	 */
