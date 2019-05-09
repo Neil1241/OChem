@@ -106,7 +106,7 @@ public class Interpreter {
 			return ending;
 		}
 		catch (StringIndexOutOfBoundsException e)
-		{
+		{ 
 			//if error is thrown, add one to the error counter and then run itself again
 			error++;
 			ending=ending(mainChain);
