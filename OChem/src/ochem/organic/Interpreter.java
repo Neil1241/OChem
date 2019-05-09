@@ -1,11 +1,10 @@
-package ochem.organic;
+package ochem;
 
 /*
  * Interpreter
  * Created by: Neil Balaskandarajah
- * Last modified: 05/04/2019
+ * Last modified: 05/07/2019
  * Converts text names of compounds into compound objects
- * TO-DO: Add side chain location functionality
  */
 
 import java.util.ArrayList;
@@ -15,8 +14,8 @@ public class Interpreter {
 	//Attributes
 	private static StringTokenizer compoundName; //name of the compound
 	private static Compound compound; //compound to be created
-	
-	private static int main; //size of the main chain
+	private static String suffix=""; //compound suffix made more general for future use
+	private static int error=0; //counter to use for checking suffix
 	
 	private static ArrayList<String> chainNames; //all the side chains
 	private static ArrayList<Integer> chainLocations; //locations of the side chains
@@ -39,19 +38,23 @@ public class Interpreter {
 			System.out.println(chainNames.get(i)); //dbg
 		}*/
 		
-		return new Compound(0);
+		compound=new Compound(mainChainToNumber(chainNames.get(chainNames.size()-1),suffix));
+		addChains();
+		
+		
+		return compound;
 	} //end compoundFromName
 	
 	/*
 	 * Split the text form of the name into the side chains and locations
 	 */
 	private static void splitChains() {		
-		compoundName = new StringTokenizer(originalName); //Create StringTokenizer for ease of manipulation
+		compoundName = new StringTokenizer(originalName,"-,"); //Create StringTokenizer for ease of manipulation
 		
 		chainNames = new ArrayList<String>();
 		
 		while (compoundName.hasMoreTokens()) { //delimit by the hyphen and add it to the list
-			chainNames.add(compoundName.nextToken("-"));
+			chainNames.add(compoundName.nextToken());
 		} //loop
 		
 		splitLastChain(); //split the last chain and add it to the list
@@ -61,50 +64,77 @@ public class Interpreter {
 	 * Split the last chain into its elements
 	 */
 	private static void splitLastChain() {
-		StringTokenizer lastChain = new StringTokenizer(chainNames.get(chainNames.size() - 1)); //last element in list
+		String last=chainNames.get(chainNames.size() - 1);
+		int length=0;
 		chainNames.remove(chainNames.get(chainNames.size() - 1)); //remove last element
+		length=last.indexOf(OrganicUtil.ALKYL_SIDE_CHAIN);
 		
-		while(lastChain.hasMoreTokens()) {
-			chainNames.add(lastChain.nextToken(OrganicUtil.ALKYL_SIDE_CHAIN) + OrganicUtil.ALKYL_SIDE_CHAIN); //delimit by side chain signifier (will be changed later)
-		} //loop
+		
+		//try to find attached sidechain, if it fails just add the entire compound
+		if (length != -1) {
+			length += 2;
+			chainNames.add(last.substring(0, length));
+			chainNames.add(last.substring(length));
+		} 
+		else {
+			chainNames.add(last);
+		}
 		
 		//create the last chain to remove the yl
 		String mainChain = chainNames.get(chainNames.size() - 1);
+		
+		suffix=ending(mainChain);
 		chainNames.remove(chainNames.size() - 1); //remove last element
 		
-		chainNames.add(mainChain.substring(0, mainChain.length() - OrganicUtil.ALKYL_SIDE_CHAIN.length()));
+		chainNames.add(mainChain);
 	} //end splitLastChain
+	
+	private static String ending(String mainChain)
+	{
+		//string to hold the suffix and to be returned at the end
+		String ending="";
+		try
+		{
+			//based on the error counter at the beginning, determine the type of suffix
+			if (error==0)
+				ending=mainChain.substring(mainChain.indexOf(OrganicUtil.ALKANE));
+			else if (error==1)
+				ending=mainChain.substring(mainChain.indexOf(OrganicUtil.ALKENE));
+			else if (error==2)
+				ending=mainChain.substring(mainChain.indexOf(OrganicUtil.ALKYNE));
+			//end if
+			return ending;
+		}
+		catch (StringIndexOutOfBoundsException e)
+		{
+			//if error is thrown, add one to the error counter and then run itself again
+			error++;
+			ending=ending(mainChain);
+			return ending;
+		}
+	}//end ending
 	
 	/*
 	 * Remove the locations from the chain names list and add it to locations list
 	 */
 	private static void addLocations() {
-		ArrayList<Integer> numIndices = new ArrayList<Integer>(); //indices for all the numbers to remove later
 		chainLocations = new ArrayList<Integer>();
 		
 		for (int i = 0; i < chainNames.size(); i++) {
 			if (isStringNumber(chainNames.get(i))) {
 				chainLocations.add(Integer.parseInt(chainNames.get(i))); //add it to the locations list
-				numIndices.add(i); //remove it from the list
-				System.out.println("i " + i +" "+ chainNames.get(i));
+				chainNames.remove(i);
 			} //if
 		} //loop
 		
-		for (int j = 0; j < numIndices.size(); j++) {
-			System.out.println(j +" "+ chainNames.get(numIndices.get(j)));
-			chainNames.remove(chainNames.get(numIndices.get(j)));
-		}
-		
 	} //end addLocation
 	
-	/*
-	 * Add the side chains to the compound
-	 * TO-DO: add the proper location
-	 */
+
+	//Add the side chains to the compound
 	private static void addChains() {
 		//loop through the list of the text forms of the chains, convert them and add them
-		for (int i = 0; i < chainNames.size(); i++) {
-			compound.addSideChain(chainToNumber(chainNames.get(i)), 0);
+		for (int i = 0; i < chainLocations.size(); i++) {
+			compound.addSideChain(chainToNumber(chainNames.get(i)),chainLocations.get(i));
 		} //loop
 		
 	} //end addChains
@@ -118,40 +148,79 @@ public class Interpreter {
 		int size = 0;
 		
 		//compare the String to each of the main chain Strings and set the size accordingly
-		if (chain.equals(OrganicUtil.ONE_CHAIN)) { //methane
+		if (chain.equals(OrganicUtil.ONE_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //meth
 			size = 1;
 			
-		}  else if (chain.equals(OrganicUtil.TWO_CHAIN)) { //ethane
+		}  else if (chain.equals(OrganicUtil.TWO_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //eth
 			size = 2;
 			
-		} else if (chain.equals(OrganicUtil.THREE_CHAIN)) { //propane
+		} else if (chain.equals(OrganicUtil.THREE_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //prop
 			size = 3;
 			
-		} else if (chain.equals(OrganicUtil.FOUR_CHAIN)) { //butane
+		} else if (chain.equals(OrganicUtil.FOUR_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //but
 			size = 4;
 			
-		} else if (chain.equals(OrganicUtil.FIVE_CHAIN)) { //pentane
+		} else if (chain.equals(OrganicUtil.FIVE_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //pent
 			size = 5;
 				
-		} else if (chain.equals(OrganicUtil.SIX_CHAIN)) { //hexane
+		} else if (chain.equals(OrganicUtil.SIX_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //hex
 			size = 6;
 			
-		} else if (chain.equals(OrganicUtil.SEVEN_CHAIN)) { //heptane
+		} else if (chain.equals(OrganicUtil.SEVEN_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //hept
 			size = 7;
 			
-		} else if (chain.equals(OrganicUtil.EIGHT_CHAIN)) { //octane
+		} else if (chain.equals(OrganicUtil.EIGHT_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //oct
 			size = 8;
 			
-		} else if (chain.equals(OrganicUtil.NINE_CHAIN)) { //nonane
+		} else if (chain.equals(OrganicUtil.NINE_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //non
 			size = 9;
 			
-		} else if (chain.equals(OrganicUtil.TEN_CHAIN)) { //decane
+		} else if (chain.equals(OrganicUtil.TEN_CHAIN+OrganicUtil.ALKYL_SIDE_CHAIN)) { //dec
 			size = 10;
 		} //(gigantic) if
 		
 		return size;
 	} //end chainToNumber
 	
+	
+	private static int mainChainToNumber(String chain, String suffix) {
+		int size = 0;
+
+		// compare the String to each of the main chain Strings and set the size
+		// accordingly
+		if (chain.equals(OrganicUtil.ONE_CHAIN + suffix)) { // methane
+			size = 1;
+
+		} else if (chain.equals(OrganicUtil.TWO_CHAIN + suffix)) { // ethane
+			size = 2;
+
+		} else if (chain.equals(OrganicUtil.THREE_CHAIN + suffix)) { // propane
+			size = 3;
+
+		} else if (chain.equals(OrganicUtil.FOUR_CHAIN + suffix)) { // butane
+			size = 4;
+
+		} else if (chain.equals(OrganicUtil.FIVE_CHAIN + suffix)) { // pentane
+			size = 5;
+
+		} else if (chain.equals(OrganicUtil.SIX_CHAIN + suffix)) { // hexane
+			size = 6;
+
+		} else if (chain.equals(OrganicUtil.SEVEN_CHAIN + suffix)) { // heptane
+			size = 7;
+
+		} else if (chain.equals(OrganicUtil.EIGHT_CHAIN + suffix)) { // octane
+			size = 8;
+
+		} else if (chain.equals(OrganicUtil.NINE_CHAIN + suffix)) { // nonane
+			size = 9;
+
+		} else if (chain.equals(OrganicUtil.TEN_CHAIN+suffix)) { // decane
+			size = 10;
+		} // (gigantic) if
+
+		return size;
+	}
 	/*
 	 * Checks whether a String is a number
 	 */
