@@ -29,7 +29,9 @@ public class Canvas extends JComponent {
 	private final int NODE_RADIUS; //node radius
 	public static Color BACKGROUND_COLOR;
 	
-	private ArrayList<Node> singleBonds; //all the nodes in a single array
+	private ArrayList<Node> singleBonds; //all the single bonded nodes in a list
+	private ArrayList<Node> doubleBonds; //all the double bonded nodes in a list
+	private ArrayList<Node> tripleBonds; //all the double bonded nodes in a list
 	
 	/*
 	 * Create a canvas with its parent's width and height
@@ -91,7 +93,10 @@ public class Canvas extends JComponent {
 			}
 		} //outer
 		
+		//instantiate lists
 		singleBonds = new ArrayList<Node>();
+		doubleBonds = new ArrayList<Node>();
+		tripleBonds = new ArrayList<Node>();
 	} //end createNodes
 	
 	/*
@@ -102,6 +107,7 @@ public class Canvas extends JComponent {
 	private void drawNode(Graphics2D g2, Node n) {
 		g2.setColor(n.getColor());
 		
+		//draw the node using its position and dimensions
 		g2.fillOval(n.getX() - n.getRad(), n.getY() - n.getRad(), 2 * n.getRad(), 2 * n.getRad());
 	} //end drawNode
 
@@ -113,30 +119,38 @@ public class Canvas extends JComponent {
 		for (int i = 0; i < nodes.length; i++) {
 			for (int j = 0; j < nodes[i].length; j++) {
 				drawNode(g2, nodes[i][j]);
-			}
+			} //inner
 		} //outer
 	} //end drawNodes
 	
 	/*
 	 * Draw all bonds to the screen
 	 */
-	private void drawBonds(Graphics2D g2) {
-		/*for (int i = 0; i < nodes.length; i++) {
-			for (int j = 0; j < nodes[i].length; j++) {
-				//if a bond type, add it to the bonded nodes list
-				if (nodes[i][j].getType() == NodeType.SINGLE_BOND) {
-					singleBonds.add(nodes[i][j]);
-				} //if
-			}
-		} //outer
-		 */		
-		
+	private void drawBonds(Graphics2D g2) {		
 		g2.setStroke(new BasicStroke(10.0F));
 		g2.setColor(Color.BLACK);
 		//draw lines between everything in the single bonds list
 		for (int d = 0; d < singleBonds.size()-1; d++) { 
 			g2.drawLine(singleBonds.get(d).getX(), singleBonds.get(d).getY(), 
 					singleBonds.get(d+1).getX(), singleBonds.get(d+1).getY());
+		} //loop
+
+		g2.setColor(Color.RED);
+		//draw lines between everything in the double bonds list
+		for (int d = 0; d < doubleBonds.size()-1; d++) { 
+			double angle = calcAngle(doubleBonds.get(d), doubleBonds.get(d+1));
+			System.out.println(angle);
+			g2.drawLine(doubleBonds.get(d).getX(), doubleBonds.get(d).getY(), 
+					doubleBonds.get(d+1).getX(), doubleBonds.get(d+1).getY());
+		} //loop
+
+		g2.setColor(Color.BLUE);
+		//draw lines between everything in the single bonds list
+		for (int d = 0; d < tripleBonds.size()-1; d++) { 
+			
+			//rotate to draw bonds
+			g2.drawLine(tripleBonds.get(d).getX(), tripleBonds.get(d).getY(), 
+					tripleBonds.get(d+1).getX(), tripleBonds.get(d+1).getY());
 		} //loop
 	} //end drawBonds
 	
@@ -178,11 +192,11 @@ public class Canvas extends JComponent {
 				break;
 			
 			case DOUBLE_BOND:
-				
+				output = doubleBonds;
 				break;
 			
 			case TRIPLE_BOND:
-				
+				output = tripleBonds;
 				break;
 		} //switch
 		
@@ -195,7 +209,29 @@ public class Canvas extends JComponent {
 	 */
 	public NodeType getSelectedType() {
 		return palette.getSelectedType();
-	}
+	} //end getSelectedType
 	
+	/*
+	 * Remove a node from all lists
+	 * Node n - node to remove
+	 */
+	public void clearNode(Node n) {
+		//remove the node from all the lists
+		singleBonds.remove(n);
+		doubleBonds.remove(n);
+		tripleBonds.remove(n);
+	} //end clearNode
 	
+	/*
+	 * Calculate the angle between two nodes for drawing double and triple bonds
+	 * Node p1 - first node
+	 * Node p2 - secondd node
+	 * return - angle between the two values in radians
+	 */
+	public static double calcAngle(Node p1, Node p2) {
+		double dx = p2.getX() - p1.getX();
+		double dy = p2.getY() - p1.getY();
+		
+		return Math.atan2(dy,dx);
+	} //end calcAngleRad
 } //end class

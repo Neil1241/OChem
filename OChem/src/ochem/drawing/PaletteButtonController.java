@@ -20,21 +20,17 @@ public class PaletteButtonController implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent b) {
 		//get the text in the button 
-		char text = button.getText().charAt(0);
+		String text = button.getText();
 
 		//set type based on button text
-		switch (text) {
-			case 'S':
-				palette.setSelectedType(NodeType.SINGLE_BOND);
-				break;
-			
-			case 'D':
-				palette.setSelectedType(NodeType.DOUBLE_BOND);
-				break;
-			
-			case 'T':
-				palette.setSelectedType(NodeType.TRIPLE_BOND);
-				break;
+		if (text.equals("S")) {
+			palette.setSelectedType(NodeType.SINGLE_BOND);
+		} else if (text.equals("D")) {
+			palette.setSelectedType(NodeType.DOUBLE_BOND);
+		} else if (text.equals("T")) {
+			palette.setSelectedType(NodeType.TRIPLE_BOND);
+		} else if (text.equals("ERASE")) {
+			palette.setSelectedType(NodeType.BLANK);
 		} // switch
 		System.out.println(this.toString() +": "+ palette.getSelectedType().toString()); //dbg
 	}

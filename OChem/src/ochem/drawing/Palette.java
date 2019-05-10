@@ -24,6 +24,7 @@ public class Palette extends JPanel {
 	private JButton singleBnd;
 	private JButton doubleBnd;
 	private JButton tripleBnd;
+	private JButton clear;
 	
 	//current type
 	private NodeType selectedType;
@@ -67,6 +68,11 @@ public class Palette extends JPanel {
 		tripleBnd = new JButton("T");
 		tripleBnd.setPreferredSize(new Dimension(width/2, height / 5));
 		this.add(tripleBnd);
+		
+		//clear button
+		clear = new JButton("ERASE");
+		clear.setPreferredSize(new Dimension(width/2, height / 5));
+		this.add(clear);
 	} //end layoutView
 
 	/*
@@ -81,6 +87,9 @@ public class Palette extends JPanel {
 		
 		PaletteButtonController t = new PaletteButtonController(this, tripleBnd);
 		tripleBnd.addActionListener(t);
+		
+		PaletteButtonController c = new PaletteButtonController(this, clear);
+		clear.addActionListener(c);
 	} //end registerControllers
 	
 	/*
