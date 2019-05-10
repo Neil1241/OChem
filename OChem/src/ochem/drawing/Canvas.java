@@ -79,12 +79,15 @@ public class Canvas extends JComponent {
 		int widthChunk = (width - 100) / (nodes.length+1);
 		int heightChunk = (height - 50) / (nodes.length+1);
 		
+		int tag = 0;
 		for (int i = 0; i < nodes.length; i++) {
 			for (int j = 0; j < nodes[i].length; j++) {
 				int x = widthChunk * (i+1);
 				int y = heightChunk * (j+1);
 				
 				nodes[i][j] = new Node(x, y, NODE_RADIUS);
+				nodes[i][j].setTag(tag);
+				tag++;
 			}
 		} //outer
 		

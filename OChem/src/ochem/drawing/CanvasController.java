@@ -61,9 +61,9 @@ public class CanvasController implements MouseListener {
 				Node current = nodes[i][j];
 				
 				//if the click is on a node
-				if (isWithinBounds(x, y, current.getX(), current.getY(), current.getRad())) {
-					current.setType(canvas.getSelectedType()); //update the node type
-					canvas.getBonds(canvas.getSelectedType()).add(current); //add it to the list
+				if (isWithinBounds(x, y, current.getX(), current.getY(), current.getRad()) 
+						&& canvas.getSelectedType() != NodeType.BLANK) {
+					handleClick(m, current);
 					
 					//break out of the loop
 					breakOut = true;
@@ -102,4 +102,22 @@ public class CanvasController implements MouseListener {
 			return false;
 		} //if
 	} //end isWithinBounds
+	
+	/*
+	 * Handles a click action on a node
+	 * MouseEvent m - the event object created on click
+	 * Node current - current node
+	 */
+	private void handleClick(MouseEvent m, Node current) {
+		if (m.getButton() == MouseEvent.BUTTON1) { //left click
+			System.out.println("LEFT CLICK");
+			current.setType(canvas.getSelectedType());
+			canvas.getBonds(canvas.getSelectedType()).add(current);
+			
+		} else if (m.getButton() == MouseEvent.BUTTON3) { //right click
+			System.out.println("RIGHT CLICK");
+			canvas.getBonds(canvas.getSelectedType()).remove(current);
+			current.setType(NodeType.BLANK);
+		}
+	} //end handleClick
 } //end class

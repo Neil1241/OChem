@@ -17,6 +17,8 @@ public class Node {
 	private Color color; //color of the node
 	private NodeType type; //the type of node
 	
+	private int tag; //tag for the nodes
+	
 	/*
 	 * Enum containing all the states a node can be in
 	 */
@@ -40,7 +42,6 @@ public class Node {
 		
 		this.type = NodeType.BLANK;
 		this.color = Color.BLACK;
-		
 	} //end constructor
 	
 	/*
@@ -123,4 +124,12 @@ public class Node {
 	public void setType(NodeType type) {
 		this.type = type;
 	} //end setType
+	
+	public void setTag(int tag) {
+		this.tag = tag;
+	}
+	
+	public int getTag() {
+		return tag;
+	}
 } //end class
