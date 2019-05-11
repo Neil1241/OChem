@@ -1,4 +1,4 @@
-package ochem;
+package ochem.welcome;
 /*
  * WelcomeButton
  * Jordan Lin

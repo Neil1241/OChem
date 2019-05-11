@@ -55,22 +55,26 @@ public class Palette extends JPanel {
 		this.setLayout(grid);
 		
 		//single button 
-		singleBnd = new JButton("S");
+		singleBnd = new JButton("1");
+		singleBnd.setFont(singleBnd.getFont().deriveFont(120.0F));
 		singleBnd.setPreferredSize(new Dimension(width/2, height / 5));
 		this.add(singleBnd);
 		
 		//double button
-		doubleBnd = new JButton("D");
+		doubleBnd = new JButton("2");
+		doubleBnd.setFont(doubleBnd.getFont().deriveFont(120.0F));
 		doubleBnd.setPreferredSize(new Dimension(width/2, height / 5));
 		this.add(doubleBnd);
 		
 		//triple button
-		tripleBnd = new JButton("T");
+		tripleBnd = new JButton("3");
+		tripleBnd.setFont(tripleBnd.getFont().deriveFont(120.0F));
 		tripleBnd.setPreferredSize(new Dimension(width/2, height / 5));
 		this.add(tripleBnd);
 		
 		//clear button
-		clear = new JButton("ERASE");
+		clear = new JButton("E");
+		clear.setFont(clear.getFont().deriveFont(120.0F));
 		clear.setPreferredSize(new Dimension(width/2, height / 5));
 		this.add(clear);
 	} //end layoutView
@@ -79,15 +83,19 @@ public class Palette extends JPanel {
 	 * Add controllers to each button
 	 */
 	private void registerControllers() {
+		//single bond button controller
 		PaletteButtonController s = new PaletteButtonController(this, singleBnd);
 		singleBnd.addActionListener(s);
 		
+		//double bond button controller
 		PaletteButtonController d = new PaletteButtonController(this, doubleBnd);
 		doubleBnd.addActionListener(d);
 		
+		//triple bond button controller
 		PaletteButtonController t = new PaletteButtonController(this, tripleBnd);
 		tripleBnd.addActionListener(t);
 		
+		//clear button controller
 		PaletteButtonController c = new PaletteButtonController(this, clear);
 		clear.addActionListener(c);
 	} //end registerControllers

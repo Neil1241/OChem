@@ -17,6 +17,8 @@ public class CanvasController implements MouseListener {
 	//Attributes
 	private Canvas canvas; //instance of the Canvas to be updated
 	
+	private Node last; //used for validating clicks
+	
 	/*
 	 * Creates a canvas controller
 	 * Canvas canvas - instance of the canvas to be updated
@@ -62,10 +64,15 @@ public class CanvasController implements MouseListener {
 				
 				//if the click is on a node
 				if (isWithinBounds(x, y, current.getX(), current.getY(), 75)) { //change back to node radius
+					if (last == null) {
+						last = current;
+					}
+					
 					handleClick(m, current);
 					
 					//break out of the loop
 					breakOut = true;
+					last = current;
 					break;
 				} //if
 			} //inner
@@ -112,16 +119,31 @@ public class CanvasController implements MouseListener {
 			System.out.println(canvas.getSelectedType().toString());
 			
 			if (canvas.getSelectedType() != NodeType.BLANK) {
-				current.setType(canvas.getSelectedType());
-				canvas.getBonds(canvas.getSelectedType()).add(current);
+				if (isNodeClose(current)) {
+					current.setType(canvas.getSelectedType());
+					canvas.getBonds(canvas.getSelectedType()).add(current);
+				}
 			} else {
 				System.out.println("CLEAR CLICK");
 				canvas.clearNode(current);
 				current.setType(NodeType.BLANK);
-			} //else
+			} //if
 			
-		} else if (m.getButton() == MouseEvent.BUTTON3) { //right click
-			
-		}
+		} //big if
+		//button 3 for right click
 	} //end handleClick
+	
+	private boolean isNodeClose(Node current) {
+		//compare tag difference of current and last
+		//if not +-1, +-6, report error
+		//else, add
+		int diff = current.getTag() - last.getTag();
+		if (diff == 6 || diff == -6 || diff == 1 || diff == -1) {
+			DrawingGUI.reportError("");
+			return true;
+		} else {
+			DrawingGUI.reportError("Nodes too far!");
+			return false;
+		}
+	}
 } //end class

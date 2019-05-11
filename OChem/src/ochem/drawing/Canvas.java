@@ -77,16 +77,18 @@ public class Canvas extends JComponent {
 	 */
 	private void createNodes() {
 		//all regular arrays
-		nodes = new Node[6][10];
-		int widthChunk = (width - 100) / (nodes.length+1);
-		int heightChunk = (height - 50) / (nodes.length+1);
+		nodes = new Node[10][6];
+		int widthChunk = (width) / (nodes.length);
+		int heightChunk = (height) / (nodes.length);
 		
 		int tag = 0;
 		for (int i = 0; i < nodes.length; i++) {
 			for (int j = 0; j < nodes[i].length; j++) {
-				int x = widthChunk * (i+1);
-				int y = heightChunk * (j+1);
+				//calculate the node's x,y coordinates
+				int x = widthChunk * (i);
+				int y = heightChunk * (j);
 				
+				//create the node
 				nodes[i][j] = new Node(x, y, NODE_RADIUS);
 				nodes[i][j].setTag(tag);
 				tag++;
@@ -109,6 +111,10 @@ public class Canvas extends JComponent {
 		
 		//draw the node using its position and dimensions
 		g2.fillOval(n.getX() - n.getRad(), n.getY() - n.getRad(), 2 * n.getRad(), 2 * n.getRad());
+		
+		//draw tag
+		g2.setColor(Color.black);
+		g2.drawString(""+n.getTag(), n.getX(), n.getY());
 	} //end drawNode
 
 	/*
@@ -137,11 +143,18 @@ public class Canvas extends JComponent {
 
 		g2.setColor(Color.RED);
 		//draw lines between everything in the double bonds list
+		int r2 = 50; //length in pixels for bond offset
 		for (int d = 0; d < doubleBonds.size()-1; d++) { 
 			double angle = calcAngle(doubleBonds.get(d), doubleBonds.get(d+1));
 			System.out.println(angle);
-			g2.drawLine(doubleBonds.get(d).getX(), doubleBonds.get(d).getY(), 
-					doubleBonds.get(d+1).getX(), doubleBonds.get(d+1).getY());
+			int x1 = doubleBonds.get(d).getX();
+			int y1 = doubleBonds.get(d).getY();
+			int x2 = doubleBonds.get(d+1).getX();
+			int y2 = doubleBonds.get(d+1).getY();
+			
+			g2.drawLine(x1, y1, x2, y2);
+			g2.drawLine((int) (x1 + r2*Math.cos(angle)), (int) (y1 + r2*Math.sin(angle)), 
+						(int) (x2 + r2*Math.cos(angle)), (int) (y2 + r2*Math.sin(angle)));
 		} //loop
 
 		g2.setColor(Color.BLUE);
@@ -230,8 +243,27 @@ public class Canvas extends JComponent {
 	 */
 	public static double calcAngle(Node p1, Node p2) {
 		double dx = p2.getX() - p1.getX();
-		double dy = p2.getY() - p1.getY();
+		double dy = p1.getY() - p2.getY(); //1 - 2 instead because y is flipped in Graphics
 		
-		return Math.atan2(dy,dx);
+		double angle = 0;
+		
+		//if goal point lies on x or y axis (dx or dy equal to zero)
+		if(dy == 0) { //if no change in y
+			if (dx > 0) {
+				angle = 0; //dead right
+			} else if (dx < 0) {
+				angle = 180; //dead left
+			} //if
+		} else if (dx == 0) { //if no change in x
+			if (dy > 0) {
+				angle = 90; //dead ahead
+			} else if (dy < 0) {
+				angle = 270; //dead behind
+			} //if
+		} else {
+			angle = Math.atan2(dy,dx);
+		} //big if
+		
+		return angle;
 	} //end calcAngleRad
 } //end class

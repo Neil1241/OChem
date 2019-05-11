@@ -25,8 +25,8 @@ public class View extends JFrame {
 	 * Create a frame with a view proportional to the 
 	 */
 	public View() {
-		width = (int) (0.75 * OChem.width);
-		height = (int) (0.5 * OChem.height);
+		width = (int) (0.625 * OChem.width);
+		height = (int) (0.8 * OChem.height);
 		
 //		this.setPreferredSize(new Dimension(width, height));
 		

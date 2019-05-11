@@ -1,4 +1,4 @@
-package ochem;
+package ochem.welcome;
 /*
  *WelcomeButton Controller 
  * 
@@ -6,6 +6,8 @@ package ochem;
 
 //import packages
 import java.awt.event.*;
+
+import ochem.Model;
 
 public class WelcomeController implements ActionListener
 {

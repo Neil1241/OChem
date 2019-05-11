@@ -1,5 +1,6 @@
 package ochem;
 
+import ochem.welcome.WelcomeGUI;
 
 public class Model extends Object
 {
