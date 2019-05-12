@@ -1,4 +1,4 @@
-package ochem.organic;
+package ochem;
 
 /*
  * OChem
@@ -13,7 +13,6 @@ import java.io.PrintStream;
 import java.util.Scanner;
 
 public class OChem {
-	
 	/*
 	 * Instantiate the View, Model and show the frame
 	 * (Currently a test platform for the Interpreter)
@@ -28,10 +27,16 @@ public class OChem {
 		Compound compound = Interpreter.compoundFromName(cmpnd);
 		Chain[] chains=compound.getSideChains();
 		
+		out.println("------------------------------------------");
+		out.println("OCHEM RUNNING THIS");
+		out.println("------------------------------------------");
 		out.println(compound.toString());
+		out.println("------------------CYCLO-------------------");
 		out.println(compound.getMainChain().getCyclo());
 		for (int i=0;i<compound.getSideChains().length;i++)
 			out.println(chains[i].getCyclo());
+		out.println("------------------BOND--------------------");
+		out.println(compound.getMainChain().getBond());
 		in.close();
 	} //end main
 
