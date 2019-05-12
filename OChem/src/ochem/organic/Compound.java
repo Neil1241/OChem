@@ -1,4 +1,4 @@
-package ochem.organic;
+package ochem;
 
 /*
  * Compound
@@ -20,9 +20,13 @@ public class Compound {
 	 */
 	public Compound(int mainSize) {
 		mainChain = new Chain(mainSize, -1);
-		
+		mainChain.setMain();
 		sideChains = new ArrayList<Chain>(); //initialize sideChains list
 	} //end constructor
+	
+	public void addFunctionalLocation(int location) {
+		mainChain.addFunctionalLocation(location);
+	}
 	
 	public Chain getMainChain() {
 		return this.mainChain;
@@ -52,9 +56,10 @@ public class Compound {
 	public void addSideChain(int size, int location,boolean cyclo) {
 		if (location < 0) { //cannot have negative location
 			throw new IllegalArgumentException("Negative numbers not valid as location of side chain");
-		} else { //zero or greater integer
-			sideChains.add(new Chain(size, location));
-			sideChains.get(sideChains.size()-1).setCyclo(cyclo);
+		}/*else if (location>mainChain.getSize()){
+			throw new IllegalArgumentException("Locations larger than the main chain are not valid as location of side chain");
+		}*/else { //zero or greater integer
+			sideChains.add(new Chain(size, location,cyclo));
 		} //if
 	} //end addSideChain
 	
@@ -78,13 +83,17 @@ public class Compound {
 	 */
 	public String toString() { //OVERRIDEN
 		String s = "";
+		ArrayList<Integer> locations=mainChain.getFunctionalLocation();
 		
 		//main chain
 		s = s.concat("Main Chain of: " + mainChain.getSize() + "\n");
-		
+		if (locations!=null)
+			for (int i=0; i<locations.size();i++)
+				s=s.concat("Main Chain Functional Groups at "+ locations.get(i)+"\n");
 		//loop through all side chains
 		for (int i = 0; i < sideChains.size(); i++) {
-			s=s.concat("Side chain " + i + " of size: " + sideChains.get(i).getSize() + " and location: "+sideChains.get(i).getLocation()+"\n");
+			int num=i+1;
+			s=s.concat("Side chain " + num + " of size: " + sideChains.get(i).getSize() + " and location: "+sideChains.get(i).getLocation()+"\n");
 		} //loop
 		
 		return s;

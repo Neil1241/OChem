@@ -1,4 +1,6 @@
-package ochem.organic;
+package ochem;
+
+import java.util.ArrayList;
 
 /*
  * Chain
@@ -11,7 +13,10 @@ public class Chain {
 	//Attributes
 	private int size; //side of the side chain
 	private int location; //location on the main chain
-	private boolean cyclo=false;
+	private boolean cyclo;
+	private  ArrayList<Integer> functionalLocation;
+	private int bond=1;
+	private boolean main;
 	
 	/*
 	 * Creates a new chain with a size and location
@@ -22,6 +27,41 @@ public class Chain {
 	public Chain(int size, int location) {
 		this.size = size;
 		this.location = location;
+		this.cyclo=false;
+		this.bond=1;
+	} //end constructor
+	 
+	public void setMain()
+	{
+		this.main=true;
+		functionalLocation=new ArrayList<Integer>();
+	}
+	
+	public boolean isMain()
+	{
+		return this.main;
+	}
+	public void addFunctionalLocation(int l) {
+		
+		functionalLocation.add(l);
+	}
+	
+	public ArrayList<Integer> getFunctionalLocation(){
+		return functionalLocation;
+	}
+	
+	public Chain(int size, int location,boolean cyclo) {
+		this.size = size;
+		this.location = location;
+		this.cyclo=cyclo;
+		this.bond=1;
+	} //end constructor
+	
+	public Chain(int size, int location,boolean cyclo, int bond) {
+		this.size = size;
+		this.location = location;
+		this.cyclo=cyclo;
+		this.bond=bond;
 	} //end constructor
 	
 	/*
@@ -62,5 +102,13 @@ public class Chain {
 	
 	public boolean getCyclo() {
 		return this.cyclo;
+	}
+	
+	public int getBond() {
+		return this.bond;
+	}
+	
+	public void setBond(int b) {
+		this.bond=b;
 	}
 } //end Chain
