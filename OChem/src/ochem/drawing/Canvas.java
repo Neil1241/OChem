@@ -1,14 +1,13 @@
 package ochem.drawing;
 
-import java.awt.BasicStroke;
-
 /*
  * Canvas
  * Created by: Neil Balaskandarajah
- * Last modified: 05/08/2019
- * Component that draws all the nodes to the screen
+ * Last modified: 05/13/2019
+ * Components that handles drawing components to the screen
  */
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
+import ochem.organic.Chain;
 import ochem.organic.Compound;
 
 public class Canvas extends JComponent {
@@ -28,16 +28,25 @@ public class Canvas extends JComponent {
 	private ArrayList<Node> nodes; //all the nodes on the screen
 	private Node mouse; //for hovering effects
 	
-	public static Color BACKGROUND_COLOR;
+	public static Color BACKGROUND_COLOR; //background color
 	
 	private Compound master; //compound being drawn
-	private ActionType type;
+	private Chain mainChain; //main chain
+	private ArrayList<Chain> sideChains; //side chains
 	
+	private ActionType type; //type of action
+	
+	private boolean mainOnScreen; //whether a main chain is on the screen
+	
+	/*
+	 *  Types of action to determine different drawing features
+	 */
 	public static enum ActionType {
+		CLEAR,
 		MAIN,
 		SIDE,
 		FUNC_GROUP
-	}
+	} //end enum
 	
 	/*
 	 * Create a canvas with its parent's width and height
@@ -46,19 +55,33 @@ public class Canvas extends JComponent {
 	 */
 	public Canvas(int width, int height, Palette palette) {
 		super();
+		
+		//set attributes
 		this.width = width;
 		this.height = height;
 		this.palette = palette;
 		
+		//set the size of the component
 		this.setPreferredSize(new Dimension(this.width, this.height));
 		
+		//instantiate the nodes list, create the mouse node
 		nodes = new ArrayList<Node>();
 		mouse = new Node(20);
 		
-		BACKGROUND_COLOR = new Color(224, 255, 253); //pale blue
+		//pale blue
+		BACKGROUND_COLOR = new Color(224, 255, 253);
 		
-		type = ActionType.MAIN;
+		//set the type
+		type = ActionType.CLEAR;
 		
+		//set the main on screen to false
+		mainOnScreen = false;
+		
+		//instantiate the chains
+		mainChain = new Chain(0, -1);
+		sideChains = new ArrayList<Chain>();
+		
+		//add the controllers to the canvas
 		registerControllers();
 	} //end constructor
 	
@@ -70,8 +93,6 @@ public class Canvas extends JComponent {
 		Graphics2D g2 = (Graphics2D) g;
 		
 		//background
-//		g2.setColor(BACKGROUND_COLOR); 
-//		g2.fillRect(0, 0, width, height);
 		g2.setBackground(BACKGROUND_COLOR);
 		g2.clearRect(0,0, width + 30, height + 30);
 		
@@ -79,6 +100,7 @@ public class Canvas extends JComponent {
 		drawMain(g2); //draw the main chain
 		drawSides(g2); //draw the side chains
 		
+		//draw all the nodes
 		g2.setColor(Color.BLACK);
 		for (Node n : nodes) {
 			g2.fillOval(n.getX() - n.getRad(), n.getY() - n.getRad(), n.getRad() * 2, n.getRad() * 2);
@@ -92,21 +114,32 @@ public class Canvas extends JComponent {
 	private void drawGhost(Graphics2D g2) {
 		
 		switch (type) {
-			case MAIN:
-				int arm = 150;
-				int xOffset = (int) (arm * Math.cos(Math.toRadians(-30)));
-				int yOffset = (int) (arm * Math.sin(Math.toRadians(-30)));
-				
-				BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-				g2.setStroke(bs);
-
-				g2.setColor(new Color(50,238,50, 255));
-				g2.drawLine(mouse.getX(), mouse.getY(), mouse.getX() + xOffset, mouse.getY() + yOffset);
-
-				g2.setColor(new Color(50,50,50, 100));
+			case CLEAR:
+				g2.setColor(new Color(50,238,50, 100));
 				g2.fillOval(mouse.getCenterX(), mouse.getCenterY(), mouse.getDia(), mouse.getDia());
-				g2.fillOval(mouse.getCenterX() + xOffset, mouse.getCenterY() + yOffset, mouse.getDia(), mouse.getDia());
-				
+				break;
+		
+			//main arm
+			case MAIN:
+				if (!mainOnScreen) {
+					//calculating constants for rotated arm
+					int arm = 150;
+					int xOffset = (int) (arm * Math.cos(Math.toRadians(-30)));
+					int yOffset = (int) (arm * Math.sin(Math.toRadians(-30)));
+					
+					//create stroke object for drawing lines
+					BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+					g2.setStroke(bs);
+	
+					//set the color and draw the line
+					g2.setColor(new Color(50,238,50, 255));
+					g2.drawLine(mouse.getX(), mouse.getY(), mouse.getX() + xOffset, mouse.getY() + yOffset);
+	
+					//change the color and draw the nodes
+					g2.setColor(new Color(50,50,50, 100));
+					g2.fillOval(mouse.getCenterX(), mouse.getCenterY(), mouse.getDia(), mouse.getDia());
+					g2.fillOval(mouse.getCenterX() + xOffset, mouse.getCenterY() + yOffset, mouse.getDia(), mouse.getDia());
+				}
 				break;
 				
 			case SIDE:
@@ -127,10 +160,15 @@ public class Canvas extends JComponent {
 		
 	}
 	
+	public void setMainSize(int main) {
+		mainChain.setSize(main);
+	}
+	
 	/*
 	 * Update the screen
 	 */
 	public void update() {
+		type = palette.getSelectedType();
 		repaint();
 	} //end update
 	
@@ -142,38 +180,6 @@ public class Canvas extends JComponent {
 		this.addMouseListener(cc);
 		this.addMouseMotionListener(cc);
 	} //end registerControllers
-	
-	/*
-	 * Calculate the angle between two nodes for drawing double and triple bonds
-	 * Node p1 - first node
-	 * Node p2 - secondd node
-	 * return - angle between the two values in radians
-	 */
-	public static double calcAngle(Node p1, Node p2) {
-		double dx = p2.getX() - p1.getX();
-		double dy = p1.getY() - p2.getY(); //1 - 2 instead because y is flipped in Graphics
-		
-		double angle = 0;
-		
-		//if goal point lies on x or y axis (dx or dy equal to zero)
-		if(dy == 0) { //if no change in y
-			if (dx > 0) {
-				angle = 0; //dead right
-			} else if (dx < 0) {
-				angle = 180; //dead left
-			} //if
-		} else if (dx == 0) { //if no change in x
-			if (dy > 0) {
-				angle = 90; //dead ahead
-			} else if (dy < 0) {
-				angle = 270; //dead behind
-			} //if
-		} else {
-			angle = Math.atan2(dy,dx);
-		} //big if
-		
-		return angle;
-	} //end calcAngleRad
 	
 	/*
 	 * Add a node to the canvas
@@ -191,4 +197,11 @@ public class Canvas extends JComponent {
 	public void setMouseXY(int x, int y) {
 		mouse.setXY(x, y);
 	} //end setMouseXY
+	
+	/*
+	 * Tell the canvas that there is a main chain on the screen already
+	 */
+	public void setMainOnScreen(boolean val) {
+		mainOnScreen = val;
+	} //end setMainOnScreen
 } //end class

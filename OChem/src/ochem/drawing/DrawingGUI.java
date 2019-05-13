@@ -4,15 +4,18 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class DrawingGUI extends JPanel {
 	private int width;
 	private int height;
 	private Canvas canvas;
 	private Palette palette;
+	
 	private static OBox dialog;
+	private static JTextField userInput;
 	
 	private final double CANVAS_SCALE = 0.8;
 	private final double ERROR_SCALE = 0.1;
@@ -44,13 +47,23 @@ public class DrawingGUI extends JPanel {
 	}
 	
 	private void addDialogBox() {
-		dialog = new OBox(width, (int) (height * ERROR_SCALE), "No errors detected");
+		JPanel dialogPanel = new JPanel();
+		double DIALOG_SCALE = 0.9;
+		
+		dialog = new OBox((int) (DIALOG_SCALE * width), (int) (height * ERROR_SCALE), "No errors detected");
 		dialog.setBackgroundColor(Color.BLACK);
 		dialog.setTextColor(Color.GREEN);
 		dialog.setCornerRadius(20);
 		dialog.setFontSize(80.0F);
+		dialogPanel.add(dialog);
 		
-		this.add(dialog, BorderLayout.SOUTH);
+		userInput = new JTextField("", SwingConstants.CENTER);
+		userInput.setPreferredSize(new Dimension((int) ((1 - DIALOG_SCALE) * width), (int) (height * ERROR_SCALE))); 
+		userInput.setFont(userInput.getFont().deriveFont(80.0F));
+		
+		dialogPanel.add(userInput);
+		
+		this.add(dialogPanel, BorderLayout.SOUTH);
 	}	
 	
 	public static void reportError(String message) {
@@ -63,5 +76,9 @@ public class DrawingGUI extends JPanel {
 		dialog.setTextColor(Color.GREEN);
 		dialog.setText(message);
 		dialog.update();
+	}
+	
+	public static String getUserInput() {
+		return userInput.getText();
 	}
 } //end class

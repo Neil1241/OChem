@@ -34,7 +34,7 @@ public class PaletteButtonController implements MouseListener {
 
 		//set type based on button text
 		if (text.equals("Main")) {
-			palette.setSelectedType(ActionType.MAIN);
+			palette.setSelectedType(ActionType.MAIN);			
 		} else if (text.equals("Side")) {
 			palette.setSelectedType(ActionType.SIDE);
 		} else if (text.equals("Function")) {
@@ -42,6 +42,8 @@ public class PaletteButtonController implements MouseListener {
 		} // switch
 		
 		button.update();
+		
+		palette.update();
 		System.out.println(palette.getSelectedType().toString());
 	}
 
