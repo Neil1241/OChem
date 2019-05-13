@@ -6,9 +6,15 @@ package ochem.welcome;
  * 
  */
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+
 //import packages
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class WelcomeGUI extends JPanel
 {

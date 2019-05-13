@@ -12,10 +12,10 @@ public class DrawingGUI extends JPanel {
 	private int height;
 	private Canvas canvas;
 	private Palette palette;
-	private static JLabel error;
+	private static OBox dialog;
 	
 	private final double CANVAS_SCALE = 0.8;
-	private final double ERROR_SCALE = 0.05;
+	private final double ERROR_SCALE = 0.1;
 	
 	public DrawingGUI(int width, int height) {		
 		this.width = width;
@@ -30,7 +30,7 @@ public class DrawingGUI extends JPanel {
 		
 		addPalette();
 		addCanvas();
-		addErrorPanel();
+		addDialogBox();
 	}
 
 	private void addPalette() {
@@ -43,15 +43,25 @@ public class DrawingGUI extends JPanel {
 		this.add(canvas, BorderLayout.CENTER);
 	}
 	
-	private void addErrorPanel() {
-		error = new JLabel("No errors detected");
-		error.setFont(error.getFont().deriveFont(50.0F));
-		error.setPreferredSize(new Dimension(width, (int) (height * ERROR_SCALE)));
-		this.add(error, BorderLayout.SOUTH);
+	private void addDialogBox() {
+		dialog = new OBox(width, (int) (height * ERROR_SCALE), "No errors detected");
+		dialog.setBackgroundColor(Color.BLACK);
+		dialog.setTextColor(Color.GREEN);
+		dialog.setCornerRadius(20);
+		dialog.setFontSize(80.0F);
+		
+		this.add(dialog, BorderLayout.SOUTH);
 	}	
 	
 	public static void reportError(String message) {
-		error.setForeground(Color.red);
-		error.setText(message);
+		dialog.setTextColor(Color.RED);
+		dialog.setText(message);
+		dialog.update();
+	}
+	
+	public static void showMessage(String message) {
+		dialog.setTextColor(Color.GREEN);
+		dialog.setText(message);
+		dialog.update();
 	}
 } //end class

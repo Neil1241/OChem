@@ -2,8 +2,6 @@ package ochem;
 
 import java.awt.Toolkit;
 
-import ochem.drawing.DrawingGUI;
-
 public class OChem {
 	public static int width;
 	public static int height;

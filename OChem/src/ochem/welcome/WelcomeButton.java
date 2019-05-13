@@ -6,9 +6,11 @@ package ochem.welcome;
  * Extend the JButton object ot be able to change the background
  */
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 //import packages
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
 
 public class WelcomeButton extends JButton 
 {

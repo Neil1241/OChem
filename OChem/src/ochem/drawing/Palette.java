@@ -1,12 +1,11 @@
 package ochem.drawing;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import ochem.drawing.Node.NodeType;
+import ochem.drawing.Canvas.ActionType;
 
 /*
  * Palette
@@ -21,13 +20,12 @@ public class Palette extends JPanel {
 	private int height;
 	
 	//Buttons
-	private JButton singleBnd;
-	private JButton doubleBnd;
-	private JButton tripleBnd;
-	private JButton clear;
+	private OBox main;
+	private OBox side;
+	private OBox func;
 	
 	//current type
-	private NodeType selectedType;
+	private ActionType selectedType;
 	
 	/*
 	 * Creates a palette with a width and a height
@@ -40,8 +38,6 @@ public class Palette extends JPanel {
 		
 		this.setPreferredSize(new Dimension(width, height));
 		
-		selectedType = NodeType.BLANK;
-		
 		layoutView();
 		registerControllers();
 	} //end constructor
@@ -50,61 +46,45 @@ public class Palette extends JPanel {
 	 * Add all the buttons to the palette
 	 */
 	private void layoutView() {
-		//add layout to panel
-		GridLayout grid = new GridLayout(2,5, 5,5); //2x5 grid with 5 pixel gap all around
-		this.setLayout(grid);
+		//main chain button
+		main = new OBox(width, height/3, "Main");
+		main.setTextColor(Color.BLACK);
+		this.add(main);
 		
-		//single button 
-		singleBnd = new JButton("1");
-		singleBnd.setFont(singleBnd.getFont().deriveFont(120.0F));
-		singleBnd.setPreferredSize(new Dimension(width/2, height / 5));
-		this.add(singleBnd);
+		//side chain button
+		side = new OBox(width, height/3, "Side");
+		side.setTextColor(Color.BLACK);
+		this.add(side);
 		
-		//double button
-		doubleBnd = new JButton("2");
-		doubleBnd.setFont(doubleBnd.getFont().deriveFont(120.0F));
-		doubleBnd.setPreferredSize(new Dimension(width/2, height / 5));
-		this.add(doubleBnd);
-		
-		//triple button
-		tripleBnd = new JButton("3");
-		tripleBnd.setFont(tripleBnd.getFont().deriveFont(120.0F));
-		tripleBnd.setPreferredSize(new Dimension(width/2, height / 5));
-		this.add(tripleBnd);
-		
-		//clear button
-		clear = new JButton("E");
-		clear.setFont(clear.getFont().deriveFont(120.0F));
-		clear.setPreferredSize(new Dimension(width/2, height / 5));
-		this.add(clear);
+		//functional group button 
+		func = new OBox(width, height/3, "Function");
+		func.setTextColor(Color.BLACK);
+		func.setFontSize(90.0F);
+		this.add(func);
 	} //end layoutView
 
 	/*
 	 * Add controllers to each button
 	 */
 	private void registerControllers() {
-		//single bond button controller
-		PaletteButtonController s = new PaletteButtonController(this, singleBnd);
-		singleBnd.addActionListener(s);
-		
-		//double bond button controller
-		PaletteButtonController d = new PaletteButtonController(this, doubleBnd);
-		doubleBnd.addActionListener(d);
-		
-		//triple bond button controller
-		PaletteButtonController t = new PaletteButtonController(this, tripleBnd);
-		tripleBnd.addActionListener(t);
-		
-		//clear button controller
-		PaletteButtonController c = new PaletteButtonController(this, clear);
-		clear.addActionListener(c);
+		//main chain button controller
+		PaletteButtonController mainC = new PaletteButtonController(this, main);
+		main.addMouseListener(mainC);
+
+		//side chain button controller
+		PaletteButtonController sideC = new PaletteButtonController(this, side);
+		side.addMouseListener(sideC);
+
+		//functional group button controller
+		PaletteButtonController funcC = new PaletteButtonController(this, func);
+		func.addMouseListener(funcC);
 	} //end registerControllers
 	
 	/*
 	 * Return the selected type of node
 	 * return selectedType - currently selected node type
 	 */
-	public NodeType getSelectedType() {
+	public ActionType getSelectedType() {
 		return selectedType;
 	} //end getSelectedType
 	
@@ -112,7 +92,7 @@ public class Palette extends JPanel {
 	 * Set the selected type of node
 	 * NodeType type - type of node selected
 	 */
-	public void setSelectedType(NodeType type) {
+	public void setSelectedType(ActionType type) {
 		selectedType = type;
 	} //end setNodeType	
 } //end class

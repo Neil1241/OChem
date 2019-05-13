@@ -30,6 +30,15 @@ public class Node {
 	} //end enum
 	
 	/*
+	 * Creates a blank node at origin with a radius
+	 */
+	public Node(int rad) {
+		this.x = 0;
+		this.y = 0;
+		this.rad = rad;
+	} //end constructor
+	
+	/*
 	 * Creates a node with an (x,y) coordinate for its top left corner and a radius
 	 * int x - x value for top left
 	 * int y - y value for top left
@@ -69,12 +78,36 @@ public class Node {
 	} //end getY
 	
 	/*
+	 * Get the center x of the node
+	 * return - center x value
+	 */
+	public int getCenterX() {
+		return x - rad;
+	} //end getCenterX
+	
+	/*
+	 * Get the center y of the node
+	 * return - center y value
+	 */
+	public int getCenterY() {
+		return y - rad;
+	} //end getCenterY
+	
+	/*
 	 * Get the radius of the node
 	 * return rad - radius of the circle
 	 */
 	public int getRad() {
 		return rad;
 	} //end getRad
+	
+	/*
+	 * Get the diameter of the node
+	 * return dia - diameter of the circle
+	 */
+	public int getDia() {
+		return 2 * rad;
+	} //end getDia
 	
 	/*
 	 * Get the color of the node

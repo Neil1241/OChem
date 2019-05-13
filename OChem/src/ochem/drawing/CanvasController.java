@@ -9,15 +9,11 @@ package ochem.drawing;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
+import java.awt.event.MouseMotionListener;
 
-import ochem.drawing.Node.NodeType;
-
-public class CanvasController implements MouseListener {
+public class CanvasController implements MouseListener, MouseMotionListener {
 	//Attributes
 	private Canvas canvas; //instance of the Canvas to be updated
-	
-	private Node last; //used for validating clicks
 	
 	/*
 	 * Creates a canvas controller
@@ -49,38 +45,10 @@ public class CanvasController implements MouseListener {
 	/*
 	 *	Updates nodes based on when its clicked
 	 */
-	public void mousePressed(MouseEvent m) {
-		Node[][] nodes = canvas.getNodes();
+	public void mousePressed(MouseEvent m) {		
+		Node current = new Node(m.getX(), m.getY(), 20);
 		
-		//get mouse coordinates
-		int x = m.getX();
-		int y = m.getY();
-		
-		//loop through all nodes to check if the click was on one of them
-		boolean breakOut = false; //break out of both loops is this is true
-		for (int i = 0; i < nodes.length; i++) {
-			for (int j = 0; j < nodes[i].length; j++) {
-				Node current = nodes[i][j];
-				
-				//if the click is on a node
-				if (isWithinBounds(x, y, current.getX(), current.getY(), 75)) { //change back to node radius
-					if (last == null) {
-						last = current;
-					}
-					
-					handleClick(m, current);
-					
-					//break out of the loop
-					breakOut = true;
-					last = current;
-					break;
-				} //if
-			} //inner
-			
-			if (breakOut) {
-				break;
-			} //if
- 		} //outer 
+		handleClick(m, current);
 		
 		canvas.update();
 	}
@@ -89,7 +57,19 @@ public class CanvasController implements MouseListener {
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	/*
+	 * Handles a click action on a node
+	 * MouseEvent m - the event object created on click
+	 * Node current - current node
+	 */
+	private void handleClick(MouseEvent m, Node current) {
+		if (m.getButton() == MouseEvent.BUTTON1) { //left click
+			canvas.addNode(current);
+			DrawingGUI.reportError(canvas.getWidth() - m.getX() +" "+ (canvas.getHeight() - m.getY()));
+		}
+	} //end handleClick
+	
 	/*
 	 * Check whether one point is within a radius around a target point 
 	 * int x1 - current point x
@@ -108,42 +88,16 @@ public class CanvasController implements MouseListener {
 			return false;
 		} //if
 	} //end isWithinBounds
-	
-	/*
-	 * Handles a click action on a node
-	 * MouseEvent m - the event object created on click
-	 * Node current - current node
-	 */
-	private void handleClick(MouseEvent m, Node current) {
-		if (m.getButton() == MouseEvent.BUTTON1) { //left click
-			System.out.println(canvas.getSelectedType().toString());
-			
-			if (canvas.getSelectedType() != NodeType.BLANK) {
-				if (isNodeClose(current)) {
-					current.setType(canvas.getSelectedType());
-					canvas.getBonds(canvas.getSelectedType()).add(current);
-				}
-			} else {
-				System.out.println("CLEAR CLICK");
-				canvas.clearNode(current);
-				current.setType(NodeType.BLANK);
-			} //if
-			
-		} //big if
-		//button 3 for right click
-	} //end handleClick
-	
-	private boolean isNodeClose(Node current) {
-		//compare tag difference of current and last
-		//if not +-1, +-6, report error
-		//else, add
-		int diff = current.getTag() - last.getTag();
-		if (diff == 6 || diff == -6 || diff == 1 || diff == -1) {
-			DrawingGUI.reportError("");
-			return true;
-		} else {
-			DrawingGUI.reportError("Nodes too far!");
-			return false;
-		}
+
+	@Override
+	public void mouseDragged(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent m) {
+		canvas.setMouseXY(m.getX(), m.getY());
+		canvas.update();
 	}
 } //end class
