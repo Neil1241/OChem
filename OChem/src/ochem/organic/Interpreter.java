@@ -3,6 +3,7 @@ package ochem.organic;
 /*
  * Interpreter
  * Created by: Neil Balaskandarajah
+ * Everything else: Jordan
  * Last modified: 05/07/2019
  * Converts text names of compounds into compound objects
  */
@@ -42,32 +43,31 @@ public class Interpreter {
 		if (front.equalsIgnoreCase(OrganicUtil.PREFIX[9]))
 			compound.getMainChain().setCyclo(true);
 
-		//set the mainchain bond type and get their locations
+		// set the mainchain bond type and get their locations
 		compound.getMainChain().setBond(mainBond);
 		for (int i = 1; i <= additionalGroups; i++)
 			compound.addFunctionalLocation(chainLocations.get(chainLocations.size() - i));
 
-		//add sidechains
+		// add sidechains
 		addChains();
 
 		return compound;
 	} // end compoundFromName
 
-	
 	// Split the text form of the name into the side chains and locations
 	private static void splitChains() {
 		// delimit by the hyphen, commas and spaces. and add it to the list
 		compoundName = new StringTokenizer(originalName, "-, "); // Create StringTokenizer for ease of manipulation
 		chainNames = new ArrayList<String>();
- 
-		//temporary variable
-		String temp = ""; //holds the next token
-		
-		//loop while there are more tokens
+
+		// temporary variable
+		String temp = ""; // holds the next token
+
+		// loop while there are more tokens
 		while (compoundName.hasMoreTokens()) {
 			temp = compoundName.nextToken();
-			
-			//if the token says acid append it with the last token
+
+			// if the token says acid append it with the last token
 			if (temp.equalsIgnoreCase("acid")) {
 				temp = chainNames.get(chainNames.size() - 1) + " " + temp;
 				chainNames.remove(chainNames.remove(chainNames.size() - 1));
@@ -79,9 +79,7 @@ public class Interpreter {
 		splitLastChain(); // split the last chain and add it to the list
 	} // end splitChains()
 
-	/*
-	 * Split the last chain into its elements
-	 */
+	// Split the last chain into its elements
 	private static void splitLastChain() {
 		// local variables
 		String last = chainNames.get(chainNames.size() - 1);
@@ -114,7 +112,7 @@ public class Interpreter {
 		if (!suffix.equalsIgnoreCase("ane"))
 			preSuffix(last);
 
-		// System.out.println(suffix);
+		System.out.println(suffix);
 		// use last chain to determine if multiple suffixes
 
 	} // end splitLastChain
@@ -139,136 +137,84 @@ public class Interpreter {
 					} // end if
 				} // end if
 			} // end for loop
-		}
-	}
+		}//end for
+	}//end relistchain
 
+	//check if any of the suffixes have prefixes
 	private static void preSuffix(String mainChain) {
 		// check on the last occurrence of this method if the suffix is an single,
 		// double or triple bond
-		String temp = "";
+		String temp = suffix;
+		String mid = "";
+		int chain = 0;
+		boolean multi=false;
+
+		// determine chain of mainchain
 		for (int i = 0; i < OrganicUtil.CHAIN.length; i++) {
-			// temp variables
-			int length = OrganicUtil.CHAIN[i].length() - 1;
-			int ending;
-			String mid;
-			boolean found = false;
-			boolean firstFound = false;
-			int same = -2;
+			if (front.equalsIgnoreCase(OrganicUtil.PREFIX[9])) {
+				if (mainChain.substring(0, OrganicUtil.CHAIN[i].length() + 5)
+						.equalsIgnoreCase("cyclo" + OrganicUtil.CHAIN[i]))
+					chain = OrganicUtil.CHAIN[i].length() + 5;
+			} else if (mainChain.substring(0, OrganicUtil.CHAIN[i].length()).equalsIgnoreCase(OrganicUtil.CHAIN[i])) {
+				chain = OrganicUtil.CHAIN[i].length();
+			}
+		}
 
-			// if the length of the main chaing is larger than the length of the chain then
-			// see if the functional groups have prefixes
-			if (mainChain.length() > length) {
-				try {
-					// setting variables for ease of use
-					ending = mainChain.length() - temp.length();
-					if (front.equalsIgnoreCase(OrganicUtil.PREFIX[9])) {
-						mid = mainChain.substring(length + OrganicUtil.PREFIX[9].length(), ending);
-					} else {
-						mid = mainChain.substring(length, ending);
-					}
+		mid = mainChain.substring(chain);
+		System.out.println(mid);
+		suffix = mid;
 
-					// check for first occurrence of prefix
-					if (!firstFound) {
-						for (int j = 0; j < OrganicUtil.PREFIX.length; j++) {
-							if (mid.length() > OrganicUtil.PREFIX[j].length()) {
-								if (mid.indexOf(OrganicUtil.PREFIX[j]) != -1 && i != 9) {
-									same = mid.indexOf(OrganicUtil.PREFIX[j]);
-									temp = OrganicUtil.PREFIX[j];
-									additionalGroups = j + 2;
-									// System.out.println(temp);
-									firstFound = true;
-									break;
-								} // end if
-							} // end if
-						} // end for
-					}
+		mid=checkPrefix(mid);
 
-					if (mid.length() > 2) {
+		// check bond type
+		if (mid.substring(0, 2).equalsIgnoreCase("an")) {
+			mainBond = 1;
+			if (mid.length() > 3)
+				if (chainLocations.size() == 0) {
+					additionalGroups++;
+					chainLocations.add(1);
+				}//end if
+		} else if (mid.substring(0, 2).equalsIgnoreCase("en")) {
+			additionalGroups++;
+			if (chainLocations.size() == 0)
+				chainLocations.add(1);
+			mainBond = 2;
+		} else if (mid.substring(0, 2).equalsIgnoreCase("yn")) {
+			additionalGroups++;
+			if (chainLocations.size() == 0)
+				chainLocations.add(1);
+			mainBond = 3;
+		}else
+			System.out.println("BREAK");
+		// end if
 
-						// add to the temp depending on what bond type if found
-						if (mid.substring(0, 2).equalsIgnoreCase("an")) {
-							temp = "an" + temp;
-							;
-							mainBond = 1;
-						} else if (mid.substring(0, 2).equalsIgnoreCase("en")) {
-							temp = "en" + temp;
-							additionalGroups++;
-							chainLocations.add(1);
-							mainBond = 2;
-						} else if (mid.substring(0, 2).equalsIgnoreCase("yn")) {
-							temp = "yn" + temp;
-							additionalGroups++;
-							chainLocations.add(1);
-							mainBond = 3;
-						} // end if
-						else if (mid.substring(temp.length(), temp.length() + 2).equalsIgnoreCase("an")) {
-							temp += "an";
-							mainBond = 1;
-						} else if (mid.substring(temp.length(), temp.length() + 2).equalsIgnoreCase("en")) {
-							temp += "en";
-							mainBond = 2;
-						} else if (mid.substring(temp.length(), temp.length() + 2).equalsIgnoreCase("yn")) {
-							temp += "yn";
-							mainBond = 3;
-						} // end if
-						else
-							System.out.println("DIED");
-					} // end if
-						// System.out.println("AFTER IF");
-						// System.out.println(temp); dbg
+		try {
+			mid = mid.substring(2, mid.length() - temp.length());
+			System.out.println("----------------------------\n"+mid);
+			temp=checkPrefix(mid);
+			if (!mid.equalsIgnoreCase(mid))
+				multi=true;
+		} catch (StringIndexOutOfBoundsException e) {
+			// System.out.println("CAUGHT");
+		} // end try catch
 
-					// check if the ending has a prefix else return the suffix without any prefixes
-					if (!found && mid.length() > 2) {
-						for (int j = 0; j < OrganicUtil.PREFIX.length; j++) {
-
-							// System.out.println("---------");
-							// System.out.println(mid);
-							// System.out.println(suffix); dbg
-
-							// search for secondary prefix on a suffix
-							if (mid.length() > OrganicUtil.PREFIX[j].length()) {
-								if (mid.lastIndexOf(OrganicUtil.PREFIX[j]) > -1 && i != 9) {
-									// if same suffix is found set this loop equal to true and set suffix equal to
-									// temp + suffix
-									if (mid.lastIndexOf(OrganicUtil.PREFIX[j]) == same) {
-										suffix = temp + suffix;
-										found = true;
-										break;
-									} else {
-										suffix = temp + OrganicUtil.PREFIX[j] + suffix;
-										additionalGroups += j + 2;
-										found = true;
-										System.out.println("SUFFIX - " + suffix);
-										break;
-									} // end if
-								} // end if
-							} // end if
-						} // end for
-
-						// break if a prefix is found
-						if (found)
-							break;
-					} else {
-						suffix = temp + suffix;
-						break;
-					} // end if
-				} catch (StringIndexOutOfBoundsException e) {
-					// System.out.println(suffix);
-					if (suffix.equalsIgnoreCase("ane")) {
-						additionalGroups = 0;
-					} else if (chainLocations.size() - chainNames.size() < 0) {
-						chainLocations.add(1);
-						additionalGroups = 1;
-						// System.out.println(additionalGroups);
-					} else if (chainLocations.size() - chainNames.size() == 0) {
-						additionalGroups = 1;
-					}
-					// System.out.println("------------------------------");
-					System.out.println("ERROR");
-				} // end try catch
-			} // end if
-		} // end for
+		if(multi)
+			additionalGroups--;
 	}// end preSuffix
+
+	private static String checkPrefix(String mid) {
+		for (int i = 0; i < OrganicUtil.PREFIX.length; i++) {
+			try {
+				if (OrganicUtil.PREFIX[i].equalsIgnoreCase(mid.substring(0, OrganicUtil.PREFIX[i].length()))) {
+					additionalGroups += i + 2;
+					mid = mid.substring(OrganicUtil.PREFIX[i].length());
+				} // end if
+			} catch (StringIndexOutOfBoundsException e) {
+				// System.out.println("CAUGHT");
+			}
+		} // end for
+		return mid;
+	}
 
 	// method tries to obtain the ending suffix of the mainChain and returns it
 	// found
@@ -292,8 +238,7 @@ public class Interpreter {
 		return ending;
 	}// end mainChainEnding
 
-	
-	// Remove the locations from the chain names list and add it to locations list 
+	// Remove the locations from the chain names list and add it to locations list
 	private static void addLocations() {
 		chainLocations = new ArrayList<Integer>();
 
@@ -331,7 +276,7 @@ public class Interpreter {
 						chainLocations.get(i), cyclo);
 			} catch (IndexOutOfBoundsException e) {
 				System.out.println("NOT ENOUGH LOCATIONS");
-			} // end try catcc
+			} // end try catch
 		} // loop
 	} // end addChains
 
@@ -350,10 +295,9 @@ public class Interpreter {
 				break;
 			} // end if
 		} // end for
-			// System.out.println("CHAIN TO NUMBER : " + prefix + OrganicUtil.CHAIN[size -
-			// 1] + suffix);// dbg
+			// System.out.println("CHAIN TO NUMBER : " + prefix + suffix);// dbg
 		return size;
-	}//end chainToNumber
+	}// end chainToNumber
 
 	// Checks whether a String is a valid number/position
 	private static boolean isStringNumber(String str) {
