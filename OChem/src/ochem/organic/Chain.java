@@ -15,7 +15,7 @@ public class Chain {
 	private int location; //location on the main chain
 	private boolean cyclo;
 	private  ArrayList<Integer> functionalLocation;
-	private int bond=1;
+	private int bond = 1;
 	private boolean main;
 	
 	/*

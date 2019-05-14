@@ -61,6 +61,9 @@ public class DrawingGUI extends JPanel {
 		userInput.setPreferredSize(new Dimension((int) ((1 - DIALOG_SCALE) * width), (int) (height * ERROR_SCALE))); 
 		userInput.setFont(userInput.getFont().deriveFont(80.0F));
 		
+		UserInputController uic = new UserInputController(canvas);
+		userInput.addKeyListener(uic);
+		
 		dialogPanel.add(userInput);
 		
 		this.add(dialogPanel, BorderLayout.SOUTH);

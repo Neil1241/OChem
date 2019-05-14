@@ -65,8 +65,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 */
 	private void handleClick(MouseEvent m, Node current) {
 		if (m.getButton() == MouseEvent.BUTTON1) { //left click
-			canvas.addNode(current);
 			DrawingGUI.reportError(m.getX() +" "+ (canvas.getHeight() - m.getY()));
+			canvas.setMainOnScreen(true);
 		}
 	} //end handleClick
 	
@@ -97,23 +97,11 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseMoved(MouseEvent m) {
-		if (isNumber(DrawingGUI.getUserInput())) {
-			canvas.setMainSize(Integer.parseInt(DrawingGUI.getUserInput()));
+		if (!canvas.getMainOnScreen()) {
+			canvas.setMouseXY(m.getX(), m.getY());
 		}
-		canvas.setMouseXY(m.getX(), m.getY());
 		canvas.update();
 	}
 	
-	/*
-	 * Checks if a String is a valid number
-	 */
-	private boolean isNumber(String text) {
-		try {
-			Integer.parseInt(text);
-			return true;
-		} catch (NumberFormatException n) {
-			
-			return false;
-		}
-	} //end isNumber
+	
 } //end class

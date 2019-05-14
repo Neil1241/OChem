@@ -24,14 +24,15 @@ public class Canvas extends JComponent {
 	private int width; //width of component
 	private int height; //height of component
 	private Palette palette; //instance of the palette
-
-	private ArrayList<Node> nodes; //all the nodes on the screen
+	
 	private Node mouse; //for hovering effects
 	
 	public static Color BACKGROUND_COLOR; //background color
 	
 	private Compound master; //compound being drawn
 	private Chain mainChain; //main chain
+	private ArrayList<Node> mainNodes; //nodes for the main chain
+	
 	private ArrayList<Chain> sideChains; //side chains
 	
 	private ActionType type; //type of action
@@ -65,7 +66,6 @@ public class Canvas extends JComponent {
 		this.setPreferredSize(new Dimension(this.width, this.height));
 		
 		//instantiate the nodes list, create the mouse node
-		nodes = new ArrayList<Node>();
 		mouse = new Node(20);
 		
 		//pale blue
@@ -78,8 +78,11 @@ public class Canvas extends JComponent {
 		mainOnScreen = false;
 		
 		//instantiate the chains
-		mainChain = new Chain(0, -1);
+		mainChain = new Chain(0, -1);		
 		sideChains = new ArrayList<Chain>();
+		
+		//instantiate lists for the nodes on the main chain
+		mainNodes = new ArrayList<Node>();
 		
 		//add the controllers to the canvas
 		registerControllers();
@@ -96,15 +99,17 @@ public class Canvas extends JComponent {
 		g2.setBackground(BACKGROUND_COLOR);
 		g2.clearRect(0,0, width + 30, height + 30);
 		
-		drawGhost(g2); //draw the selected chain by the mouse
-		drawMain(g2); //draw the main chain
+		//if there is no main on screen
+		if (!mainOnScreen) {
+			drawGhost(g2); //draw the selected chain by the mouse
+			System.out.println(false);
+		} else {
+			drawMain(g2, mainNodes.get(0)); //draw the main chain	
+			System.out.println(true);
+		} //if
+		
 		drawSides(g2); //draw the side chains
 		
-		//draw all the nodes
-		g2.setColor(Color.BLACK);
-		for (Node n : nodes) {
-			g2.fillOval(n.getX() - n.getRad(), n.getY() - n.getRad(), n.getRad() * 2, n.getRad() * 2);
-		} //loop
 	}  //end paintComponent
 	
 	/*
@@ -121,25 +126,8 @@ public class Canvas extends JComponent {
 		
 			//main arm
 			case MAIN:
-				if (!mainOnScreen) {
-					//calculating constants for rotated arm
-					int arm = 150;
-					int xOffset = (int) (arm * Math.cos(Math.toRadians(-30)));
-					int yOffset = (int) (arm * Math.sin(Math.toRadians(-30)));
-					
-					//create stroke object for drawing lines
-					BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-					g2.setStroke(bs);
-	
-					//set the color and draw the line
-					g2.setColor(new Color(50,238,50, 255));
-					g2.drawLine(mouse.getX(), mouse.getY(), mouse.getX() + xOffset, mouse.getY() + yOffset);
-	
 					//change the color and draw the nodes
-					g2.setColor(new Color(50,50,50, 100));
-					g2.fillOval(mouse.getCenterX(), mouse.getCenterY(), mouse.getDia(), mouse.getDia());
-					g2.fillOval(mouse.getCenterX() + xOffset, mouse.getCenterY() + yOffset, mouse.getDia(), mouse.getDia());
-				}
+					drawMain(g2, mouse);
 				break;
 				
 			case SIDE:
@@ -152,8 +140,43 @@ public class Canvas extends JComponent {
 		} //switch
 	} //end drawGhost
 	
-	private void drawMain(Graphics2D g2) {
+	/*
+	 * Draws the main chain from a starting point
+	 * Node start - starting point
+	 */
+	private void drawMain(Graphics2D g2, Node start) {
+		BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		g2.setStroke(bs);
 		
+		if (mainOnScreen) {
+			g2.setColor(Color.BLACK);
+		} else {
+			g2.setColor(new Color(50,50,50, 100));
+		}
+		
+		int startX = start.getCenterX();
+		int startY = start.getCenterY();
+		
+		double angle = Math.toRadians(30);
+		int arm = 150;
+		
+		for (int i = 1; i < mainChain.getSize(); i++) {
+			//change angle based on even/odd
+			angle *= -1;
+			
+			//calculate the arm offset
+			int endX = (int) (arm * Math.cos(angle)) + startX;
+			int endY = (int) (arm * Math.sin(angle)) + startY;
+			
+			//draw the line
+			g2.drawLine(startX, startY, endX, endY);
+			
+			//change the start point
+			mainNodes.add(new Node(startX, startY, 30));
+			
+			startX = endX;
+			startY = endY;
+		}
 	}
 	
 	private void drawSides(Graphics2D g2) {
@@ -169,6 +192,10 @@ public class Canvas extends JComponent {
 	 */
 	public void update() {
 		type = palette.getSelectedType();
+		if (type == ActionType.CLEAR) {
+			mainOnScreen = false;
+		}
+		
 		repaint();
 	} //end update
 	
@@ -182,20 +209,17 @@ public class Canvas extends JComponent {
 	} //end registerControllers
 	
 	/*
-	 * Add a node to the canvas
-	 * Node n - new addition to Node list
-	 */
-	public void addNode(Node n) {
-		nodes.add(n);
-	} //end addNode
-	
-	/*
 	 * Set the x and y of the mouse
 	 * int x - mouse x
 	 * int y - mouse y
 	 */
 	public void setMouseXY(int x, int y) {
 		mouse.setXY(x, y);
+		
+		if (!mainOnScreen) {
+			mainNodes.add(0, mouse);
+			System.out.println("updated main node");
+		} 
 	} //end setMouseXY
 	
 	/*
@@ -204,4 +228,11 @@ public class Canvas extends JComponent {
 	public void setMainOnScreen(boolean val) {
 		mainOnScreen = val;
 	} //end setMainOnScreen
+	
+	/*
+	 * Get whether there is a main chain on the screen
+	 */
+	public boolean getMainOnScreen() {
+		return mainOnScreen;
+	} //end getMainOnScreen
 } //end class

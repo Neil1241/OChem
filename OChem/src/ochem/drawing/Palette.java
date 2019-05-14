@@ -23,6 +23,9 @@ public class Palette extends JPanel {
 	private OBox main;
 	private OBox side;
 	private OBox func;
+	private OBox clear;
+	
+	private final int NUM_BUTTONS = 4;
 	
 	//current type
 	private ActionType selectedType;
@@ -49,20 +52,26 @@ public class Palette extends JPanel {
 	 */
 	private void layoutView() {
 		//main chain button
-		main = new OBox(width, height/3, "Main");
+		main = new OBox(width, height/NUM_BUTTONS, "Main");
 		main.setTextColor(Color.BLACK);
 		this.add(main);
 		
 		//side chain button
-		side = new OBox(width, height/3, "Side");
+		side = new OBox(width, height/NUM_BUTTONS, "Side");
 		side.setTextColor(Color.BLACK);
 		this.add(side);
 		
 		//functional group button 
-		func = new OBox(width, height/3, "Function");
+		func = new OBox(width, height/NUM_BUTTONS, "Function");
 		func.setTextColor(Color.BLACK);
 		func.setFontSize(90.0F);
 		this.add(func);
+		
+		//clear button
+		clear = new OBox(width, height/NUM_BUTTONS, "Clear");
+		clear.setTextColor(Color.BLACK);
+		clear.setFontSize(90.0F);
+		this.add(clear);
 	} //end layoutView
 
 	/*
@@ -80,6 +89,10 @@ public class Palette extends JPanel {
 		//functional group button controller
 		PaletteButtonController funcC = new PaletteButtonController(this, func);
 		func.addMouseListener(funcC);
+		
+		//clear button controller
+		PaletteButtonController clearC = new PaletteButtonController(this, clear);
+		clear.addMouseListener(clearC);
 	} //end registerControllers
 	
 	/*
