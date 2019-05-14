@@ -69,7 +69,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			canvas.setMainOnScreen(true);
 		}
 	} //end handleClick
-	
+	 
 	/*
 	 * Check whether one point is within a radius around a target point 
 	 * int x1 - current point x
