@@ -14,30 +14,30 @@ import java.util.Scanner;
 
 public class OChem {
 	/*
-	 * Instantiate the View, Model and show the frame
-	 * (Currently a test platform for the Interpreter)
+	 * Instantiate the View, Model and show the frame (Currently a test platform for
+	 * the Interpreter)
 	 */
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		PrintStream out = System.out;
-		
+
 		out.println("Enter name of compound: ");
-		String cmpnd = in.next();
-		
+		String cmpnd = in.nextLine();
+
 		Compound compound = Interpreter.compoundFromName(cmpnd);
-		Chain[] chains=compound.getSideChains();
-		
+		Chain[] chains = compound.getSideChains();
+
 		out.println("------------------------------------------");
 		out.println("OCHEM RUNNING THIS");
 		out.println("------------------------------------------");
 		out.println(compound.toString());
 		out.println("------------------CYCLO-------------------");
 		out.println(compound.getMainChain().getCyclo());
-		for (int i=0;i<compound.getSideChains().length;i++)
+		for (int i = 0; i < compound.getSideChains().length; i++)
 			out.println(chains[i].getCyclo());
 		out.println("------------------BOND--------------------");
 		out.println(compound.getMainChain().getBond());
 		in.close();
-	} //end main
+	} // end main
 
-} //end OChem
+} // end OChem
