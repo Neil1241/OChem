@@ -6,12 +6,14 @@ import java.awt.event.KeyListener;
 public class UserInputController implements KeyListener {
 	//Attributes
 	private Canvas canvas;
+	private Palette palette;
 	
 	//Constants
 	private final int ENTER_KEY = 10;
 	
-	public UserInputController(Canvas canvas) {
+	public UserInputController(Canvas canvas, Palette palette) {
 		this.canvas = canvas;
+		this.palette = palette;
 	}
 
 	@Override
@@ -29,7 +31,18 @@ public class UserInputController implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent k) {
 		if ((int) k.getKeyChar() == ENTER_KEY && isNumber(DrawingGUI.getUserInput())) {
-			canvas.setMainSize(Integer.parseInt(DrawingGUI.getUserInput()));
+			int num = Integer.parseInt(DrawingGUI.getUserInput());
+			
+			switch (palette.getSelectedType()) {
+			
+			case MAIN:
+				canvas.setMainSize(num);
+				break;
+				
+			case SIDE:
+				canvas.getSideChains().get(0).setSize(num);
+				break;
+			}
 		}
 		
 	} //end keyTyped

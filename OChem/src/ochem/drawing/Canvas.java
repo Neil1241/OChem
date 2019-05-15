@@ -34,6 +34,7 @@ public class Canvas extends JComponent {
 	private ArrayList<Node> mainNodes; //nodes for the main chain
 	
 	private ArrayList<Chain> sideChains; //side chains
+	private ArrayList<Node> sideNodes; //nodes for the side chain
 	
 	private ActionType type; //type of action
 	
@@ -81,8 +82,9 @@ public class Canvas extends JComponent {
 		mainChain = new Chain(0, -1);		
 		sideChains = new ArrayList<Chain>();
 		
-		//instantiate lists for the nodes on the main chain
+		//instantiate lists for the nodes on the main chain and side chains
 		mainNodes = new ArrayList<Node>();
+		sideNodes = new ArrayList<Node>();
 		
 		//add the controllers to the canvas
 		registerControllers();
@@ -102,13 +104,11 @@ public class Canvas extends JComponent {
 		//if there is no main on screen
 		if (!mainOnScreen) {
 			drawGhost(g2); //draw the selected chain by the mouse
-			System.out.println(false);
 		} else {
-			drawMain(g2, mainNodes.get(0)); //draw the main chain	
-			System.out.println(true);
+			drawChain(g2, mainNodes.get(0), 30); //draw the main chain
+			drawSides(g2); //draw the side chains
 		} //if
 		
-		drawSides(g2); //draw the side chains
 		
 	}  //end paintComponent
 	
@@ -127,7 +127,7 @@ public class Canvas extends JComponent {
 			//main arm
 			case MAIN:
 					//change the color and draw the nodes
-					drawMain(g2, mouse);
+					drawChain(g2, mouse, 30);
 				break;
 				
 			case SIDE:
@@ -144,7 +144,7 @@ public class Canvas extends JComponent {
 	 * Draws the main chain from a starting point
 	 * Node start - starting point
 	 */
-	private void drawMain(Graphics2D g2, Node start) {
+	private void drawChain(Graphics2D g2, Node start, double startAngle) {
 		BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
 		
@@ -157,7 +157,7 @@ public class Canvas extends JComponent {
 		int startX = start.getCenterX();
 		int startY = start.getCenterY();
 		
-		double angle = Math.toRadians(30);
+		double angle = Math.toRadians(startAngle);
 		int arm = 150;
 		
 		for (int i = 1; i < mainChain.getSize(); i++) {
@@ -177,10 +177,43 @@ public class Canvas extends JComponent {
 			startX = endX;
 			startY = endY;
 		}
+		
+		//add last node
+		mainNodes.add(new Node(startX, startY, 30));
 	}
 	
 	private void drawSides(Graphics2D g2) {
-		
+		g2.setColor(Color.ORANGE);
+		for (Node n : sideNodes) {
+			int startX = n.getCenterX();
+			int startY = n.getCenterY();
+			
+			double angle = Math.toRadians(90);
+			int arm = 150;
+			
+			for (int i = 1; i < mainChain.getSize(); i++) {
+				//change angle based on even/odd
+				if (i % 2 == 0) {
+					angle = 90;
+				} else {
+					angle = 60;
+				}
+				
+				//calculate the arm offset
+				int endX = (int) (arm * Math.cos(angle)) + startX;
+				int endY = (int) (arm * Math.sin(angle)) + startY;
+				
+				//draw the line
+				g2.drawLine(startX, startY, endX, endY);
+				
+				//change the start point
+				mainNodes.add(new Node(startX, startY, 30));
+				
+				startX = endX;
+				startY = endY;
+			}
+		}
+		System.out.println("drawSides");
 	}
 	
 	public void setMainSize(int main) {
@@ -218,7 +251,6 @@ public class Canvas extends JComponent {
 		
 		if (!mainOnScreen) {
 			mainNodes.add(0, mouse);
-			System.out.println("updated main node");
 		} 
 	} //end setMouseXY
 	
@@ -235,4 +267,32 @@ public class Canvas extends JComponent {
 	public boolean getMainOnScreen() {
 		return mainOnScreen;
 	} //end getMainOnScreen
+	
+	/*
+	 * Get the current type for the canvas
+	 */
+	public ActionType getType() {
+		return type;
+	} //end getType
+	
+	/*
+	 * Get the nodes on the main chain
+	 */
+	public ArrayList<Node> getMainNodes() {
+		return mainNodes;
+	} //end getMainNodes
+	
+	/*
+	 * Add side node to the side nodes list
+	 */
+	public void addSideNode(Node n) {
+		sideNodes.add(n);
+	} //end addSideNode
+	
+	/*
+	 * Get the side chains
+	 */
+	public ArrayList<Chain> getSideChains() {
+		return sideChains;
+	}
 } //end class

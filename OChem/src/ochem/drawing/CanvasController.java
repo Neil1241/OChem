@@ -10,6 +10,7 @@ package ochem.drawing;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 public class CanvasController implements MouseListener, MouseMotionListener {
 	//Attributes
@@ -65,8 +66,28 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 */
 	private void handleClick(MouseEvent m, Node current) {
 		if (m.getButton() == MouseEvent.BUTTON1) { //left click
-			DrawingGUI.reportError(m.getX() +" "+ (canvas.getHeight() - m.getY()));
-			canvas.setMainOnScreen(true);
+			switch (canvas.getType()) {
+				case MAIN: 
+					DrawingGUI.reportError(m.getX() +" "+ (canvas.getHeight() - m.getY()));
+					canvas.setMainOnScreen(true);
+					break;
+					
+				case SIDE:
+					ArrayList<Node> nodes = canvas.getMainNodes();
+					
+					for (int i = 0; i < nodes.size(); i++) {
+						if (isWithinBounds(current.getCenterX(), current.getCenterY(),
+								nodes.get(i).getCenterX(), nodes.get(i).getCenterY(), 20)) {
+							canvas.addSideNode(nodes.get(i));
+						}	
+					} //loop
+					break;
+					
+				case CLEAR:
+					break;
+				case FUNC_GROUP:
+					break;
+			}
 		}
 	} //end handleClick
 	 
@@ -99,8 +120,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	public void mouseMoved(MouseEvent m) {
 		if (!canvas.getMainOnScreen()) {
 			canvas.setMouseXY(m.getX(), m.getY());
+			canvas.update();
 		}
-		canvas.update();
 	}
 	
 	

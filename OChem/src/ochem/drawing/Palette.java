@@ -110,27 +110,4 @@ public class Palette extends JPanel {
 	public void setSelectedType(ActionType type) {
 		selectedType = type;
 	} //end setNodeType	
-	
-	/*
-	 * Updates the dialog box based on the selected type
-	 */
-	public void update() {
-		switch (selectedType) {
-			case CLEAR:
-				DrawingGUI.showMessage("Select a feature to add");
-				break;
-			
-			case MAIN:
-				DrawingGUI.showMessage("Enter size of the main chain");
-				break;
-				
-			case SIDE:
-				DrawingGUI.showMessage("Click the location of the side chain");
-				break;
-				
-			case FUNC_GROUP:
-				DrawingGUI.showMessage("Click the location of the functional group");				
-				break;
-		}
-	}
 } //end class
