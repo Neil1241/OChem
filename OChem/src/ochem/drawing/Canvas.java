@@ -193,7 +193,7 @@ public class Canvas extends JComponent {
 			
 			for (int i = 1; i < mainChain.getSize(); i++) {
 				//change angle based on even/odd
-				if (i % 2 == 0) {
+				if (i % 2 == 0) { 
 					angle = 90;
 				} else {
 					angle = 60;
