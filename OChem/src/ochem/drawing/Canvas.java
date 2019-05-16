@@ -40,14 +40,28 @@ public class Canvas extends JComponent {
 	
 	private boolean mainOnScreen; //whether a main chain is on the screen
 	
+	private int mainStep; //step for the "main" button
+	
 	/*
-	 *  Types of action to determine different drawing features
+	 * Types of action to determine different drawing features
 	 */
 	public static enum ActionType {
 		CLEAR,
 		MAIN,
 		SIDE,
 		FUNC_GROUP
+	} //end enum
+	
+	/*
+	 * Different directions the chain can be drawn in
+	 */
+	private enum DrawDirection {
+		UP_RIGHT,
+		RIGHT,
+		DOWN_RIGHT,
+		DOWN_LEFT,
+		LEFT,
+		UP_LEFT
 	} //end enum
 	
 	/*
@@ -79,12 +93,15 @@ public class Canvas extends JComponent {
 		mainOnScreen = false;
 		
 		//instantiate the chains
-		mainChain = new Chain(0, -1);		
+		mainChain = new Chain(0, "-1");		
 		sideChains = new ArrayList<Chain>();
 		
 		//instantiate lists for the nodes on the main chain and side chains
 		mainNodes = new ArrayList<Node>();
 		sideNodes = new ArrayList<Node>();
+		
+		//set the step numbers to zero when not being used, increment when needed
+		mainStep = 0;
 		
 		//add the controllers to the canvas
 		registerControllers();
@@ -101,16 +118,47 @@ public class Canvas extends JComponent {
 		g2.setBackground(BACKGROUND_COLOR);
 		g2.clearRect(0,0, width + 30, height + 30);
 		
-		//if there is no main on screen
-		if (!mainOnScreen) {
-			drawGhost(g2); //draw the selected chain by the mouse
-		} else {
-			drawChain(g2, mainNodes.get(0), 30); //draw the main chain
-			drawSides(g2); //draw the side chains
-		} //if
+		g2.setColor(Color.BLACK);
 		
+		//test
+		drawChain(g2, new Node(width/2,height/2, 10), DrawDirection.UP_RIGHT, 4);
+		drawGhost(g2);
 		
 	}  //end paintComponent
+	
+	private void mainAction(Graphics2D g2) {
+		switch (mainStep) {
+			//size definition step
+			case 1: 
+			/*
+			 * palette sets selected type
+			 * canvas gets that type
+			 * dialog box says "enter main size"
+			 * user types the #
+			 */
+			break;
+			
+			//location selection step
+			case 2: 
+			/*
+			 * draws the ghost with the size previously selected
+			 * dialog box says to choose a location
+			 */
+			
+			break;
+			
+			//fixed on screen step
+			case 3: 
+			/*
+			 * draw main to the screen
+			 * dialog goes blank
+			 * mainOnScreen is true (so click doesn't set mainStep to zero)
+			 */
+			
+			break;
+			
+		}
+	}
 	
 	/*
 	 * Draw the ghost
@@ -127,7 +175,7 @@ public class Canvas extends JComponent {
 			//main arm
 			case MAIN:
 					//change the color and draw the nodes
-					drawChain(g2, mouse, 30);
+//					drawChain(g2, mouse, 30);
 				break;
 				
 			case SIDE:
@@ -144,43 +192,84 @@ public class Canvas extends JComponent {
 	 * Draws the main chain from a starting point
 	 * Node start - starting point
 	 */
-	private void drawChain(Graphics2D g2, Node start, double startAngle) {
-		BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+	private void drawChain(Graphics2D g2, Node start, DrawDirection dir, int chainSize) {
+		BasicStroke bs = new BasicStroke(12.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
 		
-		if (mainOnScreen) {
-			g2.setColor(Color.BLACK);
-		} else {
-			g2.setColor(new Color(50,50,50, 100));
-		}
+		//starting x and y coordinates
+		int x1 = start.getX();
+		int y1 = start.getY();
 		
-		int startX = start.getCenterX();
-		int startY = start.getCenterY();
+		double[] angles = angleFromDirection(dir); //get the angles based on the direction
+		int arm = 120; //length of bonds in pixels
 		
-		double angle = Math.toRadians(startAngle);
-		int arm = 150;
+		Color c = new Color(0,0,0); //dbg
 		
-		for (int i = 1; i < mainChain.getSize(); i++) {
-			//change angle based on even/odd
-			angle *= -1;
+		//test
+		g2.fillOval(start.getCenterX(), start.getCenterY(), start.getDia(), start.getDia());
+		
+		for (int i = 0; i < chainSize-1; i++) {
+			//current angle to draw (alternate between the 2 angles)
+			double ang = angles[i % 2]; 
 			
-			//calculate the arm offset
-			int endX = (int) (arm * Math.cos(angle)) + startX;
-			int endY = (int) (arm * Math.sin(angle)) + startY;
+			//dbg with progressively lightening colors
+			int inc = 40;
+			Color newClr = new Color(c.getRed() + inc, c.getGreen() + inc, c.getBlue() + inc);
+			g2.setColor(newClr);
+			
+			//calculate the end points for the line
+			int x2 = (int) (arm * Math.cos(Math.toRadians(ang))) + x1;
+			int y2 = (int) (arm * Math.sin(Math.toRadians(ang))) + y1;
 			
 			//draw the line
-			g2.drawLine(startX, startY, endX, endY);
+			g2.drawLine(x1, y1, x2, y2);
 			
-			//change the start point
-			mainNodes.add(new Node(startX, startY, 30));
+			//change the start point to this end for next loop
+			x1 = x2;
+			y1 = y2;
 			
-			startX = endX;
-			startY = endY;
-		}
+			c = newClr;
+		} //loop
+	} //end drawChain
+	
+	/*
+	 * Choose the pair of angles from the direction chosen
+	 */
+	private double[] angleFromDirection(DrawDirection dir) {
+		double[] angles;
 		
-		//add last node
-		mainNodes.add(new Node(startX, startY, 30));
-	}
+		//different directions require different pairs of numbers to switch between
+		switch (dir) {
+			case DOWN_LEFT: //good
+				angles = new double[] {90,120};
+				break;
+				
+			case DOWN_RIGHT: //good
+				angles = new double[] {90,60};
+				break;
+				
+			case LEFT: //good
+				angles = new double[] {-150,150};
+				break;
+				
+			case RIGHT: //good
+				angles = new double[] {-30,30};
+				break;
+				
+			case UP_LEFT: //good
+				angles = new double[] {270,240};
+				break;
+				
+			case UP_RIGHT: //good
+				angles = new double[] {270,300};
+				break;
+				
+			default:
+				throw new IllegalArgumentException("What direction is this???");
+		} //switch
+		
+		return angles;
+	} //end angleFromDirection
 	
 	private void drawSides(Graphics2D g2) {
 		g2.setColor(Color.ORANGE);
@@ -224,11 +313,6 @@ public class Canvas extends JComponent {
 	 * Update the screen
 	 */
 	public void update() {
-		type = palette.getSelectedType();
-		if (type == ActionType.CLEAR) {
-			mainOnScreen = false;
-		}
-		
 		repaint();
 	} //end update
 	
@@ -294,5 +378,30 @@ public class Canvas extends JComponent {
 	 */
 	public ArrayList<Chain> getSideChains() {
 		return sideChains;
-	}
+	} //end getSideChains
+	
+	/*
+	 * Update the type of the canvas from the palette type
+	 */
+	public void updateActionType() {
+		type = palette.getSelectedType();
+		if (type == ActionType.CLEAR) {
+			mainOnScreen = false;
+		} //if
+	} //end updateActionType
+	
+	/*
+	 * Get the step for main drawing
+	 */
+	public int getMainStep() {
+		return mainStep;
+	} //end getMainStep
+	
+	/*
+	 * Set the step for main drawing
+	 */
+	public void setMainStep(int step) {
+		mainStep = step;
+	} //end setMainStep
+	
 } //end class

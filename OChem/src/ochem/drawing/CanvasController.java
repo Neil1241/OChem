@@ -122,7 +122,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			canvas.setMouseXY(m.getX(), m.getY());
 			canvas.update();
 		}
-	}
+	} //end mouse moved
 	
 	
 } //end class
