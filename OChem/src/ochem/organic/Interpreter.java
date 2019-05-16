@@ -21,7 +21,7 @@ public class Interpreter {
 	private static int mainBond;
 	private static String front = "";
 	private static ArrayList<String> chainNames; // all the side chains
-	private static ArrayList<Integer> chainLocations; // locations of the side chains
+	private static ArrayList<String> chainLocations; // locations of the side chains
 	private static String originalName; // original name of String
 	private static int additionalGroups = 0;
 
@@ -34,11 +34,11 @@ public class Interpreter {
 
 		splitChains(); // remove all the hyphens in the String
 
-		System.out.println("------------------ELEMENTS-------------------");
+		System.out.println("----------------ELEMENTS-----------------");
 		// print out the elements in the array
 		for (int i = 0; i < chainNames.size(); i++)
 			System.out.println(chainNames.get(i)); // dbg
-		System.out.println("---------------------------------------------");
+		System.out.println("-----------------------------------------");
 
 		// create compound and set if the main chain is a cyclo
 		compound = new Compound(chainToNumber(chainNames.get(chainNames.size() - 1), suffix, front));
@@ -59,13 +59,13 @@ public class Interpreter {
 	// Split the text form of the name into the side chains and locations
 	private static void splitChains() {
 		// delimit by the hyphen, commas and spaces. and add it to the list
-		compoundName = new StringTokenizer(originalName," -,"); // Create StringTokenizer for ease of manipulation
+		compoundName = new StringTokenizer(originalName, " -,"); // Create StringTokenizer for ease of manipulation
 		chainNames = new ArrayList<String>();
 
 		// temporary variable
 		String temp = ""; // holds the next token
 
-		//System.out.println(compoundName.countTokens());
+		// System.out.println(compoundName.countTokens());
 		// loop while there are more tokens
 		while (compoundName.hasMoreTokens()) {
 			temp = compoundName.nextToken();
@@ -74,7 +74,7 @@ public class Interpreter {
 			if (temp.equalsIgnoreCase("acid")) {
 				temp = chainNames.get(chainNames.size() - 1) + " " + temp;
 				chainNames.remove(chainNames.remove(chainNames.size() - 1));
-				//System.out.println(chainNames.get(chainNames.size()-1));
+				// System.out.println(chainNames.get(chainNames.size()-1));
 				chainNames.add(temp);
 			} else
 				chainNames.add(temp);
@@ -151,19 +151,23 @@ public class Interpreter {
 		String temp = suffix;
 		String mid = "";
 		int chain = 0;
-		//int loseMore=0;
+		// int loseMore=0;
 
 		// determine chain of mainchain
 		for (int i = 0; i < OrganicUtil.CHAIN.length; i++) {
-			if (front.equalsIgnoreCase(OrganicUtil.PREFIX[9])) {
-				if (mainChain.substring(0, OrganicUtil.CHAIN[i].length() + 5)
-						.equalsIgnoreCase("cyclo" + OrganicUtil.CHAIN[i])) {
-					chain = OrganicUtil.CHAIN[i].length() + 5;
-					//loseMore=i+1;
+			try {
+				if (front.equalsIgnoreCase(OrganicUtil.PREFIX[9])) {
+					if (mainChain.substring(0, OrganicUtil.CHAIN[i].length() + 5)
+							.equalsIgnoreCase("cyclo" + OrganicUtil.CHAIN[i])) {
+						chain = OrganicUtil.CHAIN[i].length() + 5;
+						// loseMore=i+1;
+					}
+				} else if (mainChain.substring(0, OrganicUtil.CHAIN[i].length())
+						.equalsIgnoreCase(OrganicUtil.CHAIN[i])) {
+					chain = OrganicUtil.CHAIN[i].length();
+					// loseMore=i+1;
 				}
-			} else if (mainChain.substring(0, OrganicUtil.CHAIN[i].length()).equalsIgnoreCase(OrganicUtil.CHAIN[i])) {
-				chain = OrganicUtil.CHAIN[i].length();
-				//loseMore=i+1;
+			} catch (StringIndexOutOfBoundsException e) {
 			}
 		}
 
@@ -176,60 +180,64 @@ public class Interpreter {
 		// check bond type
 		if (mid.substring(0, 2).equalsIgnoreCase("an")) {
 			mainBond = 1;
-			if (mid.length() > 3)
-				if (chainLocations.size()-chainNames.size() == 0) {
-					additionalGroups++;
-					chainLocations.add(1);
-				} // end if
-		} else if (mid.substring(0, 2).equalsIgnoreCase("en")) {
-			if (chainLocations.size()-chainNames.size()==0||chainLocations.size()-chainNames.size()==-1) {
+			if (mid.length() > 3) {
+				if ((chainLocations.size() - chainNames.size()) == -1) 
+					chainLocations.add("1");
+				 // end if
 				additionalGroups++;
-				chainLocations.add(1);
 			}
+		} else if (mid.substring(0, 2).equalsIgnoreCase("en")) {
+			if ((chainLocations.size() - chainNames.size()) == 0 || (chainLocations.size() - chainNames.size()) == -1)
+				chainLocations.add("1");
+			additionalGroups++;
 			mainBond = 2;
 		} else if (mid.substring(0, 2).equalsIgnoreCase("yn")) {
-			if (chainLocations.size()-chainNames.size()== 0||chainLocations.size()-chainNames.size()==-1)
-				additionalGroups++;
-			chainLocations.add(1);
+			if ((chainLocations.size() - chainNames.size()) == 0 || (chainLocations.size() - chainNames.size()) == -1)
+				chainLocations.add("1");
+			additionalGroups++;
 			mainBond = 3;
 		} else
 			System.out.println("BREAK");
 		// end if
-		
 
 		try {
+			String hold = mid.substring(0, 2);
 			mid = mid.substring(2, mid.length() - temp.length());
-			System.out.println("----------------------------\n" + mid);
-			if (mid.length()!=0) {
+			System.out.println("--------------MID--------------\n" + mid);
+			if (mid.length() != 0) {
 				temp = checkPrefix(mid);
-			}else {
-				if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[0])) {
-					if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[1])) {
-						if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[2])) {
-							if (chainLocations.size() == 1 || chainLocations.size() == 0)
-								chainLocations.add(1);
-							additionalGroups++;
-						}//end if
-					}//end if
-				}//end if
-			}//end if
-			
+			} else {
+				System.out.println(temp);
+				if (!hold.equalsIgnoreCase("an")) {
+					if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[0])) {
+						if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[1])) {
+							if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[2])) {
+								if ((chainLocations.size() - chainNames.size()) == -1
+										|| (chainLocations.size() - chainNames.size()) == 0)
+									chainLocations.add("1");
+								additionalGroups++;
+							} // end if
+						} // end if
+					} // end if
+				} // end if
+			} // end if
+
 		} catch (StringIndexOutOfBoundsException e) {
 			System.out.println("CAUGHT");
 			if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[0])) {
 				if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[1])) {
 					if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[2])) {
-						if (chainLocations.size() == 1 || chainLocations.size() == 0)
-							chainLocations.add(1);
+						if ((chainLocations.size() - chainNames.size()) == -1
+								|| (chainLocations.size() - chainNames.size()) == 0)
+							chainLocations.add("1");
 						additionalGroups++;
-					}//end if
-				}//end if
-			}//end if
+					} // end if
+				} // end if
+			} // end if
 		} // end try catch
-		
+
 	}// end preSuffix
 
-	
 	private static String checkPrefix(String mid) {
 		for (int i = 0; i < OrganicUtil.PREFIX.length; i++) {
 			try {
@@ -244,7 +252,6 @@ public class Interpreter {
 		return mid;
 	}
 
-	
 	// method tries to obtain the ending suffix of the mainChain and returns it
 	// found
 	private static String mainChainEnding(String mainChain) {
@@ -261,7 +268,7 @@ public class Interpreter {
 			// if error is thrown, add one to the error counter and then run itself again
 			error++;
 			ending = mainChainEnding(mainChain);
-		}// end try catch
+		} // end try catch
 
 		// return the result
 		return ending;
@@ -269,17 +276,16 @@ public class Interpreter {
 
 	// Remove the locations from the chain names list and add it to locations list
 	private static void addLocations() {
-		chainLocations = new ArrayList<Integer>();
+		chainLocations = new ArrayList<String>();
 
 		for (int i = 0; i < chainNames.size(); i++) {
 			if (isStringNumber(chainNames.get(i))) {
-				chainLocations.add(Integer.parseInt(chainNames.get(i))); // add it to the locations list
+				chainLocations.add(chainNames.get(i)); // add it to the locations list
 				chainNames.remove(i);
 				i--;
 			} // if
 		} // loop
 	} // end addLocation
-	
 
 	// Add the side chains to the compound
 	private static void addChains() {
@@ -289,7 +295,7 @@ public class Interpreter {
 			// temporary variables
 			String temp = chainNames.get(i);
 			String prefix = "";
-			int spot=-8;
+			int spot = -8;
 			boolean cyclo = false;
 			int cycloLength = OrganicUtil.PREFIX[9].length();
 
@@ -300,10 +306,10 @@ public class Interpreter {
 					prefix = OrganicUtil.PREFIX[9];
 				} /// end if
 			} // end if
-			
-			for (int j=0;j<OrganicUtil.SIDE_CHAIN_SUFFIX.length;j++) {
-				if (temp.indexOf(OrganicUtil.SIDE_CHAIN_SUFFIX[j])!=-1){
-					spot=j;
+
+			for (int j = 0; j < OrganicUtil.SIDE_CHAIN_SUFFIX.length; j++) {
+				if (temp.indexOf(OrganicUtil.SIDE_CHAIN_SUFFIX[j]) != -1) {
+					spot = j;
 					break;
 				}
 			}
@@ -334,14 +340,12 @@ public class Interpreter {
 				break;
 			} // end if
 		} // end for
-		
-		for (int i = 0; i < 10; i++) {
+
 			if (chain.equalsIgnoreCase(prefix + suffix)) {
-				size = i + 1;
-				break;
+				size = 1;
 			} // end if
-		} // end for
-			System.out.println("CHAIN TO NUMBER : " + prefix + suffix);// dbg
+			
+		System.out.println("CHAIN TO NUMBER : " + prefix + suffix);// dbg
 		return size;
 	}// end chainToNumber
 

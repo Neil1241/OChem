@@ -18,12 +18,12 @@ public class Compound {
 	 * Create a compound with a main chain int mainSize - size of the main chain
 	 */
 	public Compound(int mainSize) {
-		mainChain = new Chain(mainSize, -1);
+		mainChain = new Chain(mainSize, "-1");
 		mainChain.setMain();
 		sideChains = new ArrayList<Chain>(); // initialize sideChains list
 	} // end constructor
 
-	public void addFunctionalLocation(int location) {
+	public void addFunctionalLocation(String location) {
 		mainChain.addFunctionalLocation(location);
 	}
 
@@ -49,16 +49,19 @@ public class Compound {
 	 * Add a side chain to the compound int size - size of the side chain int
 	 * location - location of the side chain on the main chain
 	 */
-	public void addSideChain(int size, int location, boolean cyclo) {
-		if (location < 0) { // cannot have negative location
-			throw new IllegalArgumentException("Negative numbers not valid as location of side chain");
-		} /*
-			 * else if (location>mainChain.getSize()){ throw new
-			 * IllegalArgumentException("Locations larger than the main chain are not valid as location of side chain"
-			 * ); }
-			 */else { // zero or greater integer
-			sideChains.add(new Chain(size, location, cyclo));
-		} // if
+	public void addSideChain(int size, String location, boolean cyclo) {
+		boolean b=false;
+		for (int i = 0; i < OrganicUtil.LOCATIONS.length; i++) {
+			if (location.equalsIgnoreCase(OrganicUtil.LOCATIONS[i])) { 
+				sideChains.add(new Chain(size, location, cyclo));
+				b=false;
+				break;
+			} else {
+				b=true;
+			} // if
+		}
+		if (b)
+			throw new IllegalArgumentException("Not a valid location");
 	} // end addSideChain
 
 	/*
@@ -82,7 +85,7 @@ public class Compound {
 	 */
 	public String toString() { // OVERRIDEN
 		String s = "";
-		ArrayList<Integer> locations = mainChain.getFunctionalLocation();
+		ArrayList<String> locations = mainChain.getFunctionalLocation();
 
 		// main chain
 		s = s.concat("Main Chain of: " + mainChain.getSize() + "\n");
