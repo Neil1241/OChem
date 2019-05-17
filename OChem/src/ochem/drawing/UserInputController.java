@@ -36,11 +36,19 @@ public class UserInputController implements KeyListener {
 			switch (palette.getSelectedType()) {
 			
 			case MAIN:
+				//set the size and step forward
 				canvas.setMainSize(num);
+				canvas.setMainStep(2);
 				break;
 				
 			case SIDE:
-				canvas.getSideChains().get(0).setSize(num);
+				
+				break;
+			case CLEAR:
+				break;
+			case FUNC_GROUP:
+				break;
+			default:
 				break;
 			}
 		}

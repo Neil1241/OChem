@@ -26,38 +26,43 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		this.canvas = canvas;
 	} //end constructor
 	
-	@Override
-	public void mouseClicked(MouseEvent m) {
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent m) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent m) {
-		// TODO Auto-generated method stub
-		
-	}
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 */
+	public void mouseClicked(MouseEvent m) {} //end mouseClicked
 
 	/*
-	 *	Updates nodes based on when its clicked
+	 * (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
 	 */
-	public void mousePressed(MouseEvent m) {		
-		Node current = new Node(m.getX(), m.getY(), 20);
+	@Override
+	public void mouseEntered(MouseEvent m) {} //end mouseEntered
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseExited(MouseEvent m) {} //end mouseExited
+
+	/*
+	 * Send information to the canvas based on the mouse click
+	 * MouseEvent m - object holding data about the click
+	 */
+	public void mousePressed(MouseEvent m) { 
+		Node current = new Node(m.getX(), m.getY(), 20); //create a node from the mouse coordinates
 		
-		handleClick(m, current);
+		handleClick(m, current); //handle the click based on the canvas action type
 		
-		canvas.update();
-	}
+		canvas.update(); //update the canvas
+	} //end mousePressed
 	
-	public void mouseReleased(MouseEvent m) {
-		// TODO Auto-generated method stub
-		
-	}
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 */
+	public void mouseReleased(MouseEvent m) {} //end mouseReleased
 	
 	/*
 	 * Handles a click action on a node
@@ -65,13 +70,17 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 * Node current - current node
 	 */
 	private void handleClick(MouseEvent m, Node current) {
-		if (m.getButton() == MouseEvent.BUTTON1) { //left click
+		//left click
+		if (m.getButton() == MouseEvent.BUTTON1) { 
+			//change action based on the type
 			switch (canvas.getType()) {
+				//main action type
 				case MAIN: 
-					DrawingGUI.reportError(m.getX() +" "+ (canvas.getHeight() - m.getY()));
 					canvas.setMainOnScreen(true);
+					canvas.setMainStep(3);
 					break;
 					
+				//side action type
 				case SIDE:
 					ArrayList<Node> nodes = canvas.getMainNodes();
 					
@@ -83,12 +92,15 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					} //loop
 					break;
 					
+				//clear action type
 				case CLEAR:
 					break;
+					
+				//functional group action type
 				case FUNC_GROUP:
 					break;
-			}
-		}
+			} //switch
+		} //if
 	} //end handleClick
 	 
 	/*
@@ -100,6 +112,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 * int range - distance to check within
 	 */
 	private boolean isWithinBounds(int x1, int y1, int x2, int y2, int range) {
+		//calculate the differences in x and y
 		double xDiff = Math.abs(x2 - x1);
 		double yDiff = Math.abs(y2 - y1);
 		
@@ -110,19 +123,18 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		} //if
 	} //end isWithinBounds
 
-	@Override
-	public void mouseDragged(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	/*
+	 * (non-Javadoc)
+	 * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
+	 */
+	public void mouseDragged(MouseEvent arg0) {}
 
-	@Override
+	/*
+	 * Send the mouse position to the canvas
+	 */
 	public void mouseMoved(MouseEvent m) {
-		if (!canvas.getMainOnScreen()) {
-			canvas.setMouseXY(m.getX(), m.getY());
-			canvas.update();
-		}
-	} //end mouse moved
-	
-	
+		canvas.setMouseXY(m.getX(), m.getY());
+		
+		canvas.update();
+	} //end mouseMoved
 } //end class

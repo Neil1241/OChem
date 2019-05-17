@@ -15,19 +15,6 @@ public class Node {
 	private int y; //y value of the top left point of the circle
 	private int rad; //radius of the node
 	private Color color; //color of the node
-	private NodeType type; //the type of node
-	
-	private int tag; //tag for node location
-	
-	/*
-	 * Enum containing all the states a node can be in
-	 */
-	public static enum NodeType {
-		BLANK,
-		SINGLE_BOND,
-		DOUBLE_BOND,
-		TRIPLE_BOND
-	} //end enum
 	
 	/*
 	 * Creates a blank node at origin with a radius
@@ -49,7 +36,6 @@ public class Node {
 		this.y = y;
 		this.rad = rad;
 		
-		this.type = NodeType.BLANK;
 		this.color = Color.BLACK;
 	} //end constructor
 	
@@ -108,69 +94,4 @@ public class Node {
 	public int getDia() {
 		return 2 * rad;
 	} //end getDia
-	
-	/*
-	 * Get the color of the node
-	 * return color - Node color
-	 */
-	public Color getColor() {
-		updateColor();
-		return color;
-	} //end getColor
-	
-	/*
-	 * Get the type of the node
-	 * return type
-	 */
-	public NodeType getType() {
-		return type;
-	} //end getType
-	
-	/*
-	 * Change node color based on the type
-	 */
-	public void updateColor() {
-		switch (type) {
-		//blank case
-		case BLANK: 
-			color = Color.GRAY;
-			break;
-		
-		//single bond case
-		case SINGLE_BOND:
-		case DOUBLE_BOND:
-		case TRIPLE_BOND:
-			//slightly darker than background color
-			int r = Canvas.BACKGROUND_COLOR.getRed();
-			int g = Canvas.BACKGROUND_COLOR.getGreen();
-			int b = Canvas.BACKGROUND_COLOR.getBlue();
-			
-			color = new Color(r - 60, g, b - 3);
-			break;
-		} //switch
-	} //end updateColor
-	
-	/*
-	 * Set the type of the node
-	 * NodeType type - new type of the node
-	 */
-	public void setType(NodeType type) {
-		this.type = type;
-	} //end setType
-	
-	/*
-	 * Set the tag of the node
-	 * int tag - node tag
-	 */
-	public void setTag(int tag) {
-		this.tag = tag;
-	} //end setTag
-	
-	/*
-	 * Get the tag of the node
-	 * return tag - node tag
-	 */
-	public int getTag() {
-		return tag;
-	} //end getTag
 } //end class

@@ -14,18 +14,6 @@ public class OChem {
 		width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 		height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 		
-		/*
-		Scanner in = new Scanner(System.in);
-		PrintStream out = System.out;
-		
-		out.println("Enter name of compound: ");
-		String cmpnd = in.next();
-		
-		Compound compound = Interpreter.compoundFromName(cmpnd);
-		
-		out.println(compound.toString());
-		*/
-		
 		View view = new View();
 	} //end main
 
