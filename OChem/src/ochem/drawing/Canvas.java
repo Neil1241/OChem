@@ -31,17 +31,22 @@ public class Canvas extends JComponent {
 	public static Color BACKGROUND_COLOR; //background color
 	
 	private Compound master; //compound being drawn
+	
+	//main 
 	private Chain mainChain; //main chain
 	private ArrayList<Node> mainNodes; //nodes for the main chain
 	
+	//side
 	private ArrayList<Chain> sideChains; //side chains
 	private ArrayList<Node> sideNodes; //nodes for the side chain
+	private ArrayList<Integer> sideSizes; //size for the side chains
 	
 	private ActionType type; //type of action
 	
 	private boolean mainOnScreen; //whether a main chain is on the screen
 	
 	private int mainStep; //step for the "main" button
+	private int sideStep; //step for the "side" button
 	
 	/*
 	 * Types of action to determine different drawing features
@@ -97,6 +102,7 @@ public class Canvas extends JComponent {
 		//instantiate the chains
 		mainChain = new Chain(0, "-1");		
 		sideChains = new ArrayList<Chain>();
+		sideSizes = new ArrayList<Integer>();
 		
 		//instantiate lists for the nodes on the main chain and side chains
 		mainNodes = new ArrayList<Node>();
@@ -104,6 +110,7 @@ public class Canvas extends JComponent {
 		
 		//set the step numbers to zero when not being used, increment when needed
 		mainStep = 0;
+		sideStep = 0;
 		
 		//add the controllers to the canvas
 		registerControllers();
@@ -127,6 +134,7 @@ public class Canvas extends JComponent {
 		//handle the actions for each type
 		clearAction(g2);
 		mainAction(g2);
+		sideAction(g2);
 	}  //end paintComponent
 	
 	/*
@@ -178,10 +186,48 @@ public class Canvas extends JComponent {
 				mainOnScreen = true;
 				DrawingGUI.clear();
 				g2.setColor(Color.BLACK);
-				drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());
+				mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());
+				
+				//show nodes that can be clicked
+				g2.setColor(Color.ORANGE);
+				for (int i = 1; i < mainNodes.size()-1; i++) {
+					drawNode(g2, mainNodes.get(i));
+				}
 			break;
 		} //switch
 	} //end mainAction
+	
+	/*
+	 * Handles the actions for the side flow
+	 * Graphics2D g2 - object responsible for drawing
+	 */
+	private void sideAction(Graphics2D g2) {
+		//change what to draw based on what the value of main step is
+		switch (sideStep) {
+			//do nothing step
+			case 0: 
+			break;
+				
+			//size definition step
+			case 1: 
+				DrawingGUI.showMessage("Enter size of side chain: (ENTER)");
+				g2.setColor(new Color(238,50,50, 100));
+				drawNode(g2, mouse);
+			break;
+			
+			//location selection step
+			case 2: 
+				DrawingGUI.showMessage("Select location for side chain: (CLICK)");
+				g2.setColor(new Color(200,200,200, 100));
+				drawChain(g2, mouse, DrawDirection.UP_RIGHT, sideSizes.get(2));
+			break;
+			
+			//fixed on screen step
+			case 3: 
+				
+			break;
+		} //switch
+	}
 	
 	/*
 	 * Draw a node to the screen
@@ -197,8 +243,9 @@ public class Canvas extends JComponent {
 	 * Node start - starting point
 	 * DrawDirection dir - direction to draw in
 	 * int chainSize - size of chain to draw
+	 * return nodes - list of nodes for that chain
 	 */
-	private void drawChain(Graphics2D g2, Node start, DrawDirection dir, int chainSize) {
+	private ArrayList<Node> drawChain(Graphics2D g2, Node start, DrawDirection dir, int chainSize) {
 		//stroke object for drawing
 		BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
@@ -209,6 +256,8 @@ public class Canvas extends JComponent {
 		
 		double[] angles = angleFromDirection(dir); //get the angles based on the direction
 		int arm = 150; //length of bonds in pixels
+		
+		ArrayList<Node> nodes = new ArrayList<Node>(); //list of nodes
 		
 		for (int i = 0; i < chainSize-1; i++) {
 			//current angle to draw (alternate between the 2 angles)
@@ -221,10 +270,16 @@ public class Canvas extends JComponent {
 			//draw the line
 			g2.drawLine(x1, y1, x2, y2);
 			
+			nodes.add(new Node(x1,y1,20)); //add the current node to the list
+			
 			//change the start point to this end for next loop
 			x1 = x2;
 			y1 = y2;
 		} //loop
+		
+		nodes.add(new Node(x1,y1,10)); //add the last node
+		
+		return nodes;
 	} //end drawChain
 	
 	/*
@@ -266,36 +321,7 @@ public class Canvas extends JComponent {
 		
 		return angles;
 	} //end angleFromDirection
-	
-	private void sideAction(Graphics2D g2) {
-		g2.setColor(Color.ORANGE);
-		for (Node n : sideNodes) {
-			int startX = n.getCenterX();
-			int startY = n.getCenterY();
-			
-			double angle = Math.toRadians(90);
-			int arm = 150;
-			
-			for (int i = 1; i < mainChain.getSize(); i++) {
-				//change angle based on even/odd
-				if (i % 2 == 0) { 
-					angle = 90;
-				} else {
-					angle = 60;
-				}
-				
-				//calculate the arm offset
-				int endX = (int) (arm * Math.cos(angle)) + startX;
-				int endY = (int) (arm * Math.sin(angle)) + startY;
-				
-				//draw the line
-				g2.drawLine(startX, startY, endX, endY);
-				
-				startX = endX;
-				startY = endY;
-			}
-		}
-	}
+
 	
 	/*
 	 * Set the size of the main chain
@@ -410,4 +436,26 @@ public class Canvas extends JComponent {
 		
 		this.update();
 	} //end setMainStep
+	
+	/*
+	 * Set the step for side drawing
+	 * int step - step for side drawing
+	 */
+	public void setSideStep(int step) {
+		if (step < 0 || step > 3) {
+			throw new IllegalArgumentException("Too big for me :(");
+		} else {
+			sideStep = step;
+		} //if 
+		
+		this.update();
+	} //end sideStep
+	
+	/*
+	 * Add a side size to the screen
+	 * int size - new size of side chain
+	 */
+	public void addSideSize(int size) {
+		sideSizes.add(size);
+	} //end addSideSize
 } //end class

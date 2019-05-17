@@ -1,4 +1,4 @@
-package ochem.drawing;
+	package ochem.drawing;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -42,7 +42,9 @@ public class UserInputController implements KeyListener {
 				break;
 				
 			case SIDE:
-				
+				//add a size and step forward
+				canvas.addSideSize(num);
+				canvas.setSideStep(2);
 				break;
 			case CLEAR:
 				break;
