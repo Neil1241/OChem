@@ -91,7 +91,7 @@ public class Node {
 	 */
 	public int getDia() {
 		return 2 * rad;
-	} //end getDia
+	} //end getDia 
 	
 	/*
 	 * Set the color of the node
