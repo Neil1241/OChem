@@ -35,8 +35,6 @@ public class Node {
 		this.x = x;
 		this.y = y;
 		this.rad = rad;
-		
-		this.color = Color.BLACK;
 	} //end constructor
 	
 	/*
@@ -94,4 +92,21 @@ public class Node {
 	public int getDia() {
 		return 2 * rad;
 	} //end getDia
+	
+	/*
+	 * Set the color of the node
+	 * Color clr - color of the node
+	 */
+	public void setColor(Color clr) {
+		color = clr;
+		System.out.println("color changed to " + clr.toString());
+	} //setColor
+	
+	/*
+	 * Get the color of the node
+	 * return color - color of the node
+	 */
+	public Color getColor() {
+		return color;
+	} //end getColor
 } //end class

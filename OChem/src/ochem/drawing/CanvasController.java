@@ -1,5 +1,7 @@
 package ochem.drawing;
 
+import java.awt.Color;
+
 /*
  * CanvasController
  * Created by: Neil Balaskandarajah
@@ -76,8 +78,9 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			switch (canvas.getType()) {
 				//main action type
 				case MAIN: 
-					canvas.setMainOnScreen(true);
+					
 					canvas.setMainStep(3);
+					canvas.setMainOnScreen(true);
 					break;
 					
 				//side action type
@@ -90,6 +93,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 							canvas.addSideNode(nodes.get(i));
 						}	
 					} //loop
+					canvas.setSideStep(3);
 					break;
 					
 				//clear action type
@@ -134,6 +138,18 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 */
 	public void mouseMoved(MouseEvent m) {
 		canvas.setMouseXY(m.getX(), m.getY());
+
+		if (canvas.getMainOnScreen()) {
+			ArrayList<Node> nodes = canvas.getMainNodes();
+			Node ms = new Node(m.getX(), m.getY(), 10);
+			
+			for (int i = 0; i < nodes.size(); i++) {
+				if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), 
+						nodes.get(i).getCenterY(), nodes.get(i).getRad())) {
+//					canvas.getMainNodes().get(i).setColor(Color.BLUE);
+				}	
+			} //loop
+		} //if
 		
 		canvas.update();
 	} //end mouseMoved

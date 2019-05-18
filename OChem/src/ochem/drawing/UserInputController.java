@@ -1,5 +1,6 @@
 	package ochem.drawing;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -34,24 +35,30 @@ public class UserInputController implements KeyListener {
 			int num = Integer.parseInt(DrawingGUI.getUserInput());
 			
 			switch (palette.getSelectedType()) {
-			
-			case MAIN:
-				//set the size and step forward
-				canvas.setMainSize(num);
-				canvas.setMainStep(2);
-				break;
-				
-			case SIDE:
-				//add a size and step forward
-				canvas.addSideSize(num);
-				canvas.setSideStep(2);
-				break;
-			case CLEAR:
-				break;
-			case FUNC_GROUP:
-				break;
-			default:
-				break;
+				//main button
+				case MAIN:
+					//set the size and step forward
+					canvas.setMainSize(num);
+					canvas.setMainStep(2);
+					break;
+					
+				//side button
+				case SIDE:
+					//add a size and step forward
+					canvas.addSideSize(num);
+					
+					canvas.setSideStep(2);
+					break;
+					
+				//clear button
+				case CLEAR:
+					break;
+					
+				//functional group button
+				case FUNC_GROUP:
+					break;
+				default:
+					break;
 			}
 		}
 		

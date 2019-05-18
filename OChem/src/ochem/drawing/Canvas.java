@@ -187,12 +187,6 @@ public class Canvas extends JComponent {
 				DrawingGUI.clear();
 				g2.setColor(Color.BLACK);
 				mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());
-				
-				//show nodes that can be clicked
-				g2.setColor(Color.ORANGE);
-				for (int i = 1; i < mainNodes.size()-1; i++) {
-					drawNode(g2, mainNodes.get(i));
-				}
 			break;
 		} //switch
 	} //end mainAction
@@ -219,15 +213,24 @@ public class Canvas extends JComponent {
 			case 2: 
 				DrawingGUI.showMessage("Select location for side chain: (CLICK)");
 				g2.setColor(new Color(200,200,200, 100));
-				drawChain(g2, mouse, DrawDirection.UP_RIGHT, sideSizes.get(2));
+				drawChain(g2, mouse, DrawDirection.UP_RIGHT, sideSizes.get(0)+1);
+				
+				//show nodes that can be clicked
+				for (int i = 1; i < mainNodes.size()-1; i++) {
+					g2.setColor(mainNodes.get(i).getColor());
+					System.out.println(mainNodes.get(i).getColor().toString());
+					drawNode(g2, mainNodes.get(i));
+				} //loop
 			break;
 			
 			//fixed on screen step
 			case 3: 
-				
+				DrawingGUI.showMessage("");
+				g2.setColor(Color.BLACK);
+				drawChain(g2, sideNodes.get(0), DrawDirection.UP_RIGHT, sideSizes.get(0) + 1);
 			break;
 		} //switch
-	}
+	} //end sideAction
 	
 	/*
 	 * Draw a node to the screen
@@ -255,7 +258,7 @@ public class Canvas extends JComponent {
 		int y1 = start.getY();
 		
 		double[] angles = angleFromDirection(dir); //get the angles based on the direction
-		int arm = 150; //length of bonds in pixels
+		int arm = 160; //length of bonds in pixels
 		
 		ArrayList<Node> nodes = new ArrayList<Node>(); //list of nodes
 		
