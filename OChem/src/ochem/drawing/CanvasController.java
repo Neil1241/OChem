@@ -80,20 +80,23 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				case MAIN: 
 					
 					canvas.setMainStep(3);
-					canvas.setMainOnScreen(true);
+//					canvas.setMainOnScreen(true);
 					break;
 					
 				//side action type
 				case SIDE:
 					ArrayList<Node> nodes = canvas.getMainNodes();
 					
+					System.out.println("Side click: " + nodes.size());
+					
 					for (int i = 0; i < nodes.size(); i++) {
 						if (isWithinBounds(current.getCenterX(), current.getCenterY(),
 								nodes.get(i).getCenterX(), nodes.get(i).getCenterY(), 20)) {
 							canvas.addSideNode(nodes.get(i));
-						}	
+							canvas.setSideStep(3);
+							break;
+						} 
 					} //loop
-					canvas.setSideStep(3);
 					break;
 					
 				//clear action type
@@ -137,20 +140,30 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 * Send the mouse position to the canvas
 	 */
 	public void mouseMoved(MouseEvent m) {
+		//send the mouse (x,y) to the canvas
 		canvas.setMouseXY(m.getX(), m.getY());
 
+		//if there is a main chain on the screen
 		if (canvas.getMainOnScreen()) {
+			//change node color based on mouse position
 			ArrayList<Node> nodes = canvas.getMainNodes();
 			Node ms = new Node(m.getX(), m.getY(), 10);
 			
-			for (int i = 0; i < nodes.size(); i++) {
+			for (int i = 1; i < nodes.size()-1; i++) {
+				
+				//if over the node
 				if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), 
 						nodes.get(i).getCenterY(), nodes.get(i).getRad())) {
-//					canvas.getMainNodes().get(i).setColor(Color.BLUE);
-				}	
+					//make its color darker
+					nodes.get(i).setColor(new Color(201, 178, 50)); //dark yellow
+				} else {
+					//return to the defauly lighter color
+					nodes.get(i).setColor(new Color(244,217,66)); //light yellow
+				} //if
 			} //loop
 		} //if
 		
+		//update the display
 		canvas.update();
 	} //end mouseMoved
 } //end class

@@ -183,10 +183,21 @@ public class Canvas extends JComponent {
 			
 			//fixed on screen step
 			case 3: 
-				mainOnScreen = true;
+//				mainOnScreen = true;
 				DrawingGUI.clear();
 				g2.setColor(Color.BLACK);
-				mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());
+				
+				if (!mainOnScreen) { //first time called
+					mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());
+					
+					for (Node n : mainNodes) {
+						n.setColor(Color.BLUE);
+					}
+					
+					mainOnScreen = true;
+				} else { //all other times
+					drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());
+				}
 			break;
 		} //switch
 	} //end mainAction
@@ -215,10 +226,11 @@ public class Canvas extends JComponent {
 				g2.setColor(new Color(200,200,200, 100));
 				drawChain(g2, mouse, DrawDirection.UP_RIGHT, sideSizes.get(0)+1);
 				
+				System.out.println(mainNodes.size());
 				//show nodes that can be clicked
 				for (int i = 1; i < mainNodes.size()-1; i++) {
 					g2.setColor(mainNodes.get(i).getColor());
-					System.out.println(mainNodes.get(i).getColor().toString());
+					System.out.println("color is: " + mainNodes.get(i).getColor());
 					drawNode(g2, mainNodes.get(i));
 				} //loop
 			break;
@@ -240,6 +252,7 @@ public class Canvas extends JComponent {
 	private void drawNode(Graphics2D g2, Node n) {
 		g2.fillOval(n.getCenterX(), n.getCenterY(), n.getDia(), n.getDia());
 	} //end drawNode
+	
 	
 	/*
 	 * Draws the main chain from a starting point
@@ -284,6 +297,7 @@ public class Canvas extends JComponent {
 		
 		return nodes;
 	} //end drawChain
+	
 	
 	/*
 	 * Choose the pair of angles from the direction chosen
@@ -396,6 +410,14 @@ public class Canvas extends JComponent {
 	public ArrayList<Node> getMainNodes() {
 		return mainNodes;
 	} //end getMainNodes
+	
+	/*
+	 * Set the nodes on the main chain to the list passed
+	 * ArrayList<Node> mainNodes - list to change nodes to
+	 */
+	public void setMainNodes(ArrayList<Node> mainNodes) {
+		this.mainNodes = mainNodes;
+	} //end setMainNodes h
 	
 	/*
 	 * Add side node to the side nodes list

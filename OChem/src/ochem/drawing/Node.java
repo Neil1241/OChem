@@ -99,7 +99,6 @@ public class Node {
 	 */
 	public void setColor(Color clr) {
 		color = clr;
-		System.out.println("color changed to " + clr.toString());
 	} //setColor
 	
 	/*
