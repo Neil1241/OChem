@@ -1,9 +1,7 @@
 	package ochem.drawing;
 
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 
 public class UserInputController implements KeyListener {
 	//Attributes
@@ -38,43 +36,51 @@ public class UserInputController implements KeyListener {
 			switch (palette.getSelectedType()) {
 				//main button
 				case MAIN:
-					//set the size and step forward
-					canvas.setMainSize(num);
-					canvas.setMainStep(2);
+					//check to see if number entered is within range
+					if (num < 2) {
+						DrawingGUI.reportError("Size entered too small!");
+					} else if (num > 10) {
+						DrawingGUI.reportError("Size entered too big!");
+					} else {
+						//set the size and step forward
+						canvas.setMainSize(num);
+						canvas.setMainStep(2);
+					} //if
+					
 					break;
 					
 				//side button
 				case SIDE:
 					//add a size and step forward
 					canvas.addSideSize(num);
+					canvas.setSideStep(2);				
 					
-					canvas.setSideStep(2);
-					break;
-					
-				//clear button
-				case CLEAR:
 					break;
 					
 				//functional group button
 				case FUNC_GROUP:
 					break;
-				default:
+					
+				//bond button
+				case BOND:
+					
 					break;
-			}
-		}
+			} //switch
+		} //if
 		
 	} //end keyTyped
 
 	/*
 	 * Checks if a String is a valid number
+	 * String text - String to check for number
 	 */
 	private boolean isNumber(String text) {
+		//if parse succeeds, string is a number and true is returned
 		try {
 			Integer.parseInt(text);
 			return true;
 		} catch (NumberFormatException n) {
-			
 			return false;
-		}
+		} //try-catch
 	} //end isNumber
 }

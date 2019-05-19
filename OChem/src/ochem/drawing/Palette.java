@@ -28,10 +28,11 @@ public class Palette extends JPanel {
 	private OBox main;
 	private OBox side;
 	private OBox func;
+	private OBox bond;
 	private OBox clear;
 	
 	//number of buttons on the screen
-	private final int NUM_BUTTONS = 4;
+	private final int NUM_BUTTONS = 5;
 	
 	//instance of the Canvas
 	private Canvas canvas;
@@ -78,6 +79,12 @@ public class Palette extends JPanel {
 		func.setFontSize(90.0F);
 		this.add(func);
 		
+		//bond button
+		bond = new OBox(width, height/NUM_BUTTONS - 2*View.PAD, "Bond");
+		bond.setTextColor(Color.BLACK);
+		bond.setFontSize(90.0F);
+		this.add(bond);
+		
 		//clear button
 		clear = new OBox(width, height/NUM_BUTTONS - 2*View.PAD, "Clear");
 		clear.setTextColor(Color.BLACK);
@@ -103,6 +110,10 @@ public class Palette extends JPanel {
 		//functional group button controller
 		PaletteButtonController funcC = new PaletteButtonController(this, func, canvas);
 		func.addMouseListener(funcC);
+
+		//bondbutton controller
+		PaletteButtonController bondC = new PaletteButtonController(this, bond, canvas);
+		bond.addMouseListener(bondC);
 		
 		//clear button controller
 		PaletteButtonController clearC = new PaletteButtonController(this, clear, canvas);

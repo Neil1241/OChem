@@ -48,6 +48,9 @@ public class Canvas extends JComponent {
 	private int mainStep; //step for the "main" button
 	private int sideStep; //step for the "side" button
 	
+	private DrawDirection ghostDir; //direction of the ghost chain
+	private ArrayList<DrawDirection> directions; //directions for all the chains
+	
 	/*
 	 * Types of action to determine different drawing features
 	 */
@@ -55,13 +58,14 @@ public class Canvas extends JComponent {
 		CLEAR,
 		MAIN,
 		SIDE,
-		FUNC_GROUP
+		FUNC_GROUP,
+		BOND
 	} //end enum
 	
 	/*
 	 * Different directions the chain can be drawn in
 	 */
-	private enum DrawDirection {
+	public static enum DrawDirection {
 		UP_RIGHT,
 		RIGHT,
 		DOWN_RIGHT,
@@ -112,6 +116,12 @@ public class Canvas extends JComponent {
 		mainStep = 0;
 		sideStep = 0;
 		
+		//default the ghost direction to up right
+		ghostDir = DrawDirection.UP_RIGHT;
+		
+		//initialize the directions list
+		directions = new ArrayList<DrawDirection>();
+		
 		//add the controllers to the canvas
 		registerControllers();
 	} //end constructor
@@ -150,6 +160,9 @@ public class Canvas extends JComponent {
 			//set the main step to zero and for there to be no main chain on screen
 			mainOnScreen = false;
 			mainStep = 0;
+			
+			//set the side step to zero
+			sideStep = 0;
 		} //if
 	} //end clearAction
 	
@@ -183,21 +196,15 @@ public class Canvas extends JComponent {
 			
 			//fixed on screen step
 			case 3: 
-//				mainOnScreen = true;
 				DrawingGUI.clear();
 				g2.setColor(Color.BLACK);
 				
 				if (!mainOnScreen) { //first time called
-					mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());
-					
-					for (Node n : mainNodes) {
-						n.setColor(Color.BLUE);
-					}
-					
+					mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());					
 					mainOnScreen = true;
 				} else { //all other times
 					drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());
-				}
+				} //if
 			break;
 		} //switch
 	} //end mainAction
@@ -218,19 +225,27 @@ public class Canvas extends JComponent {
 				DrawingGUI.showMessage("Enter size of side chain: (ENTER)");
 				g2.setColor(new Color(238,50,50, 100));
 				drawNode(g2, mouse);
+				
+				drawSides(g2);
 			break;
 			
 			//location selection step
 			case 2: 
 				DrawingGUI.showMessage("Select location for side chain: (CLICK)");
-				g2.setColor(new Color(200,200,200, 100));
-				drawChain(g2, mouse, DrawDirection.UP_RIGHT, sideSizes.get(0)+1);
+				g2.setColor(new Color(200,200,200, 100)); //faint gray
 				
-				System.out.println(mainNodes.size());
+				if (sideNodes.isEmpty()) {
+					drawChain(g2, mouse, ghostDir, sideSizes.get(0)+1);
+				} else {
+					drawChain(g2, mouse, ghostDir, sideSizes.get(sideSizes.size()-1)+1);
+				} //if
+				
+				//draw the side chains
+				drawSides(g2);
+				
 				//show nodes that can be clicked
 				for (int i = 1; i < mainNodes.size()-1; i++) {
 					g2.setColor(mainNodes.get(i).getColor());
-					System.out.println("color is: " + mainNodes.get(i).getColor());
 					drawNode(g2, mainNodes.get(i));
 				} //loop
 			break;
@@ -238,11 +253,24 @@ public class Canvas extends JComponent {
 			//fixed on screen step
 			case 3: 
 				DrawingGUI.showMessage("");
-				g2.setColor(Color.BLACK);
-				drawChain(g2, sideNodes.get(0), DrawDirection.UP_RIGHT, sideSizes.get(0) + 1);
+				
+				//draw the side chains	
+				drawSides(g2);
 			break;
 		} //switch
 	} //end sideAction
+	
+	/*
+	 * Draw all the side chains to the screen
+	 * Graphics2D g2 - object responsible for drawing
+	 */
+	private void drawSides(Graphics2D g2) {
+		//draw side chains
+		g2.setColor(Color.black);
+		for (int i = 0; i < sideNodes.size(); i++) {
+			drawChain(g2, sideNodes.get(i), directions.get(i), sideSizes.get(i) + 1);
+		} //loop
+	} //end drawSides
 	
 	/*
 	 * Draw a node to the screen
@@ -309,11 +337,11 @@ public class Canvas extends JComponent {
 		//different directions require different pairs of numbers to switch between
 		switch (dir) {
 			case DOWN_LEFT: 
-				angles = new double[] {90,120};
+				angles = new double[] {90,150};
 				break;
 				
 			case DOWN_RIGHT:
-				angles = new double[] {90,60};
+				angles = new double[] {90,30};
 				break;
 				
 			case LEFT: 
@@ -325,11 +353,11 @@ public class Canvas extends JComponent {
 				break;
 				
 			case UP_LEFT:
-				angles = new double[] {270,240};
+				angles = new double[] {270,210};
 				break;
 				
 			case UP_RIGHT:
-				angles = new double[] {270,300};
+				angles = new double[] {270,330};
 				break;
 				
 			default:
@@ -477,10 +505,46 @@ public class Canvas extends JComponent {
 	} //end sideStep
 	
 	/*
+	 * Get the side step for drawing
+	 * return sideStep - step for drawing side chains
+	 */
+	public int getSideStep() {
+		return sideStep;
+	} //end getSideStep
+	
+	/*
 	 * Add a side size to the screen
 	 * int size - new size of side chain
 	 */
 	public void addSideSize(int size) {
 		sideSizes.add(size);
 	} //end addSideSize
+	
+	/*
+	 * Get the size of the side nodes list
+	 * return - size of side nodes list
+	 */
+	public int getSideNodesSize() {
+		return sideNodes.size();
+	} //end getSideNodesSize
+	
+	public String toString() {
+		return "Canvas";
+	}
+	
+	/*
+	 * Set the direction for the ghost to be drawn
+	 * DrawDirection dir - new direction for ghost chain
+	 */
+	public void setGhostDirection(DrawDirection dir) {
+		ghostDir = dir;
+	} //end setGhostDirection
+	
+	/*
+	 * Add a direction for a side chain
+	 * DrawDirection dir - direction for latest side chain
+	 */
+	public void addSideDirection(DrawDirection dir) {
+		directions.add(dir);
+	} //end addSideDirection
 } //end class

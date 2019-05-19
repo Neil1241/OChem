@@ -68,12 +68,17 @@ public class PaletteButtonController implements MouseListener {
 		} else if (text.equals("Function")) {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			
+		} else if (text.equals("Bond")) {
+			palette.setSelectedType(ActionType.BOND);
+			
 		} else if (text.equals("Clear")) {
 			palette.setSelectedType(ActionType.CLEAR);
-		}
+			DrawingGUI.showMessage("Screen cleared!");
+		} //if
 		
 		//update the button
 		button.update();
+		canvas.update();
 	} //end mouseClicked
 
 	/*

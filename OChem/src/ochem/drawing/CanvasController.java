@@ -14,9 +14,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
+import ochem.drawing.Canvas.DrawDirection;
+
 public class CanvasController implements MouseListener, MouseMotionListener {
 	//Attributes
 	private Canvas canvas; //instance of the Canvas to be updated
+	private DrawDirection dir; //direction for a side chain
 	
 	/*
 	 * Creates a canvas controller
@@ -26,6 +29,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		super();
 		
 		this.canvas = canvas;
+		dir = DrawDirection.UP_RIGHT;
 	} //end constructor
 	
 	/*
@@ -78,24 +82,22 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			switch (canvas.getType()) {
 				//main action type
 				case MAIN: 
-					
 					canvas.setMainStep(3);
-//					canvas.setMainOnScreen(true);
 					break;
 					
 				//side action type
 				case SIDE:
 					ArrayList<Node> nodes = canvas.getMainNodes();
 					
-					System.out.println("Side click: " + nodes.size());
-					
+					//check to see if the click was on a main chain node
 					for (int i = 0; i < nodes.size(); i++) {
 						if (isWithinBounds(current.getCenterX(), current.getCenterY(),
-								nodes.get(i).getCenterX(), nodes.get(i).getCenterY(), 20)) {
-							canvas.addSideNode(nodes.get(i));
-							canvas.setSideStep(3);
+								nodes.get(i).getCenterX(), nodes.get(i).getCenterY(), nodes.get(i).getDia())) {
+							canvas.addSideNode(nodes.get(i)); //add that node to the side nodes list
+							canvas.addSideDirection(dir); //add a direction
+							canvas.setSideStep(3); //step forward
 							break;
-						} 
+						} //if
 					} //loop
 					break;
 					
@@ -107,6 +109,13 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				case FUNC_GROUP:
 					break;
 			} //switch
+			
+		//right click
+		} else if (m.getButton() == MouseEvent.BUTTON3) {
+			if (canvas.getSideStep() == 2) {
+				incDirection();
+				canvas.setGhostDirection(dir);
+			}
 		} //if
 	} //end handleClick
 	 
@@ -155,7 +164,16 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), 
 						nodes.get(i).getCenterY(), nodes.get(i).getRad())) {
 					//make its color darker
-					nodes.get(i).setColor(new Color(201, 178, 50)); //dark yellow
+					nodes.get(i).setColor(new Color(219, 194, 52)); //dark yellow
+					
+					//change direction of the ghost depending on the position of the node on the chain
+					if (i % 2 == 0) {
+						dir = DrawDirection.DOWN_RIGHT;
+					} else {
+						dir = DrawDirection.UP_RIGHT;
+					} //if
+					
+					canvas.setGhostDirection(dir);
 				} else {
 					//return to the defauly lighter color
 					nodes.get(i).setColor(new Color(244,217,66)); //light yellow
@@ -166,4 +184,22 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		//update the display
 		canvas.update();
 	} //end mouseMoved
+	
+	/*
+	 * Increment the draw direction one step forward
+	 */
+	private void incDirection() {
+		int pos = dir.ordinal();
+		if (pos == DrawDirection.values().length-1) {
+			dir = DrawDirection.values()[0];
+		} else {
+			dir = DrawDirection.values()[pos + 1];
+		} //if
+		
+		System.out.println(dir.toString());
+	} //end incDirection
+	
+	public String toString() {
+		return "CanvasController";
+	}
 } //end class
