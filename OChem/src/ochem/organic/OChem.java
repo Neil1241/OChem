@@ -27,7 +27,7 @@ public class OChem {
 
 		Compound compound = Interpreter.compoundFromName(cmpnd);
 		Chain[] chains = compound.getSideChains();
-		TreeMap<String, Boolean> e = compound.getMainChain().getEndings();
+		TreeMap<String, Integer> e = compound.getMainChain().getEndings();
 
 		out.println("------------------------------------------");
 		out.println("OCHEM RUNNING THIS");

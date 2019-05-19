@@ -15,11 +15,11 @@ public class Chain {
 	private String location; // location on the main chain
 	private boolean cyclo;
 	private ArrayList<String> functionalLocation;
-	private TreeMap<String,Boolean> ending = new TreeMap<String,Boolean>();
-	//private TreeMap<String, Integer> places = new TreeMap<String, Integer>();
+	private TreeMap<String, Integer> ending;
 	private int bond = 1;
+	private int idx = 0;
 	private boolean main;
-	
+
 	/*
 	 * Creates a new chain with a size and location int size - size of the new chain
 	 * int location - location of the new chain on the main chain if this chain is
@@ -30,32 +30,31 @@ public class Chain {
 		this.location = location;
 		this.cyclo = false;
 		this.bond = 1;
-		setEnding();
 	} // end constructor
-	
+
 	public Chain(int size, String location, boolean cyclo) {
 		this.size = size;
 		this.location = location;
 		this.cyclo = cyclo;
 		this.bond = 1;
-		setEnding();
 	} // end constructor
 
-	private void setEnding() {
-		for (int i=0;i<OrganicUtil.FUNCTIONAL_NAMES.length;i++)
-			this.ending.put(OrganicUtil.FUNCTIONAL_NAMES[i], false);
-	}
-	
 	public void setEnding(int position) {
-		this.ending.replace(OrganicUtil.FUNCTIONAL_NAMES[position], false, true);
+		try {
+			this.ending.put(OrganicUtil.FUNCTIONAL_NAMES[position], Integer.parseInt(functionalLocation.get(idx++)));
+		} catch (IndexOutOfBoundsException e) {
+
+		}
 	}
-	
-	public TreeMap<String,Boolean> getEndings() {
+
+	public TreeMap<String, Integer> getEndings() {
 		return this.ending;
 	}
+
 	public void setMain() {
 		this.main = true;
 		functionalLocation = new ArrayList<String>();
+		ending = new TreeMap<String, Integer>();
 	}
 
 	public boolean isMain() {

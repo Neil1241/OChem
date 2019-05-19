@@ -17,15 +17,15 @@ public class Interpreter {
 	private static StringTokenizer compoundName; // name of the compound
 	private static Compound compound; // compound to be created
 	private static String suffix = ""; // compound suffix made more general for future use
-	private static String delimit;
-	private static int mainBond;
-	private static ArrayList<Integer> endingPosition=new ArrayList<Integer>();
-	private static String front = "";
+	private static String delimit; // holds the delimited version of the orignal name
+	private static int mainBond; // holds the type of bond
+	private static ArrayList<Integer> endingPosition = new ArrayList<Integer>();
+	private static String front = ""; // the prefix of the main chain
 	private static ArrayList<String> chainNames; // all the side chains
 	private static ArrayList<String> chainLocations; // locations of the side chains
 	private static String originalName; // original name of String
-	private static int additionalGroups = 0;
-	private static boolean ester;
+	private static int additionalGroups = 0; // counter to see how many groups are on the main chain
+	private static boolean ester; // boolean to determine if the compound is an ester
 
 	/*
 	 * Create a Compound object from a text name String name - name of the compound
@@ -36,11 +36,12 @@ public class Interpreter {
 
 		splitChains(); // remove all the hyphens in the String
 
-		System.out.println("----------------ELEMENTS-----------------");
-		// print out the elements in the array
-		for (int i = 0; i < chainNames.size(); i++)
-			System.out.println(chainNames.get(i)); // dbg
-		System.out.println("-----------------------------------------");
+		/*
+		 * System.out.println("----------------ELEMENTS-----------------"); // print out
+		 * the elements in the array for (int i = 0; i < chainNames.size(); i++)
+		 * System.out.println(chainNames.get(i)); // dbg
+		 * System.out.println("-----------------------------------------");
+		 */
 
 		// create compound and set if the main chain is a cyclo
 		compound = new Compound(chainToNumber(chainNames.get(chainNames.size() - 1), suffix, front));
@@ -58,9 +59,11 @@ public class Interpreter {
 
 		// add sidechains
 		addChains();
-		
-		for (Integer i: endingPosition)
+
+		// add to the main chains treemap
+		for (Integer i : endingPosition) {
 			compound.getMainChain().setEnding(i);
+		}
 
 		return compound;
 	} // end compoundFromName
@@ -74,7 +77,6 @@ public class Interpreter {
 		// temporary variable
 		String temp = ""; // holds the next token
 
-		// System.out.println(compoundName.countTokens());
 		// loop while there are more tokens
 		while (compoundName.hasMoreTokens()) {
 			temp = compoundName.nextToken();
@@ -123,11 +125,11 @@ public class Interpreter {
 
 		// use last chain to determine suffix
 		suffix = mainChainEnding(last);
-		
+
 		if (!suffix.equalsIgnoreCase("ane"))
 			preSuffix(last);
 
-		System.out.println(suffix);// dbg
+		// System.out.println(suffix);// dbg
 
 	} // end splitLastChain
 
@@ -178,14 +180,17 @@ public class Interpreter {
 			}
 		}
 
+		// substring the variable mid to hold the mainChain without the prefix
 		mid = mainChain.substring(chain);
-		System.out.println(mid);
+		// System.out.println(mid); //dbg
 		suffix = mid;
 
+		// check if mid has a prefix on the suffix and if it does set it to itself
+		// without the prefix
 		mid = checkPrefix(mid);
 
 		try {
-			// check bond type
+			// check bond type and add locations if needed
 			if (mid.substring(0, 2).equalsIgnoreCase("an")) {
 				mainBond = 1;
 				endingPosition.add(0);
@@ -208,16 +213,24 @@ public class Interpreter {
 				mainBond = 3;
 				endingPosition.add(2);
 			} else
-				System.out.println("BREAK");
+				System.out.println("BREAK");// dbg
 			// end if
 		} catch (StringIndexOutOfBoundsException e) {
 		} // end try catch
 
+		// check to see if the second part of the suffix has a prefix
 		try {
 			String hold = mid.substring(0, 2);
 			mid = mid.substring(2, mid.length() - temp.length());
-			System.out.println("--------------MID--------------\n" + mid);
-			// System.out.println(Character.isDigit(delimit.charAt(delimit.length()-mainChain.length()-1)));
+			// System.out.println("--------------MID--------------\n" + mid); //dbg
+
+			/*
+			 * if substring was possible see if the length is big enough to do another
+			 * prefix else check to make sure the bond type isn't one, if it isn't then
+			 * check to make sure it does not equal the other alkyl bond types if that is
+			 * true then see if the first character in front of the original mainChain is a
+			 * number if not add one
+			 */
 			if (mid.length() != 0) {
 				temp = checkPrefix(mid);
 				additionalGroups--;
@@ -235,9 +248,8 @@ public class Interpreter {
 					} // end if
 				} // end if
 			} // end if
-
 		} catch (StringIndexOutOfBoundsException e) {
-			System.out.println("CAUGHT");
+			// System.out.println("CAUGHT");
 			if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[0])) {
 				if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[1])) {
 					if (!temp.equalsIgnoreCase(OrganicUtil.MAIN_CHAIN_SUFFIX[2])) {
@@ -251,6 +263,7 @@ public class Interpreter {
 
 	}// end preSuffix
 
+	// checks for the prefix of a given name
 	private static String checkPrefix(String mid) {
 		for (int i = 0; i < OrganicUtil.PREFIX.length; i++) {
 			try {
@@ -259,7 +272,7 @@ public class Interpreter {
 					mid = mid.substring(OrganicUtil.PREFIX[i].length());
 				} // end if
 			} catch (StringIndexOutOfBoundsException e) {
-				// System.out.println("CAUGHT");
+				// System.out.println("CAUGHT"); //dbg
 			}
 		} // end for
 		return mid;
@@ -276,8 +289,8 @@ public class Interpreter {
 				ending = mainChain.substring(mainChain.indexOf(OrganicUtil.MAIN_CHAIN_SUFFIX[i]));
 				endingPosition.add(i);
 				if (ending.equalsIgnoreCase("oate"))
-					ester=true;
-				
+					ester = true;
+
 				if (i < 3)
 					mainBond = i + 1;
 				return ending;
@@ -306,9 +319,11 @@ public class Interpreter {
 
 	// Add the side chains to the compound
 	private static void addChains() {
+		// temp variable
+		int idx = 0;
+
 		// loop through the list of the text forms of the chains, convert them and add
 		// them
-		int idx = 0;
 		for (int i = 0; i < chainNames.size() - 1; i++) {
 			// temporary variables
 			String temp = chainNames.get(i);
@@ -325,27 +340,27 @@ public class Interpreter {
 				} /// end if
 			} // end if
 
+			// determine the suffix of the side chain
 			for (int j = 0; j < OrganicUtil.SIDE_CHAIN_SUFFIX.length; j++) {
 				if (temp.indexOf(OrganicUtil.SIDE_CHAIN_SUFFIX[j]) != -1) {
 					spot = j;
 					break;
 				} // end if
 			} // end for
-			// run through ether method if the suffix is determined to be an ether AKA
-			// ...oxy
+
+			// Check if the compound is an ester or an ether or none to add side chains
+			// accordingly
 			if (OrganicUtil.SIDE_CHAIN_SUFFIX[spot].equalsIgnoreCase("oxy")) {
 				if (!Character.isDigit(delimit.charAt(0))) {
 					ether(chainNames.get(i), prefix, cyclo, "1");
-					//endingPosition.add(1);
 				} else {
 					ether(chainNames.get(i), prefix, cyclo, chainLocations.get(idx));
-					//endingPosition.add(Integer.parseInt(chainLocations.get(idx)));
 					idx++;
 				}
 				endingPosition.add(11);
-			} else if (ester && i==0) {
-				compound.addSideChain(chainToNumber(chainNames.get(i), OrganicUtil.SIDE_CHAIN_SUFFIX[spot], prefix),"O",cyclo);
-				
+			} else if (ester && i == 0) {
+				compound.addSideChain(chainToNumber(chainNames.get(i), OrganicUtil.SIDE_CHAIN_SUFFIX[spot], prefix),
+						"O", cyclo);
 			} else {
 				try {
 					// add side chains and any additional sidechains
@@ -356,10 +371,11 @@ public class Interpreter {
 					System.out.println("CATCH");
 					idx++;
 				} // end try catch
-			}
+			} // end if
 		} // loop
 	} // end addChains
 
+	// adds splits up ethers to be an oxy group and an alkyl group
 	private static void ether(String chainName, String prefix, boolean cyclo, String location) {
 		String chain = chainName.substring(0, chainName.length() - 3);
 		compound.addSideChain(chainToNumber(chain + "yl", "yl", prefix), "O", cyclo);
@@ -372,7 +388,9 @@ public class Interpreter {
 	 * - numerical form of the chain
 	 */
 	private static int chainToNumber(String chain, String suffix, String prefix) {
+		// temporary variable
 		int size = 0;
+
 		// compare the String to each of the main chain Strings and set the size
 		// accordingly
 		System.out.println(chain);
@@ -382,17 +400,20 @@ public class Interpreter {
 				break;
 			} else if (chain.equalsIgnoreCase(OrganicUtil.CHAIN[10])) {
 				size = 6;
+				endingPosition.add(10);
 				break;
 			} // end if
 		} // end for
 
+		// checks if the suffix is phenyl to determine the size, otherwise set the size
+		// to -1
 		if (chain.equalsIgnoreCase(prefix + "phenyl"))
 			size = 6;
 		else if (chain.equalsIgnoreCase(prefix + suffix)) {
 			size = -1;
 		} // end if
 
-		System.out.println("CHAIN TO NUMBER : " + prefix + suffix);// dbg
+		// System.out.println("CHAIN TO NUMBER : " + prefix + suffix);// dbg
 		return size;
 	}// end chainToNumber
 
