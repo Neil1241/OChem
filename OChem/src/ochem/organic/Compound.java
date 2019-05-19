@@ -50,18 +50,12 @@ public class Compound {
 	 * location - location of the side chain on the main chain
 	 */
 	public void addSideChain(int size, String location, boolean cyclo) {
-		boolean b=false;
 		for (int i = 0; i < OrganicUtil.LOCATIONS.length; i++) {
-			if (location.equalsIgnoreCase(OrganicUtil.LOCATIONS[i])) { 
+			if (location.equalsIgnoreCase(OrganicUtil.LOCATIONS[i]) || location.equalsIgnoreCase("o")) {
 				sideChains.add(new Chain(size, location, cyclo));
-				b=false;
 				break;
-			} else {
-				b=true;
-			} // if
+			}
 		}
-		if (b)
-			throw new IllegalArgumentException("Not a valid location");
 	} // end addSideChain
 
 	/*

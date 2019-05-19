@@ -10,6 +10,7 @@ package ochem.organic;
  */
 
 import java.io.PrintStream;
+import java.util.TreeMap;
 import java.util.Scanner;
 
 public class OChem {
@@ -26,6 +27,7 @@ public class OChem {
 
 		Compound compound = Interpreter.compoundFromName(cmpnd);
 		Chain[] chains = compound.getSideChains();
+		TreeMap<String, Integer> e = compound.getMainChain().getEndings();
 
 		out.println("------------------------------------------");
 		out.println("OCHEM RUNNING THIS");
@@ -37,6 +39,10 @@ public class OChem {
 			out.println(chains[i].getCyclo());
 		out.println("------------------BOND--------------------");
 		out.println(compound.getMainChain().getBond());
+		out.println("------------------GROUP-----------------");
+		for (String key : e.keySet())
+			System.out.println(key + ":" + e.get(key));
+
 		in.close();
 	} // end main
 
