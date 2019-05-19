@@ -16,6 +16,7 @@ public class Chain {
 	private boolean cyclo;
 	private ArrayList<String> functionalLocation;
 	private TreeMap<String,Boolean> ending = new TreeMap<String,Boolean>();
+	//private TreeMap<String, Integer> places = new TreeMap<String, Integer>();
 	private int bond = 1;
 	private boolean main;
 	
@@ -37,18 +38,16 @@ public class Chain {
 		this.location = location;
 		this.cyclo = cyclo;
 		this.bond = 1;
+		setEnding();
 	} // end constructor
 
-	public Chain(int size, String location, boolean cyclo, int bond) {
-		this.size = size;
-		this.location = location;
-		this.cyclo = cyclo;
-		this.bond = bond;
-	} // end constructor
-	
 	private void setEnding() {
 		for (int i=0;i<OrganicUtil.FUNCTIONAL_NAMES.length;i++)
 			this.ending.put(OrganicUtil.FUNCTIONAL_NAMES[i], false);
+	}
+	
+	public void setEnding(int position) {
+		this.ending.replace(OrganicUtil.FUNCTIONAL_NAMES[position], false, true);
 	}
 	
 	public TreeMap<String,Boolean> getEndings() {
@@ -71,7 +70,6 @@ public class Chain {
 	public ArrayList<String> getFunctionalLocation() {
 		return functionalLocation;
 	}
-
 
 	/*
 	 * Set the size of the chain int size - size of the chain

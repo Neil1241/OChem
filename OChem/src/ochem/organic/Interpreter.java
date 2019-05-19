@@ -19,11 +19,13 @@ public class Interpreter {
 	private static String suffix = ""; // compound suffix made more general for future use
 	private static String delimit;
 	private static int mainBond;
+	private static ArrayList<Integer> endingPosition=new ArrayList<Integer>();
 	private static String front = "";
 	private static ArrayList<String> chainNames; // all the side chains
 	private static ArrayList<String> chainLocations; // locations of the side chains
 	private static String originalName; // original name of String
 	private static int additionalGroups = 0;
+	private static boolean ester;
 
 	/*
 	 * Create a Compound object from a text name String name - name of the compound
@@ -45,10 +47,10 @@ public class Interpreter {
 		if (front.equalsIgnoreCase(OrganicUtil.PREFIX[9]))
 			compound.getMainChain().setCyclo(true);
 
-		/*for (String n : chainLocations)
-			System.out.println(n);//dbg
-		*/
-		
+		/*
+		 * for (String n : chainLocations) System.out.println(n);//dbg
+		 */
+
 		// set the mainchain bond type and get their locations
 		compound.getMainChain().setBond(mainBond);
 		for (int i = 1; i <= additionalGroups; i++)
@@ -56,6 +58,9 @@ public class Interpreter {
 
 		// add sidechains
 		addChains();
+		
+		for (Integer i: endingPosition)
+			compound.getMainChain().setEnding(i);
 
 		return compound;
 	} // end compoundFromName
@@ -114,15 +119,15 @@ public class Interpreter {
 				front = OrganicUtil.PREFIX[9];
 
 		addLocations(); // add the locations of the chains to the locations list
-		reListChain();
-		
+		reListChain(); // reformat the list
+
 		// use last chain to determine suffix
 		suffix = mainChainEnding(last);
-
+		
 		if (!suffix.equalsIgnoreCase("ane"))
 			preSuffix(last);
 
-		System.out.println(suffix);//dbg
+		System.out.println(suffix);// dbg
 
 	} // end splitLastChain
 
@@ -183,6 +188,7 @@ public class Interpreter {
 			// check bond type
 			if (mid.substring(0, 2).equalsIgnoreCase("an")) {
 				mainBond = 1;
+				endingPosition.add(0);
 				if (mid.length() > 3) {
 					if (!Character.isDigit(delimit.charAt(delimit.length() - mainChain.length() - 1)))
 						chainLocations.add("1");
@@ -194,11 +200,13 @@ public class Interpreter {
 					chainLocations.add("1");
 				additionalGroups++;
 				mainBond = 2;
+				endingPosition.add(1);
 			} else if (mid.substring(0, 2).equalsIgnoreCase("yn")) {
 				if (!Character.isDigit(delimit.charAt(delimit.length() - mainChain.length() - 2)))
 					chainLocations.add("1");
 				additionalGroups++;
 				mainBond = 3;
+				endingPosition.add(2);
 			} else
 				System.out.println("BREAK");
 			// end if
@@ -212,6 +220,7 @@ public class Interpreter {
 			// System.out.println(Character.isDigit(delimit.charAt(delimit.length()-mainChain.length()-1)));
 			if (mid.length() != 0) {
 				temp = checkPrefix(mid);
+				additionalGroups--;
 			} else {
 				System.out.println(temp);
 				if (!hold.equalsIgnoreCase("an")) {
@@ -265,13 +274,17 @@ public class Interpreter {
 			try {
 				// based on the error counter at the beginning, determine the type of suffix
 				ending = mainChain.substring(mainChain.indexOf(OrganicUtil.MAIN_CHAIN_SUFFIX[i]));
+				endingPosition.add(i);
+				if (ending.equalsIgnoreCase("oate"))
+					ester=true;
+				
 				if (i < 3)
 					mainBond = i + 1;
 				return ending;
 			} catch (StringIndexOutOfBoundsException e) {
 			} // end try catch
-		}//end for
-		
+		} // end for
+
 		// return the result
 		return ending;
 	}// end mainChainEnding
@@ -316,15 +329,23 @@ public class Interpreter {
 				if (temp.indexOf(OrganicUtil.SIDE_CHAIN_SUFFIX[j]) != -1) {
 					spot = j;
 					break;
-				}
-			}
+				} // end if
+			} // end for
+			// run through ether method if the suffix is determined to be an ether AKA
+			// ...oxy
 			if (OrganicUtil.SIDE_CHAIN_SUFFIX[spot].equalsIgnoreCase("oxy")) {
-				if (!Character.isDigit(delimit.charAt(0)))
+				if (!Character.isDigit(delimit.charAt(0))) {
 					ether(chainNames.get(i), prefix, cyclo, "1");
-				else {
+					//endingPosition.add(1);
+				} else {
 					ether(chainNames.get(i), prefix, cyclo, chainLocations.get(idx));
+					//endingPosition.add(Integer.parseInt(chainLocations.get(idx)));
 					idx++;
 				}
+				endingPosition.add(11);
+			} else if (ester && i==0) {
+				compound.addSideChain(chainToNumber(chainNames.get(i), OrganicUtil.SIDE_CHAIN_SUFFIX[spot], prefix),"O",cyclo);
+				
 			} else {
 				try {
 					// add side chains and any additional sidechains
@@ -341,7 +362,6 @@ public class Interpreter {
 
 	private static void ether(String chainName, String prefix, boolean cyclo, String location) {
 		String chain = chainName.substring(0, chainName.length() - 3);
-		System.out.println("CHAIN BOIS " + chain + "yl");
 		compound.addSideChain(chainToNumber(chain + "yl", "yl", prefix), "O", cyclo);
 		compound.addSideChain(1, location, false);
 	}
@@ -369,7 +389,7 @@ public class Interpreter {
 		if (chain.equalsIgnoreCase(prefix + "phenyl"))
 			size = 6;
 		else if (chain.equalsIgnoreCase(prefix + suffix)) {
-			size = 1;
+			size = -1;
 		} // end if
 
 		System.out.println("CHAIN TO NUMBER : " + prefix + suffix);// dbg

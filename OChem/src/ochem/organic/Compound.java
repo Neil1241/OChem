@@ -51,7 +51,7 @@ public class Compound {
 	 */
 	public void addSideChain(int size, String location, boolean cyclo) {
 		for (int i = 0; i < OrganicUtil.LOCATIONS.length; i++) {
-			if (location.equalsIgnoreCase(OrganicUtil.LOCATIONS[i])|| location.equalsIgnoreCase("o")) { 
+			if (location.equalsIgnoreCase(OrganicUtil.LOCATIONS[i]) || location.equalsIgnoreCase("o")) {
 				sideChains.add(new Chain(size, location, cyclo));
 				break;
 			}

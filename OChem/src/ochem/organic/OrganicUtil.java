@@ -21,9 +21,10 @@ public class OrganicUtil {
 	public static final String[] SIDE_CHAIN_SUFFIX = { "phenyl", "yl", "bromo", "iodo", "fluro", "chloro", "oxo",
 			"hydroxy", "oxy", "amino" };
 
-	//name of functional groups
-	public static final String[] FUNCTIONAL_NAMES = {"Alkene","Alkyne","Alcohol","Amine","Ether","Ester","Aldehyde","ketone","Carboxylic Acid","Benzene"};
-	
+	// name of functional groups
+	public static final String[] FUNCTIONAL_NAMES = { "Alkane", "Alkene", "Alkyne", "Alcohol", "Aldehyde", "Ketone",
+			"Amide", "Amine", "Ester", "Carboxylic Acid", "Benzene", "Ether" };
+
 	// names of the main chains
 	public static final String[] CHAIN = { "meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec",
 			"benzene" };
