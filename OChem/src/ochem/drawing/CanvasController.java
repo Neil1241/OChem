@@ -149,7 +149,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			ArrayList<Node> nodes = canvas.getMainNodes();
 			Node ms = new Node(m.getX(), m.getY(), 10);
 			
-			for (int i = 1; i < nodes.size()-1; i++) {
+			for (int i = 1; i < nodes.size()-1; i++) { 
 				
 				//if over the node
 				if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), 
