@@ -345,7 +345,7 @@ public class Canvas extends JComponent {
 				break;
 				
 			case LEFT: 
-				angles = new double[] {-150,150};
+				angles = new double[] {-150,150}; 
 				break;
 				
 			case RIGHT:
