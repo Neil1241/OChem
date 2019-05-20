@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
@@ -145,6 +146,8 @@ public class Canvas extends JComponent {
 		clearAction(g2);
 		mainAction(g2);
 		sideAction(g2);
+		
+		drawCyclo(g2, new Node(500,500,20), 6);
 	}  //end paintComponent
 	
 	/*
@@ -281,6 +284,29 @@ public class Canvas extends JComponent {
 		g2.fillOval(n.getCenterX(), n.getCenterY(), n.getDia(), n.getDia());
 	} //end drawNode
 	
+	/*
+	 * Draw a cycloidal chain
+	 * Graphics2D g2 - object responsible for drawing
+	 * Node start - starting node
+	 * int chainSize - size of chain
+	 */
+	private void drawCyclo(Graphics2D g2, Node start, int chainSize) {
+		g2.setColor(Color.BLACK);
+		
+		int[] xPts = new int[chainSize+1];
+		int[] yPts = new int[chainSize+1];
+		
+		int arm = 100;
+		
+	    for (int i = 0; i < chainSize+1; i++) {
+	      xPts[i] = (int) (arm + arm * Math.cos(Math.toRadians(360.0/chainSize * i)));
+	      yPts[i] = (int) (arm * Math.sin(Math.toRadians(360.0/chainSize * i)));
+	    } //loop
+	    
+	    g2.translate(start.getX(), start.getY());
+	    g2.drawPolyline(xPts, yPts, chainSize+1);
+	    g2.translate(-start.getX(), -start.getY());
+	} //end drawCyclo
 	
 	/*
 	 * Draws the main chain from a starting point
