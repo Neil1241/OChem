@@ -15,8 +15,10 @@ public class Chain {
 	private String location; // location on the main chain
 	private boolean cyclo;
 	private ArrayList<String> functionalLocation;
-	private TreeMap<String, Integer> ending;
+	private ArrayList<String> functionalGroup;
+	private ArrayList<Integer> numOfGroups;
 	private int bond = 1;
+	private int idx2 = 0;
 	private int idx = 0;
 	private boolean main;
 
@@ -41,20 +43,28 @@ public class Chain {
 
 	public void setEnding(int position) {
 		try {
-			this.ending.put(OrganicUtil.FUNCTIONAL_NAMES[position], Integer.parseInt(functionalLocation.get(idx++)));
+			for (int i = 0; i < this.numOfGroups.get(this.idx); i++) {
+				this.functionalGroup
+						.add(OrganicUtil.FUNCTIONAL_NAMES[position] + " : " + this.functionalLocation.get(this.idx2++));
+			}
+			this.idx++;
 		} catch (IndexOutOfBoundsException e) {
 
 		}
 	}
 
-	public TreeMap<String, Integer> getEndings() {
-		return this.ending;
+	public ArrayList<String> getEndings() {
+		return this.functionalGroup;
 	}
 
 	public void setMain() {
 		this.main = true;
-		functionalLocation = new ArrayList<String>();
-		ending = new TreeMap<String, Integer>();
+		this.functionalLocation = new ArrayList<String>();
+		this.functionalGroup = new ArrayList<String>();
+	}
+
+	public void setNumOfGroups(ArrayList<Integer> n) {
+		this.numOfGroups = n;
 	}
 
 	public boolean isMain() {
@@ -63,7 +73,7 @@ public class Chain {
 
 	public void addFunctionalLocation(String l) {
 
-		functionalLocation.add(l);
+		this.functionalLocation.add(l);
 	}
 
 	public ArrayList<String> getFunctionalLocation() {
