@@ -30,44 +30,50 @@ public class UserInputController implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent k) {
-		if ((int) k.getKeyChar() == ENTER_KEY && isNumber(DrawingGUI.getUserInput())) {
-			int num = Integer.parseInt(DrawingGUI.getUserInput());
+		if ((int) k.getKeyChar() == ENTER_KEY ) {
+			if (isNumber(DrawingGUI.getUserInput())) {
+				int num = Integer.parseInt(DrawingGUI.getUserInput());
+				
+				switch (palette.getSelectedType()) {
+					//main button
+					case MAIN:
+						//check to see if number entered is within range
+						if (num < 2) {
+							DrawingGUI.reportError("Size entered too small!");
+						} else if (num > 10) {
+							DrawingGUI.reportError("Size entered too big!");
+						} else {
+							//set the size and step forward
+							canvas.setMainSize(num);
+							canvas.setMainStep(2);
+							DrawingGUI.clear();
+						} //if
+						
+						break;
+						
+					//side button
+					case SIDE:
+						//add a size and step forward
+						canvas.addSideSize(num);
+						canvas.setSideStep(2);				
+						
+						break;
+				} //switch
 			
-			switch (palette.getSelectedType()) {
-				//main button
-				case MAIN:
-					//check to see if number entered is within range
-					if (num < 2) {
-						DrawingGUI.reportError("Size entered too small!");
-					} else if (num > 10) {
-						DrawingGUI.reportError("Size entered too big!");
-					} else {
-						//set the size and step forward
-						canvas.setMainSize(num);
-						canvas.setMainStep(2);
-					} //if
-					
-					break;
-					
-				//side button
-				case SIDE:
-					//add a size and step forward
-					canvas.addSideSize(num);
-					canvas.setSideStep(2);				
-					
-					break;
-					
-				//functional group button
-				case FUNC_GROUP:
-					break;
-					
-				//bond button
-				case BOND:
-					
-					break;
-			} //switch
-		} //if
-		
+			//if letter was typed
+			} else {
+				String in = DrawingGUI.getUserInput();
+				
+				if (in.equalsIgnoreCase("Y")) {
+					canvas.setMainCyclo(true);
+				} else if (in.equalsIgnoreCase("N")) {
+					canvas.setMainCyclo(false);
+				} //if
+				
+				canvas.setMainStep(3);
+				
+			} //if
+		} //outer if
 	} //end keyTyped
 
 	/*

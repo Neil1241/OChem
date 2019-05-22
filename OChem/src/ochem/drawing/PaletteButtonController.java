@@ -59,11 +59,13 @@ public class PaletteButtonController implements MouseListener {
 			if (!canvas.getMainOnScreen()) {
 				palette.setSelectedType(ActionType.MAIN);
 				canvas.setMainStep(1);
-			}
+			} //if
 			
 		} else if (text.equals("Side")) {
-			palette.setSelectedType(ActionType.SIDE);
-			canvas.setSideStep(1);
+			if (canvas.getMainOnScreen()) {
+				palette.setSelectedType(ActionType.SIDE);
+				canvas.setSideStep(1);
+			}
 			
 		} else if (text.equals("Function")) {
 			palette.setSelectedType(ActionType.FUNC_GROUP);

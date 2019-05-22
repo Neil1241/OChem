@@ -82,7 +82,9 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			switch (canvas.getType()) {
 				//main action type
 				case MAIN: 
-					canvas.setMainStep(3);
+					if (canvas.getMainStep() == 3) {
+						canvas.setMainStep(4);
+					}
 					break;
 					
 				//side action type
@@ -158,7 +160,14 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			ArrayList<Node> nodes = canvas.getMainNodes();
 			Node ms = new Node(m.getX(), m.getY(), 10);
 			
-			for (int i = 1; i < nodes.size()-1; i++) { 
+			int start;
+			if (canvas.getMainCyclo()) {
+				start = 0;
+			} else {
+				start = 1;
+			}
+			
+			for (int i = start; i < nodes.size()-1; i++) { 
 				
 				//if over the node
 				if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), 
@@ -195,8 +204,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		} else {
 			dir = DrawDirection.values()[pos + 1];
 		} //if
-		
-		System.out.println(dir.toString());
 	} //end incDirection
 	
 	public String toString() {
