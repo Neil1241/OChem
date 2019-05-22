@@ -14,9 +14,12 @@ public class Chain {
 	private int size; // side of the side chain
 	private String location; // location on the main chain
 	private boolean cyclo;
+	private boolean benzene;
 	private ArrayList<String> functionalLocation;
-	private TreeMap<String, Integer> ending;
+	private ArrayList<String> functionalGroup;
+	private ArrayList<Integer> numOfGroups;
 	private int bond = 1;
+	private int idx2 = 0;
 	private int idx = 0;
 	private boolean main;
 
@@ -29,32 +32,43 @@ public class Chain {
 		this.size = size;
 		this.location = location;
 		this.cyclo = false;
+		this.benzene = false;
 		this.bond = 1;
 	} // end constructor
 
-	public Chain(int size, String location, boolean cyclo) {
+	public Chain(int size, String location, boolean cyclo, boolean benzene) {
 		this.size = size;
 		this.location = location;
 		this.cyclo = cyclo;
+		this.benzene = benzene;
 		this.bond = 1;
 	} // end constructor
 
 	public void setEnding(int position) {
 		try {
-			this.ending.put(OrganicUtil.FUNCTIONAL_NAMES[position], Integer.parseInt(functionalLocation.get(idx++)));
+			int hold = functionalLocation.size() - 1;
+			for (int i = 0; i < this.numOfGroups.get(idx); i++) {
+				this.functionalGroup.add(OrganicUtil.FUNCTIONAL_NAMES[position] + " : "
+						+ this.functionalLocation.get(hold - this.idx2++));
+			}
+			this.idx++;
 		} catch (IndexOutOfBoundsException e) {
-
+			System.out.println("oof");
 		}
 	}
 
-	public TreeMap<String, Integer> getEndings() {
-		return this.ending;
+	public ArrayList<String> getEndings() {
+		return this.functionalGroup;
 	}
 
 	public void setMain() {
 		this.main = true;
-		functionalLocation = new ArrayList<String>();
-		ending = new TreeMap<String, Integer>();
+		this.functionalLocation = new ArrayList<String>();
+		this.functionalGroup = new ArrayList<String>();
+	}
+
+	public void setNumOfGroups(ArrayList<Integer> n) {
+		this.numOfGroups = n;
 	}
 
 	public boolean isMain() {
@@ -63,7 +77,7 @@ public class Chain {
 
 	public void addFunctionalLocation(String l) {
 
-		functionalLocation.add(l);
+		this.functionalLocation.add(l);
 	}
 
 	public ArrayList<String> getFunctionalLocation() {
@@ -104,7 +118,7 @@ public class Chain {
 		this.cyclo = b;
 	}
 
-	public boolean getCyclo() {
+	public boolean isCyclo() {
 		return this.cyclo;
 	}
 
@@ -114,5 +128,13 @@ public class Chain {
 
 	public void setBond(int b) {
 		this.bond = b;
+	}
+
+	public boolean isBenzene() {
+		return this.benzene;
+	}
+
+	public void setBenzene(Boolean b) {
+		this.benzene = b;
 	}
 } // end Chain

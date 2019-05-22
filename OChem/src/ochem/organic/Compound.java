@@ -49,10 +49,10 @@ public class Compound {
 	 * Add a side chain to the compound int size - size of the side chain int
 	 * location - location of the side chain on the main chain
 	 */
-	public void addSideChain(int size, String location, boolean cyclo) {
+	public void addSideChain(int size, String location, boolean cyclo, boolean benzene) {
 		for (int i = 0; i < OrganicUtil.LOCATIONS.length; i++) {
 			if (location.equalsIgnoreCase(OrganicUtil.LOCATIONS[i]) || location.equalsIgnoreCase("o")) {
-				sideChains.add(new Chain(size, location, cyclo));
+				sideChains.add(new Chain(size, location, cyclo, benzene));
 				break;
 			}
 		}

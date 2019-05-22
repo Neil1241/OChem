@@ -10,8 +10,8 @@ package ochem.organic;
  */
 
 import java.io.PrintStream;
-import java.util.TreeMap;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class OChem {
 	/*
@@ -27,21 +27,25 @@ public class OChem {
 
 		Compound compound = Interpreter.compoundFromName(cmpnd);
 		Chain[] chains = compound.getSideChains();
-		TreeMap<String, Integer> e = compound.getMainChain().getEndings();
+		ArrayList<String> e = compound.getMainChain().getEndings();
 
 		out.println("------------------------------------------");
 		out.println("OCHEM RUNNING THIS");
 		out.println("------------------------------------------");
 		out.println(compound.toString());
 		out.println("------------------CYCLO-------------------");
-		out.println(compound.getMainChain().getCyclo());
+		out.println(compound.getMainChain().isCyclo());
 		for (int i = 0; i < compound.getSideChains().length; i++)
-			out.println(chains[i].getCyclo());
+			out.println(chains[i].isCyclo());
+		out.println("-----------------BENZENE-----------------");
+		out.println(compound.getMainChain().isBenzene());
+		for (int i = 0; i < compound.getSideChains().length; i++)
+			out.println(chains[i].isBenzene());
 		out.println("------------------BOND--------------------");
 		out.println(compound.getMainChain().getBond());
-		out.println("------------------GROUP-----------------");
-		for (String key : e.keySet())
-			System.out.println(key + ":" + e.get(key));
+		out.println("------------------GROUP-------------------");
+		for (String k : e)
+			System.out.println(k);
 
 		in.close();
 	} // end main
