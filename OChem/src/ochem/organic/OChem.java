@@ -34,9 +34,13 @@ public class OChem {
 		out.println("------------------------------------------");
 		out.println(compound.toString());
 		out.println("------------------CYCLO-------------------");
-		out.println(compound.getMainChain().getCyclo());
+		out.println(compound.getMainChain().isCyclo());
 		for (int i = 0; i < compound.getSideChains().length; i++)
-			out.println(chains[i].getCyclo());
+			out.println(chains[i].isCyclo());
+		out.println("-----------------BENZENE-----------------");
+		out.println(compound.getMainChain().isBenzene());
+		for (int i = 0; i < compound.getSideChains().length; i++)
+			out.println(chains[i].isBenzene());
 		out.println("------------------BOND--------------------");
 		out.println(compound.getMainChain().getBond());
 		out.println("------------------GROUP-------------------");

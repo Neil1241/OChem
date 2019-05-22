@@ -14,6 +14,7 @@ public class Chain {
 	private int size; // side of the side chain
 	private String location; // location on the main chain
 	private boolean cyclo;
+	private boolean benzene;
 	private ArrayList<String> functionalLocation;
 	private ArrayList<String> functionalGroup;
 	private ArrayList<Integer> numOfGroups;
@@ -31,25 +32,28 @@ public class Chain {
 		this.size = size;
 		this.location = location;
 		this.cyclo = false;
+		this.benzene = false;
 		this.bond = 1;
 	} // end constructor
 
-	public Chain(int size, String location, boolean cyclo) {
+	public Chain(int size, String location, boolean cyclo, boolean benzene) {
 		this.size = size;
 		this.location = location;
 		this.cyclo = cyclo;
+		this.benzene = benzene;
 		this.bond = 1;
 	} // end constructor
 
 	public void setEnding(int position) {
 		try {
-			for (int i = 0; i < this.numOfGroups.get(this.idx); i++) {
-				this.functionalGroup
-						.add(OrganicUtil.FUNCTIONAL_NAMES[position] + " : " + this.functionalLocation.get(this.idx2++));
+			int hold = functionalLocation.size() - 1;
+			for (int i = 0; i < this.numOfGroups.get(idx); i++) {
+				this.functionalGroup.add(OrganicUtil.FUNCTIONAL_NAMES[position] + " : "
+						+ this.functionalLocation.get(hold - this.idx2++));
 			}
 			this.idx++;
 		} catch (IndexOutOfBoundsException e) {
-
+			System.out.println("oof");
 		}
 	}
 
@@ -114,7 +118,7 @@ public class Chain {
 		this.cyclo = b;
 	}
 
-	public boolean getCyclo() {
+	public boolean isCyclo() {
 		return this.cyclo;
 	}
 
@@ -124,5 +128,13 @@ public class Chain {
 
 	public void setBond(int b) {
 		this.bond = b;
+	}
+
+	public boolean isBenzene() {
+		return this.benzene;
+	}
+
+	public void setBenzene(Boolean b) {
+		this.benzene = b;
 	}
 } // end Chain
