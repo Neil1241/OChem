@@ -155,7 +155,7 @@ public class Canvas extends JComponent {
 		clearAction(g2);
 		mainAction(g2);
 		sideAction(g2);
-	}  //end paintComponent
+	}  //end paintComponent 
 	
 	/*
 	 * Handles the actions for the clear flow
