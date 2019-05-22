@@ -208,7 +208,7 @@ public class Canvas extends JComponent {
 				DrawingGUI.showMessage("Select location for main chain: (CLICK)");
 				g2.setColor(new Color(200,200,200, 100));
 				
-				if (mainChain.getCyclo()) {
+				if (mainChain.isCyclo()) {
 					drawCyclo(g2, mouse, mainChain.getSize(), false);
 				} else {
 					drawChain(g2, mouse, DrawDirection.RIGHT, mainChain.getSize());					
@@ -223,7 +223,7 @@ public class Canvas extends JComponent {
 				g2.setColor(Color.BLACK);
 				
 				if (!mainOnScreen) { //first time called					
-					if (mainChain.getCyclo()) {
+					if (mainChain.isCyclo()) { 
 						mainNodes = drawCyclo(g2, mainNodes.get(0), mainChain.getSize(), false);
 						System.out.println("first time main node location " + mainNodes.get(0).toString());
 					} else {
@@ -232,7 +232,7 @@ public class Canvas extends JComponent {
 					mainOnScreen = true;
 					
 				} else { //all other times
-					if (mainChain.getCyclo()) {
+					if (mainChain.isCyclo()) {
 						drawCyclo(g2, mainNodes.get(0), mainChain.getSize(), false);
 						System.out.println("main node location " + mainNodes.get(0).toString());
 					} else {
@@ -281,7 +281,7 @@ public class Canvas extends JComponent {
 				g2.setColor(new Color(200,200,200, 100)); //faint gray
 				
 				Chain ghost = sideChains.get(sideChains.size()-1);
-				if (ghost.getCyclo()) {
+				if (ghost.isCyclo()) {
 					drawCyclo(g2, mouse, ghost.getSize(), true);
 				} else {
 					drawChain(g2, mouse, ghostDir, ghost.getSize()+1); //draw most recent chain
@@ -291,7 +291,7 @@ public class Canvas extends JComponent {
 				drawSides(g2);
 				
 				int start;
-				if (mainChain.getCyclo()) {
+				if (mainChain.isCyclo()) {
 					start = 0;
 				} else {
 					start = 1;
@@ -322,7 +322,7 @@ public class Canvas extends JComponent {
 		//draw side chains
 		g2.setColor(Color.black);
 		for (int i = 0; i < sideNodes.size(); i++) {
-			if (sideChains.get(i).getCyclo()) {
+			if (sideChains.get(i).isCyclo()) {
 				drawCyclo(g2, sideNodes.get(i), sideChains.get(i).getSize(), true);
 			} else {
 				drawChain(g2, sideNodes.get(i), directions.get(i), sideChains.get(i).getSize() + 1);
@@ -702,7 +702,7 @@ public class Canvas extends JComponent {
 	 * return - whether main chain is cycloidal or not
 	 */
 	public boolean getMainCyclo() {
-		return mainChain.getCyclo();
+		return mainChain.isCyclo();
 	} //end getMainCyclo
 
 	/*
