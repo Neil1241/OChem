@@ -108,4 +108,8 @@ public class Node {
 	public Color getColor() {
 		return color;
 	} //end getColor
+	
+	public String toString() {
+		return "" + x + " " + y;
+	}
 } //end class

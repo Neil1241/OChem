@@ -97,7 +97,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 								nodes.get(i).getCenterX(), nodes.get(i).getCenterY(), nodes.get(i).getDia())) {
 							canvas.addSideNode(nodes.get(i)); //add that node to the side nodes list
 							canvas.addSideDirection(dir); //add a direction
-							canvas.setSideStep(3); //step forward
+							canvas.setSideStep(4); //step forward
 							break;
 						} //if
 					} //loop
@@ -114,7 +114,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			
 		//right click
 		} else if (m.getButton() == MouseEvent.BUTTON3) {
-			if (canvas.getSideStep() == 2) {
+			if (canvas.getSideStep() == 3) {
 				incDirection();
 				canvas.setGhostDirection(dir);
 			}
@@ -155,7 +155,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		canvas.setMouseXY(m.getX(), m.getY());
 
 		//if there is a main chain on the screen
-		if (canvas.getMainOnScreen()) {
+		if (canvas.getMainOnScreen() ) {
 			//change node color based on mouse position
 			ArrayList<Node> nodes = canvas.getMainNodes();
 			Node ms = new Node(m.getX(), m.getY(), 10);
@@ -175,14 +175,16 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					//make its color darker
 					nodes.get(i).setColor(new Color(219, 194, 52)); //dark yellow
 					
-					//change direction of the ghost depending on the position of the node on the chain
-					if (i % 2 == 0) {
-						dir = DrawDirection.DOWN_RIGHT;
-					} else {
-						dir = DrawDirection.UP_RIGHT;
-					} //if
-					
-					canvas.setGhostDirection(dir);
+					if (!canvas.getMainCyclo()) {
+						//change direction of the ghost depending on the position of the node on the chain
+						if (i % 2 == 0) {
+							dir = DrawDirection.DOWN_RIGHT;
+						} else {
+							dir = DrawDirection.UP_RIGHT;
+						} //if
+						
+						canvas.setGhostDirection(dir);
+					}
 				} else {
 					//return to the defauly lighter color
 					nodes.get(i).setColor(new Color(244,217,66)); //light yellow

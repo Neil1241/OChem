@@ -54,23 +54,59 @@ public class UserInputController implements KeyListener {
 					//side button
 					case SIDE:
 						//add a size and step forward
-						canvas.addSideSize(num);
-						canvas.setSideStep(2);				
+						
+						if (num < 1) { //invalidly small
+							DrawingGUI.reportError("Size enter too small!");
+							
+						} else if (num == 1 || num == 2) { //too small for cyclo
+							canvas.addSideSize(num);
+							canvas.addSideCyclo(false);
+							canvas.setSideStep(3); //skip over cyclo step
+							
+						} else if (num > 10) { //invalidly big
+							DrawingGUI.reportError("Size entered too big");		
+							
+						} else {
+							canvas.addSideSize(num);
+							canvas.setSideStep(2);
+						}
 						
 						break;
 				} //switch
 			
 			//if letter was typed
-			} else {
+			} else {				
 				String in = DrawingGUI.getUserInput();
 				
-				if (in.equalsIgnoreCase("Y")) {
-					canvas.setMainCyclo(true);
-				} else if (in.equalsIgnoreCase("N")) {
-					canvas.setMainCyclo(false);
-				} //if
-				
-				canvas.setMainStep(3);
+				switch (palette.getSelectedType()) {
+				//main button
+				case MAIN:
+									
+					if (in.equalsIgnoreCase("Y")) {
+						canvas.setMainCyclo(true);
+						canvas.setMainStep(3);
+					} else if (in.equalsIgnoreCase("N")) {
+						canvas.setMainCyclo(false);
+						canvas.setMainStep(3);
+					} //if
+					
+					break;
+					
+				//side button
+				case SIDE:
+					
+					if (canvas.getSideStep() == 2) {
+						if (in.equalsIgnoreCase("Y")) {
+							canvas.addSideCyclo(true);
+							canvas.setSideStep(3);
+						} else if (in.equalsIgnoreCase("N")) {
+							canvas.addSideCyclo(false);
+							canvas.setSideStep(3);
+						} //if
+					}
+					
+					break;
+			} //switch
 				
 			} //if
 		} //outer if
