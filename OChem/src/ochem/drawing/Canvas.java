@@ -361,8 +361,8 @@ public class Canvas extends JComponent {
 			first = 0;
 		}
 		
-		int[] xPts = new int[chainSize+plus];
-		int[] yPts = new int[chainSize+plus];
+		int[] xPts = new int[chainSize + plus];
+		int[] yPts = new int[chainSize + plus];
 		
 		int arm = 120;
 		
@@ -391,7 +391,7 @@ public class Canvas extends JComponent {
 			xPts[0] = start.getX();
 			yPts[0] = start.getY();
 			
-			xPts[1] = (int) (start.getX() + arm * Math.cos(Math.toRadians(angle)));
+			xPts[1] = (int) (start.getX() + arm + arm * Math.cos(Math.toRadians(angle)));
 			yPts[1] = (int) (start.getY() + arm * Math.sin(Math.toRadians(angle)));
 			
 			startX = xPts[1];
