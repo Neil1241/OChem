@@ -38,10 +38,17 @@ public class UserInputController implements KeyListener {
 					//main button
 					case MAIN:
 						//check to see if number entered is within range
-						if (num < 2) {
+						if (num < 2) { //too small
 							DrawingGUI.reportError("Size entered too small!");
-						} else if (num > 10) {
+							
+						} else if (num > 10) { //too big
 							DrawingGUI.reportError("Size entered too big!");
+							
+						} else if (num > 6) { //too big for cyclo
+							canvas.setMainSize(num);
+							canvas.setMainStep(3);
+							DrawingGUI.clear();
+							
 						} else {
 							//set the size and step forward
 							canvas.setMainSize(num);
@@ -81,14 +88,18 @@ public class UserInputController implements KeyListener {
 				switch (palette.getSelectedType()) {
 				//main button
 				case MAIN:
-									
-					if (in.equalsIgnoreCase("Y")) {
-						canvas.setMainCyclo(true);
-						canvas.setMainStep(3);
-					} else if (in.equalsIgnoreCase("N")) {
-						canvas.setMainCyclo(false);
-						canvas.setMainStep(3);
-					} //if
+					
+					if (canvas.getMainStep() == 2) {
+						if (in.equalsIgnoreCase("Y")) {
+							canvas.setMainCyclo(true);
+							canvas.setMainStep(3);
+							DrawingGUI.clear();
+						} else if (in.equalsIgnoreCase("N")) {
+							canvas.setMainCyclo(false);
+							canvas.setMainStep(3);
+							DrawingGUI.clear();
+						} //if
+					}
 					
 					break;
 					

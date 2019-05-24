@@ -40,6 +40,7 @@ public class View extends JFrame {
 		this.pack();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
+		this.setLocation(OChem.width/2 - width/2, OChem.height/2 - 3*height/4);
 		this.setVisible(true);
 	} //end constructor
 	

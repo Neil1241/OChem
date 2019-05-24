@@ -11,7 +11,7 @@ import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import ochem.drawing.Canvas.ActionType;
+import ochem.drawing.CanvasUtil.ActionType;
 
 public class PaletteButtonController implements MouseListener {
 	//Attributes

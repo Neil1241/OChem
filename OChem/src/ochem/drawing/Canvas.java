@@ -12,12 +12,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
 import ochem.View;
+import ochem.drawing.CanvasUtil.ActionType;
+import ochem.drawing.CanvasUtil.DrawDirection;
 import ochem.organic.Chain;
 import ochem.organic.Compound;
 
@@ -49,29 +50,6 @@ public class Canvas extends JComponent {
 	private int sideStep; //step for the "side" button
 	
 	private DrawDirection ghostDir; //direction of the ghost chain
-	
-	/*
-	 * Types of action to determine different drawing features
-	 */
-	public static enum ActionType {
-		CLEAR,
-		MAIN,
-		SIDE,
-		FUNC_GROUP,
-		BOND
-	} //end enum
-	
-	/*
-	 * Different directions the chain can be drawn in
-	 */
-	public static enum DrawDirection {
-		UP_RIGHT,
-		RIGHT,
-		DOWN_RIGHT,
-		DOWN_LEFT,
-		LEFT,
-		UP_LEFT
-	} //end enum
 	
 	/*
 	 * Create a canvas with its parent's width and height
@@ -209,7 +187,7 @@ public class Canvas extends JComponent {
 				g2.setColor(new Color(200,200,200, 100));
 				
 				if (mainChain.isCyclo()) {
-					drawCyclo(g2, mouse, mainChain.getSize(), false);
+					drawCyclo(g2, mouse, mainChain.getSize(), false, null);
 				} else {
 					drawChain(g2, mouse, DrawDirection.RIGHT, mainChain.getSize());					
 				} //if
@@ -224,8 +202,7 @@ public class Canvas extends JComponent {
 				
 				if (!mainOnScreen) { //first time called					
 					if (mainChain.isCyclo()) { 
-						mainNodes = drawCyclo(g2, mainNodes.get(0), mainChain.getSize(), false);
-						System.out.println("first time main node location " + mainNodes.get(0).toString());
+						mainNodes = drawCyclo(g2, mainNodes.get(0), mainChain.getSize(), false, null);
 					} else {
 						mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());			
 					} //if
@@ -233,8 +210,7 @@ public class Canvas extends JComponent {
 					
 				} else { //all other times
 					if (mainChain.isCyclo()) {
-						drawCyclo(g2, mainNodes.get(0), mainChain.getSize(), false);
-						System.out.println("main node location " + mainNodes.get(0).toString());
+						drawCyclo(g2, mainNodes.get(0), mainChain.getSize(), false, null);
 					} else {
 						drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());	
 					} //if
@@ -282,7 +258,7 @@ public class Canvas extends JComponent {
 				
 				Chain ghost = sideChains.get(sideChains.size()-1);
 				if (ghost.isCyclo()) {
-					drawCyclo(g2, mouse, ghost.getSize(), true);
+					drawCyclo(g2, mouse, ghost.getSize(), true, ghostDir);
 				} else {
 					drawChain(g2, mouse, ghostDir, ghost.getSize()+1); //draw most recent chain
 				}
@@ -323,7 +299,7 @@ public class Canvas extends JComponent {
 		g2.setColor(Color.black);
 		for (int i = 0; i < sideNodes.size(); i++) {
 			if (sideChains.get(i).isCyclo()) {
-				drawCyclo(g2, sideNodes.get(i), sideChains.get(i).getSize(), true);
+				drawCyclo(g2, sideNodes.get(i), sideChains.get(i).getSize(), true, directions.get(i));
 			} else {
 				drawChain(g2, sideNodes.get(i), directions.get(i), sideChains.get(i).getSize() + 1);
 			} //if
@@ -345,77 +321,62 @@ public class Canvas extends JComponent {
 	 * Node start - starting node
 	 * int chainSize - size of chain
 	 * boolean extend - whether the cyclo is a side chain or not
+	 * DrawDirection dir - direction to draw in
+	 * return nodes - nodes for that chain
 	 */
-	private ArrayList<Node> drawCyclo(Graphics2D g2, Node start, int chainSize, boolean extend) {
+	private ArrayList<Node> drawCyclo(Graphics2D g2, Node start, int chainSize, boolean extend, DrawDirection dir) {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		
-		g2.setColor(Color.BLACK);
+		int r = 120;
 		
-		int plus;
-		int first;
+		int x1 = start.getX();
+		int y1 = start.getY();
+		
+		int x2 = 0;
+		int y2 = 0;
+		
+		double theta = Math.toRadians(-360.0 / chainSize);
+		
+		int xOffset;
+		int yOffset;
+		double angOffset;
 		if (extend) {
-			plus = 2;
-			first = 2;
+			if (directions.isEmpty()) {
+				angOffset = Math.toRadians(CanvasUtil.cycloAngle(dir));
+			} else {
+				angOffset = Math.toRadians(CanvasUtil.cycloAngle(dir));
+			}
+			xOffset = (int) (r * Math.cos(angOffset));
+			yOffset = (int) (r * Math.sin(angOffset));
 		} else {
-			plus = 1;
-			first = 0;
+			angOffset = 0;
+			xOffset = 0;
+			yOffset = 0;
 		}
 		
-		int[] xPts = new int[chainSize + plus];
-		int[] yPts = new int[chainSize + plus];
-		
-		int arm = 120;
-		
-		double angle;
-		switch(chainSize) {
-			case 3:
-				angle = 30;
-			break;
+		x1 += xOffset;
+		y1 += yOffset;
+ 		
+		for (int i = 0; i < chainSize; i++) {
+			x2 = x1 + (int) (r * Math.cos(theta * i + angOffset));
+			y2 = y1 + (int) (r * Math.sin(theta * i + angOffset));
 			
-			case 4:
-				angle = 45;
-			break;
+			g2.drawLine(x1, y1, x2, y2);
 			
-			case 5:
-				angle = 54;
-			break;
+			nodes.add(new Node(x1, y1, 20));
 			
-			default:
-				angle = 0;
-		} //switch start
+			x1 = x2;
+			y1 = y2;
+		} //loop
 		
-		int startX;
-		int startY;
+		nodes.add(new Node(x1, y1, 20));
+		
+		g2.drawLine(start.getX(), start.getY(), x2, y2);
 		if (extend) {
-			angle += angleFromDirection(ghostDir)[0];
-			xPts[0] = start.getX();
-			yPts[0] = start.getY();
-			
-			xPts[1] = (int) (start.getX() + arm + arm * Math.cos(Math.toRadians(angle)));
-			yPts[1] = (int) (start.getY() + arm * Math.sin(Math.toRadians(angle)));
-			
-			startX = xPts[1];
-			startY = yPts[1];
-			
-			nodes.add(new Node(xPts[0], yPts[0], 20));
-			nodes.add(new Node(xPts[1], yPts[1], 20));
-			
-		} else {
-			startX = start.getX();
-			startY = start.getY();
+			g2.drawLine(start.getX(), start.getY(), start.getX() + xOffset, start.getY() + yOffset);
 		}
 		
-	    for (int i = first; i < xPts.length; i++) {
-	    	double theta = 360.0/chainSize;
-    		xPts[i] = startX + (int) (arm * Math.cos(Math.toRadians(theta * i + angle)));
-	    	yPts[i] = startY + (int) (arm * Math.sin(Math.toRadians(theta * i + angle)));
-	    	
-	    	nodes.add(new Node(xPts[i], yPts[i], 20));
-	    } //loop
-	    
-	    g2.drawPolyline(xPts, yPts, chainSize+1);
-	    
-	    return nodes;
+		return nodes;
 	} //end drawCyclo
 	
 	/*
@@ -431,7 +392,7 @@ public class Canvas extends JComponent {
 		int x1 = start.getX();
 		int y1 = start.getY();
 		
-		double[] angles = angleFromDirection(dir); //get the angles based on the direction
+		double[] angles = CanvasUtil.angleFromDirection(dir); //get the angles based on the direction
 		int arm = 120; //length of bonds in pixels
 		
 		ArrayList<Node> nodes = new ArrayList<Node>(); //list of nodes
@@ -458,46 +419,6 @@ public class Canvas extends JComponent {
 	    
 		return nodes;
 	} //end drawChain
-	
-	/*
-	 * Choose the pair of angles from the direction chosen
-	 * DrawDirection dir - direction to draw in
-	 */
-	private double[] angleFromDirection(DrawDirection dir) {
-		double[] angles; //array of angles to draw with
-		
-		//different directions require different pairs of numbers to switch between
-		switch (dir) {
-			case DOWN_LEFT: 
-				angles = new double[] {90,150};
-				break;
-				
-			case DOWN_RIGHT:
-				angles = new double[] {90,30};
-				break;
-				 
-			case LEFT: 
-				angles = new double[] {-150,150}; 
-				break;
-				
-			case RIGHT:
-				angles = new double[] {-30,30};
-				break;
-				
-			case UP_LEFT:
-				angles = new double[] {270,210};
-				break;
-				
-			case UP_RIGHT:
-				angles = new double[] {270,330};
-				break;
-				
-			default:
-				throw new IllegalArgumentException("What direction is this???");
-		} //switch
-		
-		return angles;
-	} //end angleFromDirection
 
 	
 	/*
@@ -531,16 +452,20 @@ public class Canvas extends JComponent {
 	 */
 	public void setMouseXY(int x, int y) {
 		mouse.setXY(x, y);
-		
-		//if there is no main chain on the screen, set the potential position to the mouse point
-		if (mainStep == 3) {
-			if (mainNodes.isEmpty()) {
-				mainNodes.add(new Node(mouse.getX(), mouse.getY(), 20));
-			} else {
-				mainNodes.set(0, new Node(mouse.getX(), mouse.getY(), 20));
-			} //inner if
-		} //if 
 	} //end setMouseXY
+	
+	/*
+	 * Set the node for the start position of the main chain
+	 * int x - starting x
+	 * int y - starting y
+	 */
+	public void setMainStart(int x, int y) {
+		if (mainNodes.isEmpty()) {
+			mainNodes.add(new Node(mouse.getX(), mouse.getY(), 20));
+		} else {
+			mainNodes.set(0, new Node(mouse.getX(), mouse.getY(), 20));
+		} //inner if
+	} //end setMainStart
 	
 	
 	/*
@@ -574,22 +499,6 @@ public class Canvas extends JComponent {
 	public void setMainNodes(ArrayList<Node> mainNodes) {
 		this.mainNodes = mainNodes;
 	} //end setMainNodes h
-	
-	/*
-	 * Add side node to the side nodes list
-	 * Node n - node to add to the side Nodes
-	 */
-	public void addSideNode(Node n) {
-		sideNodes.add(n);
-	} //end addSideNode
-	
-	/*
-	 * Get the side chains
-	 * return sideChains - list of all the side chains
-	 */
-	public ArrayList<Chain> getSideChains() {
-		return sideChains;
-	} //end getSideChains
 	
 	/*
 	 * Update the type of the canvas from the palette type
@@ -627,6 +536,65 @@ public class Canvas extends JComponent {
 	} //end getMainStep
 	
 	/*
+	 * Get the size of the side nodes list
+	 * return - size of side nodes list
+	 */
+	public int getSideNodesSize() {
+		return sideNodes.size();
+	} //end getSideNodesSize
+	
+	public String toString() {
+		return "Canvas"; //dbg
+	}
+	
+	/*
+	 * Set the direction for the ghost to be drawn
+	 * DrawDirection dir - new direction for ghost chain
+	 */
+	public void setGhostDirection(DrawDirection dir) {
+		ghostDir = dir;
+	} //end setGhostDirection
+	
+	
+	/*
+	 * Set the main chain to be cycloidal
+	 * boolean val - whether main chain is cyclo or not
+	 */
+	public void setMainCyclo(boolean val) {
+		mainChain.setCyclo(val);
+	} //end setMainCyclo
+	
+	/*
+	 * Get whether the main chain is a cyclo or not
+	 * return - whether main chain is cycloidal or not
+	 */
+	public boolean getMainCyclo() {
+		return mainChain.isCyclo();
+	} //end getMainCyclo
+
+	/*
+	 * Add a side cyclo to the list
+	 * boolean val - value to add to the side lists
+	 */
+	public void addSideCyclo(boolean val) {
+		sideChains.get(sideChains.size() - 1).setCyclo(val);			
+		System.out.println("addSideCyclo: " + (sideChains.size()-1));
+	} //end addSideCyclo
+	
+	/*
+	 * Add a direction for a side chain
+	 * DrawDirection dir - direction for latest side chain
+	 */
+	public void addSideDirection(DrawDirection dir) {
+		directions.add(dir);
+		
+		for (DrawDirection direction : directions) {
+			System.out.print(direction.toString() + " ");
+		} //loop
+		System.out.println();
+	} //end addSideDirection
+	
+	/*
 	 * Set the step for side drawing
 	 * int step - step for side drawing
 	 */
@@ -658,59 +626,22 @@ public class Canvas extends JComponent {
 		} else {
 			sideChains.add(new Chain(size, ""));			
 			System.out.println("addSideSize: " + (sideChains.size()-1));
-		}
+		} //if
 	} //end addSideSize
 	
 	/*
-	 * Get the size of the side nodes list
-	 * return - size of side nodes list
+	 * Add side node to the side nodes list
+	 * Node n - node to add to the side Nodes
 	 */
-	public int getSideNodesSize() {
-		return sideNodes.size();
-	} //end getSideNodesSize
-	
-	public String toString() {
-		return "Canvas"; //dbg
-	}
+	public void addSideNode(Node n) {
+		sideNodes.add(n);
+	} //end addSideNode
 	
 	/*
-	 * Set the direction for the ghost to be drawn
-	 * DrawDirection dir - new direction for ghost chain
+	 * Get the side chains
+	 * return sideChains - list of all the side chains
 	 */
-	public void setGhostDirection(DrawDirection dir) {
-		ghostDir = dir;
-	} //end setGhostDirection
-	
-	/*
-	 * Add a direction for a side chain
-	 * DrawDirection dir - direction for latest side chain
-	 */
-	public void addSideDirection(DrawDirection dir) {
-		directions.add(dir);
-	} //end addSideDirection
-	
-	/*
-	 * Set the main chain to be cycloidal
-	 * boolean val - whether main chain is cyclo or not
-	 */
-	public void setMainCyclo(boolean val) {
-		mainChain.setCyclo(val);
-	} //end setMainCyclo
-	
-	/*
-	 * Get whether the main chain is a cyclo or not
-	 * return - whether main chain is cycloidal or not
-	 */
-	public boolean getMainCyclo() {
-		return mainChain.isCyclo();
-	} //end getMainCyclo
-
-	/*
-	 * Add a side cyclo to the list
-	 * boolean val - value to add to the side lists
-	 */
-	public void addSideCyclo(boolean val) {
-		sideChains.get(sideChains.size() - 1).setCyclo(val);			
-		System.out.println("addSideCyclo: " + (sideChains.size()-1));
-	} //end addSideCyclo
+	public ArrayList<Chain> getSideChains() {
+		return sideChains;
+	} //end getSideChains
 } //end class

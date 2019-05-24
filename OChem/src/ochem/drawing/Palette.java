@@ -3,14 +3,10 @@ package ochem.drawing;
 import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 
 import ochem.View;
-import ochem.drawing.Canvas.ActionType;
+import ochem.drawing.CanvasUtil.ActionType;
 
 /*
  * Palette
