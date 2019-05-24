@@ -78,39 +78,8 @@ public class CanvasUtil {
 	 * return angle - angle to draw chain with
 	 */
 	public static double cycloAngle(DrawDirection dir) {
-		double angles; //array of angles to draw with
+		return dir.ordinal() * 60;
 		
-		//different directions require different pairs of numbers to switch between
-		switch (dir) {
-			case DOWN_LEFT: 
-				angles = 120;
-				break;
-				
-			case DOWN_RIGHT:
-				angles = 60;
-				break;
-				 
-			case LEFT: 
-				angles = 180;
-				break;
-				
-			case RIGHT:
-				angles = 0;
-				break;
-				
-			case UP_LEFT:
-				angles = 240;
-				break;
-				
-			case UP_RIGHT:
-				angles = 300;
-				break;
-				
-			default:
-				throw new IllegalArgumentException("What direction is this???");
-		} //switch
-		
-		return angles;
 	} //end angleFromDirection
 
 } //end class

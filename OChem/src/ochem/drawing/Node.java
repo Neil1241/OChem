@@ -15,14 +15,17 @@ public class Node {
 	private int y; //y value of the top left point of the circle
 	private int rad; //radius of the node
 	private Color color; //color of the node
+	private String tag; //location of the node
 	
 	/*
 	 * Creates a blank node at origin with a radius
+	 * int rad - radius of the node
 	 */
 	public Node(int rad) {
 		this.x = 0;
 		this.y = 0;
 		this.rad = rad;
+		this.tag = "-1";
 	} //end constructor
 	
 	/*
@@ -35,10 +38,27 @@ public class Node {
 		this.x = x;
 		this.y = y;
 		this.rad = rad;
+		this.tag = "-1";
+	} //end constructor
+	
+	/*
+	 * Creates a node with an (x,y) coordinate for its top left corner, a radius and a tag
+	 * int x - x value for top left
+	 * int y - y value for top left
+	 * int rad - radius of the circle
+	 * String tag - tag of the node
+	 */
+	public Node(int x, int y, int rad, String tag) {
+		this.x = x;
+		this.y = y;
+		this.rad = rad;
+		this.tag = tag;
 	} //end constructor
 	
 	/*
 	 * Set the (x,y) of the node
+	 * int x - x of node
+	 * int y - y of node 
 	 */
 	public void setXY(int x, int y) {
 		this.x = x;
@@ -112,4 +132,21 @@ public class Node {
 	public String toString() {
 		return "" + x + " " + y;
 	}
+	
+	/*
+	 * Set the tag of the node
+	 * String tag - tag for the node
+	 */
+	public void setTag(String tag) {
+		this.tag = tag;
+	} //end setTag
+	
+	/*
+	 * Get the tag of the node
+	 * return tag - node tag
+	 */
+	public String getTag() {
+		return tag;
+	} //end getTag
+	
 } //end class

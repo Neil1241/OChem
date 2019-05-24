@@ -44,7 +44,7 @@ public class UserInputController implements KeyListener {
 						} else if (num > 10) { //too big
 							DrawingGUI.reportError("Size entered too big!");
 							
-						} else if (num > 6) { //too big for cyclo
+						} else if (num > 6 || num < 3) { //too big or too small for cyclo
 							canvas.setMainSize(num);
 							canvas.setMainStep(3);
 							DrawingGUI.clear();
@@ -65,7 +65,7 @@ public class UserInputController implements KeyListener {
 						if (num < 1) { //invalidly small
 							DrawingGUI.reportError("Size enter too small!");
 							
-						} else if (num == 1 || num == 2) { //too small for cyclo
+						} else if (num < 3 || num > 5) { //too small or too big for cyclo
 							canvas.addSideSize(num);
 							canvas.addSideCyclo(false);
 							canvas.setSideStep(3); //skip over cyclo step
@@ -76,7 +76,7 @@ public class UserInputController implements KeyListener {
 						} else {
 							canvas.addSideSize(num);
 							canvas.setSideStep(2);
-						}
+						} //if
 						
 						break;
 				} //switch

@@ -216,8 +216,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		} else { //any other
 			dir = DrawDirection.values()[pos + 1]; 
 		} // if
-		
-		System.out.println("Cycled to: " + dir.toString());
 	} // end incDirection
 
 	public String toString() {

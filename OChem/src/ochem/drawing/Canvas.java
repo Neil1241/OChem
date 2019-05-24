@@ -32,10 +32,8 @@ public class Canvas extends JComponent {
 	
 	public static Color BACKGROUND_COLOR; //background color
 	
-	private Compound master; //compound being drawn
-	
 	//main 
-	private Chain mainChain; //main chain
+	private Compound master; //compound being drawn
 	private ArrayList<Node> mainNodes; //nodes for the main chain
 	
 	//side
@@ -81,8 +79,7 @@ public class Canvas extends JComponent {
 		mainOnScreen = false;
 		
 		//instantiate the chains
-		mainChain = new Chain(0, "-1");		
-		mainChain.setMain();
+		master = new Compound(0);		
 		
 		sideChains = new ArrayList<Chain>();
 		
@@ -149,6 +146,8 @@ public class Canvas extends JComponent {
 			//clear the lists of nodes
 			mainNodes.clear();
 			sideNodes.clear();
+			directions.clear();
+			sideChains.clear();
 		} //if
 	} //end clearAction
 	
@@ -177,7 +176,7 @@ public class Canvas extends JComponent {
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Cyclo? (Y/N)");
 				g2.setColor(new Color(200,200,200, 100));
-				drawChain(g2, mouse, DrawDirection.RIGHT, mainChain.getSize());
+				drawChain(g2, mouse, DrawDirection.RIGHT, master.getMainSize(), false);
 			break;
 			
 			//determine cyclo step
@@ -186,10 +185,10 @@ public class Canvas extends JComponent {
 				DrawingGUI.showMessage("Select location for main chain: (CLICK)");
 				g2.setColor(new Color(200,200,200, 100));
 				
-				if (mainChain.isCyclo()) {
-					drawCyclo(g2, mouse, mainChain.getSize(), false, null);
+				if (master.getMainChain().isCyclo()) {
+					drawCyclo(g2, mouse, master.getMainSize(), false, null);
 				} else {
-					drawChain(g2, mouse, DrawDirection.RIGHT, mainChain.getSize());					
+					drawChain(g2, mouse, DrawDirection.RIGHT, master.getMainSize(), false);					
 				} //if
 				
 				drawSides(g2);
@@ -201,18 +200,18 @@ public class Canvas extends JComponent {
 				g2.setColor(Color.BLACK);
 				
 				if (!mainOnScreen) { //first time called					
-					if (mainChain.isCyclo()) { 
-						mainNodes = drawCyclo(g2, mainNodes.get(0), mainChain.getSize(), false, null);
+					if (master.getMainChain().isCyclo()) { 
+						mainNodes = drawCyclo(g2, mainNodes.get(0), master.getMainSize(), false, null);
 					} else {
-						mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());			
+						mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, master.getMainSize(), false);			
 					} //if
 					mainOnScreen = true;
 					
 				} else { //all other times
-					if (mainChain.isCyclo()) {
-						drawCyclo(g2, mainNodes.get(0), mainChain.getSize(), false, null);
+					if (master.getMainChain().isCyclo()) {
+						drawCyclo(g2, mainNodes.get(0), master.getMainSize(), false, null);
 					} else {
-						drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, mainChain.getSize());	
+						drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, master.getMainSize(), false);	
 					} //if
 					
 				} //big if
@@ -246,7 +245,7 @@ public class Canvas extends JComponent {
 			case 2: 
 				DrawingGUI.showMessage("Cyclo? (Y/N)");
 				g2.setColor(new Color(200,200,200, 100));
-				drawChain(g2, mouse, DrawDirection.RIGHT, sideChains.get(sideChains.size()-1).getSize() + 1);
+				drawChain(g2, mouse, DrawDirection.RIGHT, sideChains.get(sideChains.size()-1).getSize() + 1, true);
 				
 				drawSides(g2);
 			break;
@@ -260,14 +259,14 @@ public class Canvas extends JComponent {
 				if (ghost.isCyclo()) {
 					drawCyclo(g2, mouse, ghost.getSize(), true, ghostDir);
 				} else {
-					drawChain(g2, mouse, ghostDir, ghost.getSize()+1); //draw most recent chain
+					drawChain(g2, mouse, ghostDir, ghost.getSize()+1, true); //draw most recent chain
 				}
 				
 				//draw the side chains
 				drawSides(g2);
 				
 				int start;
-				if (mainChain.isCyclo()) {
+				if (master.getMainChain().isCyclo()) {
 					start = 0;
 				} else {
 					start = 1;
@@ -296,12 +295,13 @@ public class Canvas extends JComponent {
 	 */
 	private void drawSides(Graphics2D g2) {
 		//draw side chains
-		g2.setColor(Color.black);
+//		g2.setColor(Color.black);
 		for (int i = 0; i < sideNodes.size(); i++) {
 			if (sideChains.get(i).isCyclo()) {
+				g2.setColor(Color.BLACK);
 				drawCyclo(g2, sideNodes.get(i), sideChains.get(i).getSize(), true, directions.get(i));
 			} else {
-				drawChain(g2, sideNodes.get(i), directions.get(i), sideChains.get(i).getSize() + 1);
+				drawChain(g2, sideNodes.get(i), directions.get(i), sideChains.get(i).getSize() + 1, true);
 			} //if
 		} //loop
 	} //end drawSides
@@ -327,54 +327,68 @@ public class Canvas extends JComponent {
 	private ArrayList<Node> drawCyclo(Graphics2D g2, Node start, int chainSize, boolean extend, DrawDirection dir) {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		
+		//offset length in pixels
 		int r = 120;
 		
+		//start point
 		int x1 = start.getX();
 		int y1 = start.getY();
 		
+		//end point
 		int x2 = 0;
 		int y2 = 0;
 		
+		//value to increment angle by each step
 		double theta = Math.toRadians(-360.0 / chainSize);
 		
+		//offsets based on side and size
 		int xOffset;
 		int yOffset;
 		double angOffset;
-		if (extend) {
-			if (directions.isEmpty()) {
-				angOffset = Math.toRadians(CanvasUtil.cycloAngle(dir));
-			} else {
-				angOffset = Math.toRadians(CanvasUtil.cycloAngle(dir));
-			}
+		
+		//if a side chain
+		if (extend) { //calculate offsets
+			angOffset = Math.toRadians(CanvasUtil.cycloAngle(dir));
 			xOffset = (int) (r * Math.cos(angOffset));
 			yOffset = (int) (r * Math.sin(angOffset));
-		} else {
+			
+		} else { //otherwise no offsets
 			angOffset = 0;
 			xOffset = 0;
 			yOffset = 0;
 		}
 		
+		//translate start point
 		x1 += xOffset;
 		y1 += yOffset;
  		
+		//draw the cyclo
 		for (int i = 0; i < chainSize; i++) {
 			x2 = x1 + (int) (r * Math.cos(theta * i + angOffset));
 			y2 = y1 + (int) (r * Math.sin(theta * i + angOffset));
 			
 			g2.drawLine(x1, y1, x2, y2);
 			
-			nodes.add(new Node(x1, y1, 20));
+			//add the node to the list
+			nodes.add(new Node(x1, y1, 20, ""+(i+1)));
 			
 			x1 = x2;
 			y1 = y2;
 		} //loop
 		
-		nodes.add(new Node(x1, y1, 20));
+		nodes.add(new Node(x1, y1, 20, ""+(chainSize)));
 		
+		//draw the final bonds
 		g2.drawLine(start.getX(), start.getY(), x2, y2);
 		if (extend) {
 			g2.drawLine(start.getX(), start.getY(), start.getX() + xOffset, start.getY() + yOffset);
 		}
+		
+		/*g2.setFont(g2.getFont().deriveFont(60.0F));
+		g2.setColor(Color.RED);
+		for (Node n : nodes) {
+			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
+		}*/
 		
 		return nodes;
 	} //end drawCyclo
@@ -384,9 +398,10 @@ public class Canvas extends JComponent {
 	 * Node start - starting point
 	 * DrawDirection dir - direction to draw in
 	 * int chainSize - size of chain to draw
+	 * boolean side - whether the chain is on the side or not
 	 * return nodes - list of nodes for that chain
 	 */
-	private ArrayList<Node> drawChain(Graphics2D g2, Node start, DrawDirection dir, int chainSize) {
+	private ArrayList<Node> drawChain(Graphics2D g2, Node start, DrawDirection dir, int chainSize, boolean side) {
 		
 		//starting x and y coordinates
 		int x1 = start.getX();
@@ -396,6 +411,13 @@ public class Canvas extends JComponent {
 		int arm = 120; //length of bonds in pixels
 		
 		ArrayList<Node> nodes = new ArrayList<Node>(); //list of nodes
+		
+		int tagStart;
+		if (side) {
+			tagStart = 1;
+		} else {
+			tagStart = 0;
+		}
 		
 		for (int i = 0; i < chainSize-1; i++) {
 			//current angle to draw (alternate between the 2 angles)
@@ -408,15 +430,25 @@ public class Canvas extends JComponent {
 			//draw the line
 			g2.drawLine(x1, y1, x2, y2);
 			
-			nodes.add(new Node(x1,y1,20)); //add the current node to the list
+			if (i >= tagStart) {
+				if (side) {
+					nodes.add(new Node(x1,y1,20, "" + (i))); //add the current node to the list
+				} else {
+					nodes.add(new Node(x1,y1,20, "" + (i+1))); //add the current node to the list
+				} //small if
+			} //big if
 			
 			//change the start point to this end for next loop
 			x1 = x2;
 			y1 = y2;
 		} //loop
 		
-		nodes.add(new Node(x1,y1,20)); //add the last node
-	    
+		//add the last node
+		if (side) 
+			nodes.add(new Node(x1,y1,20, "" + (chainSize-1))); 
+		else 
+			nodes.add(new Node(x1,y1,20, "" + (chainSize)));
+		
 		return nodes;
 	} //end drawChain
 
@@ -426,7 +458,7 @@ public class Canvas extends JComponent {
 	 * int main - size of the main chain
 	 */
 	public void setMainSize(int main) {
-		mainChain = new Chain(main, "-1");
+		master.setMainSize(main);
 	} //end setMainSize
 	
 	/*
@@ -535,14 +567,6 @@ public class Canvas extends JComponent {
 		return mainStep;
 	} //end getMainStep
 	
-	/*
-	 * Get the size of the side nodes list
-	 * return - size of side nodes list
-	 */
-	public int getSideNodesSize() {
-		return sideNodes.size();
-	} //end getSideNodesSize
-	
 	public String toString() {
 		return "Canvas"; //dbg
 	}
@@ -561,7 +585,7 @@ public class Canvas extends JComponent {
 	 * boolean val - whether main chain is cyclo or not
 	 */
 	public void setMainCyclo(boolean val) {
-		mainChain.setCyclo(val);
+		master.getMainChain().setCyclo(val);
 	} //end setMainCyclo
 	
 	/*
@@ -569,7 +593,7 @@ public class Canvas extends JComponent {
 	 * return - whether main chain is cycloidal or not
 	 */
 	public boolean getMainCyclo() {
-		return mainChain.isCyclo();
+		return master.getMainChain().isCyclo();
 	} //end getMainCyclo
 
 	/*
@@ -577,8 +601,7 @@ public class Canvas extends JComponent {
 	 * boolean val - value to add to the side lists
 	 */
 	public void addSideCyclo(boolean val) {
-		sideChains.get(sideChains.size() - 1).setCyclo(val);			
-		System.out.println("addSideCyclo: " + (sideChains.size()-1));
+		sideChains.get(sideChains.size() - 1).setCyclo(val);
 	} //end addSideCyclo
 	
 	/*
@@ -587,11 +610,6 @@ public class Canvas extends JComponent {
 	 */
 	public void addSideDirection(DrawDirection dir) {
 		directions.add(dir);
-		
-		for (DrawDirection direction : directions) {
-			System.out.print(direction.toString() + " ");
-		} //loop
-		System.out.println();
 	} //end addSideDirection
 	
 	/*
