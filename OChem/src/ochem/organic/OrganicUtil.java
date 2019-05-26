@@ -18,7 +18,6 @@ public class OrganicUtil {
 			"oic acid" };
 	public static final String[] SIDE_CHAIN_SUFFIX = { "phenyl", "yl", "bromo", "iodo", "fluro", "chloro", "oxo",
 			"hydroxy", "oxy", "amino" };
-	//private static final String[] ALKYL = {"methyl","ethyl","propyl","butyl"};
 
 	// public static final String [] HALOALKYLS = {};
 
@@ -54,6 +53,8 @@ public class OrganicUtil {
 		mainSize = random(2, 10);
 		c = new Compound(mainSize);
 
+		pass();
+
 		// generate type of bond and functional group
 		bondType = random(1, 3);
 		ending = random(0, FUNCTIONAL_NAMES.length - 1);
@@ -66,18 +67,23 @@ public class OrganicUtil {
 		c.getMainChain().setBenzene(benzene);
 		c.getMainChain().setCyclo(cyclo);
 
+		pass();
+
 		// set bond type if it turns out to be an alkane set to one
-		if (ending == 0)
+		if (ending == 0) {
 			bondType = 1;
-		else
-			prefixBond = random(0, mainSize);
+		} else {
+			prefixBond = random(1, 4);
+		}
 		c.getMainChain().setBond(bondType);
-		bondLocation = new int[prefixBond];
+
+		pass();
 
 		// creates random values but with no duplicate values
 		if (bondType != 1) {
+			bondLocation = new int[prefixBond];
 			for (int i = 0; i < prefixBond; i++) {
-				int hold = random(1, mainSize - 1);
+				int hold = random(1, mainSize);
 				boolean b = false;
 				for (int j = 0; j < i; j++) {
 					if (bondLocation[j] == hold) {
@@ -93,20 +99,28 @@ public class OrganicUtil {
 			} // end for
 		} // end if
 
-		// Check Endings
+		pass();
+
+		// if ending position is an amide, acid, ester or aldehyde set the functional
+		// location to one
 		if (ending == 9 || ending == 8 || ending == 7 || ending == 4) {
 			c.getMainChain().addFunctionalLocation("1");
 			prefixGroup = 1;
-		} else if (ending == 9) {
+		} else if (ending == 10) {
+			// set prefix on benzene to be one
 			prefixGroup = 1;
 			bondLocation = null;
 		} else if (ending != 0) {
-			prefixGroup = random(1, 10);
+			// generate a random number between 1 and 4 for a prefix on the functional group
+			// and generate a random location for the group
+			prefixGroup = random(1, 4);
 			groupLocation = new int[prefixGroup];
 			for (int i = 0; i < prefixGroup; i++)
 				groupLocation[i] = random(1, mainSize);
 			// end for
 		} // end if
+
+		pass();
 
 		// add locations to mainchain
 		if (groupLocation != null) {
@@ -119,20 +133,43 @@ public class OrganicUtil {
 			for (int i = 0; i < prefixBond; i++)
 				c.getMainChain().addFunctionalLocation(Integer.toString(bondLocation[i]));
 		}
+		c.getMainChain().addNumOfGroups(prefixBond);
+		c.getMainChain().addNumOfGroups(prefixGroup);
+		c.getMainChain().setEnding(ending);
 		// determine amount of side chains
 		numOfSideChains = random(0, mainSize);
 		sideLocation = new int[numOfSideChains];
 		sideChainType = new String[numOfSideChains];
+
+		// add the sidechains to the compound
 		for (int i = 0; i < numOfSideChains; i++) {
+			// temp variables for the loop
 			int pre = 0;
+			boolean phenyl = false;
+			boolean sideCyclo = false;
+
 			sideLocation[i] = random(1, mainSize);
 			sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
 			if (sideChainType[i].equals("yl")) {
-				pre = random(1,4);
+				sideCyclo = cyclo();
+				if (sideCyclo)
+					pre = random(3, 8);
+				else
+					pre = random(1, 4);
 				sideChainType[i] = CHAIN[pre] + sideChainType[i];
-			}
-			c.addSideChain(pre, Integer.toString(sideLocation[i]), false, false);
-		}
+			} else if (sideChainType[i].equals("phenyl")) {
+				pre = 6;
+				phenyl = true;
+			} else {
+				for (int j = 2; j < SIDE_CHAIN_SUFFIX.length; j++) {
+					if (sideChainType[i].equals(SIDE_CHAIN_SUFFIX[j])) {
+						pre = -j;
+						break;
+					} // end if
+				} // end for
+			} // end if
+			c.addSideChain(pre, Integer.toString(sideLocation[i]), sideCyclo, phenyl);
+		} // end for
 
 		// output for debugging
 		System.out.println(
@@ -148,8 +185,8 @@ public class OrganicUtil {
 			for (int i = 0; i < bondLocation.length; i++)
 				System.out.print(bondLocation[i] + " ");
 		System.out.println("\nSideChain + SideLocation");
-		for (int i=0;i<sideLocation.length;i++) {
-			System.out.println(sideChainType[i]+" "+sideLocation[i]);
+		for (int i = 0; i < sideLocation.length; i++) {
+			System.out.println(sideChainType[i] + " " + sideLocation[i]);
 		}
 		System.out.println("\n------------------------------------------");
 
@@ -157,7 +194,7 @@ public class OrganicUtil {
 		return c;
 	}// end generateRandomCompound
 
-	// returns true or false whether the a componenet should be a cyclo or not
+	// returns true or false whether the a component should be a cyclo or not
 	private static boolean cyclo() {
 		if (Math.round(Math.random()) == 1)
 			return true;
@@ -172,6 +209,10 @@ public class OrganicUtil {
 		return (int) (Math.random() * range) + lowest;
 	}// end random
 
+	private static void pass() {
+		System.out.println("PASSED");
+	}
+
 	public static void bubbleSort(int[] a) {
 		for (int i = a.length - 1; i > 0; i--) {
 			for (int j = 0; j < i; j++) {
@@ -183,4 +224,10 @@ public class OrganicUtil {
 			} // end for
 		} // end for
 	}// end bubblesort
+
+	// main for testing purposes
+	public static void main(String[] args) {
+		System.out.println(OrganicUtil.generateRandomCompound().toString());
+	}
+
 } // end OrganicUtil
