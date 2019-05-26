@@ -392,7 +392,7 @@ public class Canvas extends JComponent {
 		} //loop
 		
 //		nodes.add(new Node(x1, y1, 20, ""+(chainSize)));
-		
+		 
 		//draw the final bonds
 		g2.drawLine(start.getX(), start.getY(), x2, y2);
 		if (extend) {
