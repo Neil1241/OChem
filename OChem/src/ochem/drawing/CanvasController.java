@@ -101,9 +101,11 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 				// check to see if the click was on a main chain node
 				for (int i = 0; i < nodes.size(); i++) {
-					if (isWithinBounds(current.getCenterX(), current.getCenterY(), nodes.get(i).getCenterX(),
-							nodes.get(i).getCenterY(), nodes.get(i).getDia())) {
-						canvas.addSideNode(nodes.get(i)); // add that node to the side nodes list
+					Node n = nodes.get(i);
+					
+					if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(), n.getDia())) {
+						n.setTag("" + i); //set the location for that chain
+						canvas.addSideNode(n); // add that node to the side nodes list
 						canvas.addSideDirection(dir); // add a direction
 						canvas.setSideStep(4); // step forward
 						break;

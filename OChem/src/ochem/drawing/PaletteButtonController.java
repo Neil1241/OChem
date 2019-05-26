@@ -76,7 +76,12 @@ public class PaletteButtonController implements MouseListener {
 		} else if (text.equals("Clear")) {
 			palette.setSelectedType(ActionType.CLEAR);
 			DrawingGUI.showMessage("Screen cleared!");
-		} //if
+		
+		} else if (text.equals("Name")) {
+			if (canvas.getMainOnScreen()) {
+				System.out.println(canvas.getCompound().toString());
+			}
+		}
 		
 		//update the button
 		button.update();

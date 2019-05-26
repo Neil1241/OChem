@@ -83,6 +83,8 @@ public class Compound {
 
 		// main chain
 		s = s.concat("Main Chain of: " + mainChain.getSize() + "\n");
+		s = s.concat("Main isCyclo: " + mainChain.isCyclo() + "\n");
+		
 		if (locations != null)
 			for (int i = 0; i < locations.size(); i++)
 				s = s.concat("Main Chain Functional Groups at " + locations.get(i) + "\n");

@@ -62,7 +62,6 @@ public class Interpreter {
 		// set the mainchain bond type and get their locations
 		compound.getMainChain().setBond(mainBond);
 		for (int i = 1; i <= additionalGroups; i++) {
-
 			compound.addFunctionalLocation(chainLocations.get(chainLocations.size() - i));
 		}
 

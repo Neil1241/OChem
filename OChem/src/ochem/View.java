@@ -1,5 +1,7 @@
 package ochem;
 
+import java.awt.Dimension;
+
 /*
  * View
  * Created by: Neil Balaskandarajah
@@ -37,10 +39,12 @@ public class View extends JFrame {
 		this.setContentPane(draw);
 		
 		//configure the frame
+//		this.setSize(new Dimension(width, height));
 		this.pack();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setResizable(false);
 		this.setLocation(OChem.width/2 - width/2, OChem.height/2 - 3*height/4);
+//		this.setUndecorated(false);
+		this.setResizable(false);
 		this.setVisible(true);
 	} //end constructor
 	

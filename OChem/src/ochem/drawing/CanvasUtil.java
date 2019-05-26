@@ -73,13 +73,37 @@ public class CanvasUtil {
 	} //end angleFromDirection
 	
 	/*
-	 * Choose the pair of angles from the direction chosen
+	 * Calculate an angle to rotate a side cyclo chain based on a direction
 	 * DrawDirection dir - direction to draw in
-	 * return angle - angle to draw chain with
+	 * return - angle based on the direction
 	 */
 	public static double cycloAngle(DrawDirection dir) {
-		return dir.ordinal() * 60;
-		
+		return dir.ordinal() * 30 - 30; //ordinal is the enum's position in its parent set
 	} //end angleFromDirection
+	
+	/*
+	 * Get an angle offset from the size of a chain
+	 * int size - size of the chain
+	 * return - angle to offset by
+	 */
+	public static double cycloAngOffset(int size) {
+		switch(size) {
+			//triangle
+			case 3:
+				return Math.toRadians(30);
+			
+			//square
+			case 4:
+				return Math.toRadians(45);
+			
+			//pentagon
+			case 5:
+				return Math.toRadians(60);
+			
+			//soft limited to not go here
+			default:
+				return 0;
+		} //switch
+	} //end cycloAngOffset
 
 } //end class
