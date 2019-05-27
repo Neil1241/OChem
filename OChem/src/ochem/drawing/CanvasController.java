@@ -177,7 +177,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	} // end mouseMoved
 
 	/*
-	 * Increment the draw direction one step forward
+	 * Increment the draw direction one step forward 
 	 */
 	private void incDirection() {
 		int pos = dir.ordinal();
