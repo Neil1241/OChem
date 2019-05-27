@@ -93,7 +93,7 @@ public class Compound {
 		int num = 1;
 		for (Chain side : sideChains) {
 			s = s.concat("Side chain " + num + " of size: " + side.getSize() + " and location: " + side.getLocation()
-					+ " and cyclo: " + side.isCyclo() + " and benzene: " + side.isBenzene() + "\n");
+					+ " | cyclo: " + side.isCyclo() + " and benzene: " + side.isBenzene() + "\n");
 			num++;
 		} // loop
 		s = s.concat("------------------GROUP-------------------\n");

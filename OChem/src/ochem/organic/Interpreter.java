@@ -6,6 +6,7 @@ package ochem.organic;
  * Everything else: Jordan
  * Last modified: 05/07/2019
  * Converts text names of compounds into compound objects
+ * TODO: fix the way locations are added
  */
 
 import java.util.ArrayList;

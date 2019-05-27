@@ -8,7 +8,6 @@ package ochem.organic;
  */
 
 public class OrganicUtil {
-
 	// prefixes for all numbers one to ten
 	public static final String[] PREFIX = { "di", "tri", "tetra", "penta", "hexa", "hepta", "octa", "nona", "deca",
 			"cyclo" };
@@ -58,6 +57,7 @@ public class OrganicUtil {
 		// generate type of bond and functional group
 		bondType = random(1, 3);
 		ending = random(0, FUNCTIONAL_NAMES.length - 1);
+		
 
 		// check for benzene and cyclo and set the main chain accordingly
 		if (ending == 9)
@@ -73,7 +73,7 @@ public class OrganicUtil {
 		if (ending == 0) {
 			bondType = 1;
 		} else {
-			prefixBond = random(1, 4);
+			prefixBond = random(1, 3);
 		}
 		c.getMainChain().setBond(bondType);
 
@@ -83,7 +83,7 @@ public class OrganicUtil {
 		if (bondType != 1) {
 			bondLocation = new int[prefixBond];
 			for (int i = 0; i < prefixBond; i++) {
-				int hold = random(1, mainSize);
+				int hold = random(1, mainSize-1);
 				boolean b = false;
 				for (int j = 0; j < i; j++) {
 					if (bondLocation[j] == hold) {
@@ -113,7 +113,7 @@ public class OrganicUtil {
 		} else if (ending != 0) {
 			// generate a random number between 1 and 4 for a prefix on the functional group
 			// and generate a random location for the group
-			prefixGroup = random(1, 4);
+			prefixGroup = random(1, 3);
 			groupLocation = new int[prefixGroup];
 			for (int i = 0; i < prefixGroup; i++)
 				groupLocation[i] = random(1, mainSize);
@@ -127,15 +127,24 @@ public class OrganicUtil {
 			bubbleSort(groupLocation);
 			for (int i = 0; i < prefixGroup; i++)
 				c.getMainChain().addFunctionalLocation(Integer.toString(groupLocation[i]));
-		}
+		}//end if
 		if (bondLocation != null) {
 			bubbleSort(bondLocation);
 			for (int i = 0; i < prefixBond; i++)
 				c.getMainChain().addFunctionalLocation(Integer.toString(bondLocation[i]));
-		}
-		c.getMainChain().addNumOfGroups(prefixBond);
-		c.getMainChain().addNumOfGroups(prefixGroup);
-		c.getMainChain().setEnding(ending);
+		}//end if
+		
+		//depending on the bondtype add the locations
+		if(bondType!=1) {
+			c.getMainChain().addNumOfGroups(prefixBond);
+			c.getMainChain().addNumOfGroups(prefixGroup);
+			c.getMainChain().setEnding(bondType-1);
+			c.getMainChain().setEnding(ending);
+		}else {
+			c.getMainChain().addNumOfGroups(prefixGroup);
+			c.getMainChain().setEnding(ending);
+		}//end if
+		
 		// determine amount of side chains
 		numOfSideChains = random(0, mainSize);
 		sideLocation = new int[numOfSideChains];
@@ -151,9 +160,12 @@ public class OrganicUtil {
 			sideLocation[i] = random(1, mainSize);
 			sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
 			if (sideChainType[i].equals("yl")) {
+				while(sideLocation[i] == 1 || sideLocation[i] == mainSize) {
+					sideLocation[i] = random(2,mainSize-1);
+				}//end while
 				sideCyclo = cyclo();
 				if (sideCyclo)
-					pre = random(3, 8);
+					pre = random(3, mainSize);
 				else
 					pre = random(1, 4);
 				sideChainType[i] = CHAIN[pre] + sideChainType[i];
