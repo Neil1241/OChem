@@ -35,89 +35,39 @@ public class UserInputController implements KeyListener {
 				int num = Integer.parseInt(DrawingGUI.getUserInput());
 				
 				switch (palette.getSelectedType()) {
-					//main button
+					//main action
 					case MAIN:
-						//check to see if number entered is within range
-						if (num < 2) { //too small
-							DrawingGUI.reportError("Size entered too small!");
-							
-						} else if (num > 10) { //too big
-							DrawingGUI.reportError("Size entered too big!");
-							
-						} else if (num > 6 || num < 3) { //too big or too small for cyclo
-							canvas.setMainSize(num);
-							canvas.setMainStep(3);
-							DrawingGUI.clear();
-							
-						} else {
-							//set the size and step forward
-							canvas.setMainSize(num);
-							canvas.setMainStep(2);
-							DrawingGUI.clear();
-						} //if
+						mainAction(num);
 						
 						break;
 						
-					//side button
+					//side action
 					case SIDE:
-						//add a size and step forward
+						sideAction(num);
 						
-						if (num < 1) { //invalidly small
-							DrawingGUI.reportError("Size enter too small!");
-							
-						} else if (num < 3 || num > 5) { //too small or too big for cyclo
-							canvas.addSideSize(num);
-							canvas.addSideCyclo(false);
-							canvas.setSideStep(3); //skip over cyclo step
-							
-						} else if (num > 10) { //invalidly big
-							DrawingGUI.reportError("Size entered too big");		
-							
-						} else {
-							canvas.addSideSize(num);
-							canvas.setSideStep(2);
-						} //if
+						break;
 						
+					//bond action
+					case BOND: 
+						bondNum(num);
 						break;
 				} //switch
 			
-			//if letter was typed
-			} else {				
-				String in = DrawingGUI.getUserInput();
-				
-				switch (palette.getSelectedType()) {
-				//main button
-				case MAIN:
+				//if letter was typed
+				} else {				
+					String in = DrawingGUI.getUserInput();
 					
-					if (canvas.getMainStep() == 2) {
-						if (in.equalsIgnoreCase("Y")) {
-							canvas.setMainCyclo(true);
-							canvas.setMainStep(3);
-							DrawingGUI.clear();
-						} else if (in.equalsIgnoreCase("N")) {
-							canvas.setMainCyclo(false);
-							canvas.setMainStep(3);
-							DrawingGUI.clear();
-						} //if
-					}
-					
-					break;
-					
-				//side button
-				case SIDE:
-					
-					if (canvas.getSideStep() == 2) {
-						if (in.equalsIgnoreCase("Y")) {
-							canvas.addSideCyclo(true);
-							canvas.setSideStep(3);
-						} else if (in.equalsIgnoreCase("N")) {
-							canvas.addSideCyclo(false);
-							canvas.setSideStep(3);
-						} //if
-					}
-					
-					break;
-			} //switch
+					switch (palette.getSelectedType()) {
+						//main button
+						case MAIN:
+							mainAction(in);					
+							break;
+							
+						//side button
+						case SIDE:
+							sideAction(in);
+							break;
+				} //switch
 				
 			} //if
 		} //outer if
@@ -136,4 +86,110 @@ public class UserInputController implements KeyListener {
 			return false;
 		} //try-catch
 	} //end isNumber
-}
+	
+	//MAIN//
+	
+	/*
+	 * Handles the main action
+	 * int num - num entered by user
+	 */
+	private void mainAction(int num) {
+		//check to see if number entered is within range
+		if (num < 2) { //too small
+			DrawingGUI.reportError("Size entered too small!");
+			
+		} else if (num > 10) { //too big
+			DrawingGUI.reportError("Size entered too big!");
+			
+		} else if (num > 6 || num < 3) { //too big or too small for cyclo
+			canvas.setMainSize(num);
+			canvas.setMainStep(3);
+			DrawingGUI.clear();
+			
+		} else {
+			//set the size and step forward
+			canvas.setMainSize(num);
+			canvas.setMainStep(2);
+			DrawingGUI.clear();
+		} //if
+	} //end bondAction
+	
+	/*
+	 * Handles the main action
+	 * String key - key entered by user
+	 */
+	private void mainAction(String in) {
+		if (canvas.getMainStep() == 2) {
+			if (in.equalsIgnoreCase("Y")) {
+				canvas.setMainCyclo(true);
+				canvas.setMainStep(3);
+				DrawingGUI.clear();
+			} else if (in.equalsIgnoreCase("N")) {
+				canvas.setMainCyclo(false);
+				canvas.setMainStep(3);
+				DrawingGUI.clear();
+			} //if
+		} //big if
+	} //end mainAction
+	
+	//SIDE//
+	
+	/*
+	 * Handles the side action
+	 * int num - num entered by user
+	 */
+	private void sideAction(int num) {
+		//add a size and step forward
+		
+		if (num < 1) { //invalidly small
+			DrawingGUI.reportError("Size enter too small!");
+			
+		} else if (num < 3 || num > 5) { //too small or too big for cyclo
+			canvas.addSideSize(num);
+			canvas.addSideCyclo(false);
+			canvas.setSideStep(3); //skip over cyclo step
+			
+		} else if (num > 10) { //invalidly big
+			DrawingGUI.reportError("Size entered too big");		
+			
+		} else {
+			canvas.addSideSize(num);
+			canvas.setSideStep(2);
+		} //if
+	} //end sideAction
+	
+	/*
+	 * Handles the side action
+	 * String in - key entered by user
+	 */
+	private void sideAction(String in) {
+		if (canvas.getSideStep() == 2) {
+			if (in.equalsIgnoreCase("Y")) {
+				canvas.addSideCyclo(true);
+				canvas.setSideStep(3);
+			} else if (in.equalsIgnoreCase("N")) {
+				canvas.addSideCyclo(false);
+				canvas.setSideStep(3);
+			} //if
+		} //big if
+	} //end sideAction
+	
+	//BOND//
+	
+	/*
+	 * Handles the bond action
+	 * int num - num entered by user
+	 */
+	private void bondNum(int num) {
+		if (num < 2) { //too small
+			DrawingGUI.reportError("Number entered too small!");
+			
+		} else if (num > 3) { //too big
+			DrawingGUI.reportError("Number entered too big!");
+			
+		} else { //valid
+			canvas.setBondSize(num);
+			canvas.setBondStep(2);
+		} //if
+	} //end bondAction
+} //end class

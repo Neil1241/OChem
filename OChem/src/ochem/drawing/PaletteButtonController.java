@@ -65,13 +65,16 @@ public class PaletteButtonController implements MouseListener {
 			if (canvas.getMainOnScreen()) {
 				palette.setSelectedType(ActionType.SIDE);
 				canvas.setSideStep(1);
-			}
+			} //if
 			
 		} else if (text.equals("Function")) {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			
 		} else if (text.equals("Bond")) {
-			palette.setSelectedType(ActionType.BOND);
+			if (canvas.getMainOnScreen()) {
+				palette.setSelectedType(ActionType.BOND);
+				canvas.setBondStep(1);
+			} //if
 			
 		} else if (text.equals("Clear")) {
 			palette.setSelectedType(ActionType.CLEAR);
@@ -80,8 +83,8 @@ public class PaletteButtonController implements MouseListener {
 		} else if (text.equals("Name")) {
 			if (canvas.getMainOnScreen()) {
 				System.out.println(canvas.getCompound().toString());
-			}
-		}
+			} //if
+		} //big if
 		
 		//update the button
 		button.update();

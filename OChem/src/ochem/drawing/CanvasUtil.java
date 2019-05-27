@@ -1,5 +1,7 @@
 package ochem.drawing;
 
+import java.awt.Color;
+
 /*
  * CanvasUtil
  * Created by: Neil Balaskandarajah
@@ -8,6 +10,14 @@ package ochem.drawing;
  */
 
 public class CanvasUtil {
+	//Static colors
+	public static Color TRANS_RED = new Color(238,50,50,100);
+	public static Color TRANS_GREEN = new Color(50,238,50,100);
+	public static Color TRANS_BLUE = new Color(50,50,238,100);
+	public static Color TRANS_GREY = new Color(200,200,200,100);
+	public static Color DARK_YELLOW = new Color(219, 194, 52);
+	public static Color LIGHT_YELLOW = new Color(244, 217, 66);
+	
 	/*
 	 * Types of action to determine different drawing features
 	 */

@@ -163,46 +163,15 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	public void mouseMoved(MouseEvent m) {
 		// send the mouse (x,y) to the canvas
 		canvas.setMouseXY(m.getX(), m.getY());
-
-		// if there is a main chain on the screen
-		if (canvas.getMainOnScreen()) {
-			// change node color based on mouse position
-			ArrayList<Node> nodes = canvas.getMainNodes();
-			Node ms = new Node(m.getX(), m.getY(), 10);
-
-			int start;
-			if (canvas.getMainCyclo()) {
-				start = 0;
-			} else {
-				start = 1;
-			}
-
-			for (int i = start; i < nodes.size() - 1; i++) {
-
-				// if over the node
-				if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(),
-						nodes.get(i).getCenterY(), nodes.get(i).getRad())) {
-					// make its color darker
-					nodes.get(i).setColor(new Color(219, 194, 52)); // dark yellow
-
-					if (!canvas.getMainCyclo()) {
-						// change direction of the ghost depending on the position of the node on the
-						// chain
-						if (i % 2 == 0) {
-							dir = DrawDirection.DOWN_RIGHT;
-						} else {
-							dir = DrawDirection.UP_RIGHT;
-						} // if
-
-						canvas.setGhostDirection(dir);
-					}
-				} else {
-					// return to the defauly lighter color
-					nodes.get(i).setColor(new Color(244, 217, 66)); // light yellow
-				} // if
-			} // loop
-		} // if
-
+		
+		// if on the side drawing step
+		if (canvas.getSideStep() == 3) {
+			showSideNodes(m);
+			
+		} else if (canvas.getBondStep() == 2) {
+			showBondNodes(m);
+		} //if
+		
 		// update the display
 		canvas.update();
 	} // end mouseMoved
@@ -213,13 +182,63 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	private void incDirection() {
 		int pos = dir.ordinal();
 		if (pos == DrawDirection.values().length - 1) { //if last value in enum
-			dir = DrawDirection.values()[0];
+			dir = DrawDirection.values()[0]; //set to zero
 			
 		} else { //any other
-			dir = DrawDirection.values()[pos + 1]; 
+			dir = DrawDirection.values()[pos + 1]; //set to one further ahead
 		} // if
 	} // end incDirection
 
+	/*
+	 * Show the side nodes able to be clicked
+	 * MouseEvent m - holds information about the click event
+	 */
+	private void showSideNodes(MouseEvent m) {
+		// change node color based on mouse position
+		ArrayList<Node> nodes = canvas.getMainNodes();
+		Node ms = new Node(m.getX(), m.getY(), 10);
+
+		int start;
+		if (canvas.getMainCyclo()) {
+			start = 0;
+		} else {
+			start = 1;
+		}
+
+		for (int i = start; i < nodes.size() - 1; i++) {
+
+			// if mouse is over the node
+			if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(),
+					nodes.get(i).getCenterY(), nodes.get(i).getRad())) {
+				// make its color darker
+				nodes.get(i).setColor(CanvasUtil.DARK_YELLOW); // dark yellow
+
+				if (!canvas.getMainCyclo()) {
+					// change direction of the ghost depending on the position of the node on the
+					// chain
+					if (i % 2 == 0) {
+						dir = DrawDirection.DOWN_RIGHT;
+					} else {
+						dir = DrawDirection.UP_RIGHT;
+					} // if
+
+					canvas.setGhostDirection(dir);
+				}
+			} else {
+				// return to the default lighter color
+				nodes.get(i).setColor(CanvasUtil.LIGHT_YELLOW); // light yellow
+			} // if
+		} // loop
+	} //end showSideNodes
+	
+	/*
+	 * Show the bond nodes
+	 * MouseEvent m - holds information about the click event
+	 */
+	private void showBondNodes(MouseEvent m) {
+		
+	} //showBondNodes
+	
 	public String toString() {
 		return "CanvasController";
 	}

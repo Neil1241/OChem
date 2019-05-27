@@ -46,6 +46,7 @@ public class Canvas extends JComponent {
 	private ActionType type; //type of action
 	private int mainStep; //step for the "main" button
 	private int sideStep; //step for the "side" button
+	private int bondStep; //step for the "bond" button
 	
 	private DrawDirection ghostDir; //direction of the ghost chain
 	
@@ -90,6 +91,7 @@ public class Canvas extends JComponent {
 		//set the step numbers to zero when not being used, increment when needed
 		mainStep = 0;
 		sideStep = 0;
+		bondStep = 0;
 		
 		//default the ghost direction to up right
 		ghostDir = DrawDirection.UP_RIGHT;
@@ -124,6 +126,7 @@ public class Canvas extends JComponent {
 		clearAction(g2);
 		mainAction(g2);
 		sideAction(g2);
+		bondAction(g2);
 	}  //end paintComponent 
 	
 	/*
@@ -133,15 +136,16 @@ public class Canvas extends JComponent {
 	private void clearAction(Graphics2D g2) {
 		//only draw the node if the type is CLEAR
 		if (type == ActionType.CLEAR) {
-			g2.setColor(new Color(50,238,50, 100)); //transparent green
+			g2.setColor(CanvasUtil.TRANS_GREY); //transparent green
 			drawNode(g2, mouse);
 			
-			//set the main step to zero and for there to be no main chain on screen
-			mainOnScreen = false;
+			//set the steps to zero 
 			mainStep = 0;
-			
-			//set the side step to zero
 			sideStep = 0;
+			bondStep = 0;
+
+			//set mainOnScreen to false
+			mainOnScreen = false;
 			
 			//clear the lists of nodes
 			mainNodes.clear();
@@ -177,7 +181,7 @@ public class Canvas extends JComponent {
 			case 1: 
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Enter size of main chain: (ENTER)");
-				g2.setColor(new Color(50,50,238, 100));
+				g2.setColor(CanvasUtil.TRANS_BLUE);
 				drawNode(g2, mouse);
 			break;
 			
@@ -185,7 +189,7 @@ public class Canvas extends JComponent {
 			case 2: 
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Cyclo? (Y/N)");
-				g2.setColor(new Color(200,200,200, 100));
+				g2.setColor(CanvasUtil.TRANS_GREY);
 				drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
 			break;
 			
@@ -193,7 +197,7 @@ public class Canvas extends JComponent {
 			case 3:
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Select location for main chain: (CLICK)");
-				g2.setColor(new Color(200,200,200, 100));
+				g2.setColor(CanvasUtil.TRANS_GREY);
 				
 				if (compound.getMainChain().isCyclo()) {
 					drawCyclo(g2, mouse, compound.getMainSize(), false, null);
@@ -245,7 +249,7 @@ public class Canvas extends JComponent {
 			//size definition step
 			case 1: 
 				DrawingGUI.showMessage("Enter size of side chain: (ENTER)");
-				g2.setColor(new Color(238,50,50, 100));
+				g2.setColor(CanvasUtil.TRANS_RED);
 				drawNode(g2, mouse);
 				
 				drawSides(g2);
@@ -254,7 +258,7 @@ public class Canvas extends JComponent {
 			//location selection step
 			case 2: 
 				DrawingGUI.showMessage("Cyclo? (Y/N)");
-				g2.setColor(new Color(200,200,200, 100));
+				g2.setColor(CanvasUtil.TRANS_GREY);
 				drawChain(g2, mouse, DrawDirection.RIGHT, sideChains.get(sideChains.size()-1).getSize() + 1, true);
 				
 				drawSides(g2);
@@ -263,7 +267,7 @@ public class Canvas extends JComponent {
 			//determine cyclo step
 			case 3:				
 				DrawingGUI.showMessage("Select location for side chain: (CLICK)");
-				g2.setColor(new Color(200,200,200, 100)); //faint gray
+				g2.setColor(CanvasUtil.TRANS_GREY); //faint gray
 				
 				//create and draw the would-be chain
 				Chain ghost = sideChains.get(sideChains.size()-1);
@@ -299,6 +303,36 @@ public class Canvas extends JComponent {
 			break;
 		} //switch
 	} //end sideAction
+	
+	/*
+	 * Handles the action for the bond flow
+	 * Graphics2D g2 - object responsible for drawing
+	 */
+	private void bondAction(Graphics2D g2) {
+		switch (bondStep) {
+			//do nothing step
+			case 0:	
+				break;
+				
+			//enter size step
+			case 1:
+				DrawingGUI.showMessage("Enter size of the bond (2,3)");
+				g2.setColor(CanvasUtil.TRANS_GREEN);
+				drawNode(g2, mouse);
+				break;
+				
+			//select location step
+			case 2:
+				DrawingGUI.showMessage("Select node for the bond");
+				g2.setColor(CanvasUtil.TRANS_GREY);
+				break;
+				
+			//fixed on screen step
+			case 3:
+				
+				break;			
+		} //switch
+	} //end bondAction
 	
 	/*
 	 * Draw all the side chains to the screen
@@ -466,7 +500,6 @@ public class Canvas extends JComponent {
 		return nodes;
 	} //end drawChain
 
-	
 	/*
 	 * Set the size of the main chain
 	 * int main - size of the main chain
@@ -513,7 +546,6 @@ public class Canvas extends JComponent {
 		} //inner if
 	} //end setMainStart
 	
-	
 	/*
 	 * Get whether there is a main chain on the screen
 	 * return mainOnScreen - whether the main chain is on the screen
@@ -558,29 +590,6 @@ public class Canvas extends JComponent {
 		} //if
 	} //end updateActionType
 	
-	/*
-	 * Set the step for main drawing
-	 * int step - step for main drawing
-	 */
-	public void setMainStep(int step) {
-		//if outside of the range
-		if (step < 0 || step > 4) {
-			throw new IllegalArgumentException("Too big for me :(");
-		} else {
-			mainStep = step;
-		}  //if
-		
-		this.update();
-	} //end setMainStep
-	
-	/*
-	 * Get the step for main drawing
-	 * return mainStep - step for the main drawing
-	 */
-	public int getMainStep() {
-		return mainStep;
-	} //end getMainStep
-	
 	public String toString() {
 		return "Canvas"; //dbg
 	}
@@ -592,7 +601,6 @@ public class Canvas extends JComponent {
 	public void setGhostDirection(DrawDirection dir) {
 		ghostDir = dir;
 	} //end setGhostDirection
-	
 	
 	/*
 	 * Set the main chain to be cycloidal
@@ -610,6 +618,8 @@ public class Canvas extends JComponent {
 		return compound.getMainChain().isCyclo();
 	} //end getMainCyclo
 
+	//SIDE//
+	
 	/*
 	 * Add a side cyclo to the list
 	 * boolean val - value to add to the side lists
@@ -625,28 +635,6 @@ public class Canvas extends JComponent {
 	public void addSideDirection(DrawDirection dir) {
 		directions.add(dir);
 	} //end addSideDirection
-	
-	/*
-	 * Set the step for side drawing
-	 * int step - step for side drawing
-	 */
-	public void setSideStep(int step) {
-		if (step < 0 || step > 4) {
-			throw new IllegalArgumentException("Too big for me :(");
-		} else {
-			sideStep = step;
-		} //if 
-		
-		this.update();
-	} //end sideStep
-	
-	/*
-	 * Get the side step for drawing
-	 * return sideStep - step for drawing side chains
-	 */
-	public int getSideStep() {
-		return sideStep;
-	} //end getSideStep
 	
 	/*
 	 * Add a side size to the screen
@@ -679,6 +667,88 @@ public class Canvas extends JComponent {
 	public ArrayList<Chain> getSideChains() {
 		return sideChains;
 	} //end getSideChains
+	
+	//STEPS//
+	
+	/*
+	 * Set the step for main drawing
+	 * int step - step for main drawing
+	 */
+	public void setMainStep(int step) {
+		//if outside of the range
+		if (step < 0 || step > 4) {
+			throw new IllegalArgumentException("Too much for me :(");
+		} else {
+			mainStep = step;
+		}  //if
+		
+		this.update();
+	} //end setMainStep
+	
+	/*
+	 * Get the step for main drawing
+	 * return mainStep - step for the main drawing
+	 */
+	public int getMainStep() {
+		return mainStep;
+	} //end getMainStep
+	
+	/*
+	 * Set the step for side drawing
+	 * int step - step for side drawing
+	 */
+	public void setSideStep(int step) {
+		if (step < 0 || step > 4) {
+			throw new IllegalArgumentException("Too much for me :(");
+		} else {
+			sideStep = step;
+		} //if 
+		
+		this.update();
+	} //end sideStep
+	
+	/*
+	 * Get the side step for drawing
+	 * return sideStep - step for drawing side chains
+	 */
+	public int getSideStep() {
+		return sideStep;
+	} //end getSideStep
+	
+	//BOND//
+	
+	/*
+	 * Set the step for side drawing
+	 * int step - step for side drawing
+	 */
+	public void setBondStep(int step) {
+		if (step < 0 || step > 3) {
+			throw new IllegalArgumentException("Too much for me :(");
+		} else {
+			bondStep = step;
+		} //if 
+		
+		this.update();
+	} //end sideStep
+	
+	/*
+	 * Get the side step for drawing
+	 * return sideStep - step for drawing side chains
+	 */
+	public int getBondStep() {
+		return bondStep;
+	} //end getSideStep
+	
+	/*
+	 * Set the bond size for main drawing
+	 * int bond - size of bond
+	 */
+	public void setBondSize(int bond) {
+		compound.getMainChain().setBond(bond);
+//		compound.getMainChain().setEnding(bond+1); was throwing null pointer
+	} //end setBondSize
+	
+	//COMPOUND//
 	
 	/*
 	 * Get the compound
