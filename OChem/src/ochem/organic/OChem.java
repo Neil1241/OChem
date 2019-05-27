@@ -11,7 +11,6 @@ package ochem.organic;
 
 import java.io.PrintStream;
 import java.util.Scanner;
-import java.util.ArrayList;
 
 public class OChem {
 	/*
@@ -26,26 +25,14 @@ public class OChem {
 		String cmpnd = in.nextLine();
 
 		Compound compound = Interpreter.compoundFromName(cmpnd);
-		Chain[] chains = compound.getSideChains();
-		ArrayList<String> e = compound.getMainChain().getEndings();
 
 		out.println("------------------------------------------");
 		out.println("OCHEM RUNNING THIS");
 		out.println("------------------------------------------");
 		out.println(compound.toString());
-		out.println("------------------CYCLO-------------------");
-		out.println(compound.getMainChain().isCyclo());
-		for (int i = 0; i < compound.getSideChains().length; i++)
-			out.println(chains[i].isCyclo());
-		out.println("-----------------BENZENE-----------------");
-		out.println(compound.getMainChain().isBenzene());
-		for (int i = 0; i < compound.getSideChains().length; i++)
-			out.println(chains[i].isBenzene());
 		out.println("------------------BOND--------------------");
 		out.println(compound.getMainChain().getBond());
-		out.println("------------------GROUP-------------------");
-		for (String k : e)
-			System.out.println(k);
+		
 
 		in.close();
 	} // end main

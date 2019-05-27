@@ -65,10 +65,15 @@ public class Chain {
 		this.main = true;
 		this.functionalLocation = new ArrayList<String>();
 		this.functionalGroup = new ArrayList<String>();
+		this.numOfGroups = new ArrayList<Integer>();
 	}
 
 	public void setNumOfGroups(ArrayList<Integer> n) {
 		this.numOfGroups = n;
+	}
+	
+	public void addNumOfGroups(int n) {
+		this.numOfGroups.add(n);
 	}
 
 	public boolean isMain() {

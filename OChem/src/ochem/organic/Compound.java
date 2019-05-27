@@ -80,11 +80,12 @@ public class Compound {
 	public String toString() { // OVERRIDEN
 		String s = "";
 		ArrayList<String> locations = mainChain.getFunctionalLocation();
+		ArrayList<String> e = mainChain.getEndings();
 
 		// main chain
 		s = s.concat("Main Chain of: " + mainChain.getSize() + "\n");
 		s = s.concat("Main isCyclo: " + mainChain.isCyclo() + "\n");
-		
+		s = s.concat("Main isBenzene: " + mainChain.isBenzene() + "\n");
 		if (locations != null)
 			for (int i = 0; i < locations.size(); i++)
 				s = s.concat("Main Chain Functional Groups at " + locations.get(i) + "\n");
@@ -92,9 +93,12 @@ public class Compound {
 		int num = 1;
 		for (Chain side : sideChains) {
 			s = s.concat("Side chain " + num + " of size: " + side.getSize() + " and location: " + side.getLocation()
-					+ "\n");
+					+ " | cyclo: " + side.isCyclo() + " and benzene: " + side.isBenzene() + "\n");
 			num++;
 		} // loop
+		s = s.concat("------------------GROUP-------------------\n");
+		for (String k : e)
+			s = s.concat(k+"\n");
 
 		return s;
 	} // end toString

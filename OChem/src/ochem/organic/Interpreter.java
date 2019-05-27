@@ -6,6 +6,7 @@ package ochem.organic;
  * Everything else: Jordan
  * Last modified: 05/07/2019
  * Converts text names of compounds into compound objects
+ * TODO: fix the way locations are added
  */
 
 import java.util.ArrayList;
@@ -225,8 +226,8 @@ public class Interpreter {
 		try {
 			test = delimit.substring(0, delimit.length() - mainChain.length());
 			int idx = test.length() - 1;
-			while (!Character.isDigit(test.charAt(idx)))
-				idx--;
+			/*while (!Character.isDigit(test.charAt(idx)))
+				idx--;*/
 
 			while (Character.isDigit(test.charAt(idx))) {
 				hold = test.charAt(idx) + hold;
@@ -437,11 +438,15 @@ public class Interpreter {
 
 		// checks if the suffix is phenyl to determine the size, otherwise set the size
 		// to 1
-		if (chain.equalsIgnoreCase(prefix + "phenyl"))
-			size = 6;
-		else if (chain.equalsIgnoreCase(prefix + suffix)) {
-			size = 1;
-		} // end if
+		for (int i = 0; i < OrganicUtil.SIDE_CHAIN_SUFFIX.length; i++) {
+			if (chain.equalsIgnoreCase(prefix + "phenyl")) {
+				size = 6;
+				break;
+			} else if (chain.equalsIgnoreCase(prefix + suffix)) {
+				size = -i;
+				break;
+			} // end if
+		}
 
 		System.out.println("CHAIN TO NUMBER : " + prefix + suffix);// dbg
 		return size;
