@@ -97,13 +97,14 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 			// side action type
 			case SIDE:
-				ArrayList<Node> nodes = canvas.getMainNodes();
+				ArrayList<Node> sideNodes = canvas.getMainNodes();
 
 				// check to see if the click was on a main chain node
-				for (int i = 0; i < nodes.size(); i++) {
-					Node n = nodes.get(i);
+				for (int i = 0; i < sideNodes.size(); i++) {
+					Node n = sideNodes.get(i);
 					
-					if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(), n.getDia())) {
+					if (isWithinBounds(current.getCenterX(), current.getCenterY(),
+							n.getCenterX(), n.getCenterY(), n.getDia())) {
 						n.setTag("" + i); //set the location for that chain
 						canvas.addSideNode(n); // add that node to the side nodes list
 						canvas.addSideDirection(dir); // add a direction
@@ -112,13 +113,23 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					} // if
 				} // loop
 				break;
-
-			// clear action type
-			case CLEAR:
-				break;
-
-			// functional group action type
-			case FUNC_GROUP:
+				
+			//bond action type
+			case BOND:		
+				ArrayList<Node> bondNodes = canvas.getMainNodes();
+				
+				// check to see if the click was on a main chain node
+				for (int i = 0; i < bondNodes.size()-1; i++) {
+					Node n = bondNodes.get(i);
+					
+					//if the click was on a valid node
+					if (isWithinBounds(current.getCenterX(), current.getCenterY(),
+							n.getCenterX(), n.getCenterY(), n.getDia())) {
+						canvas.addBondNode(i); //add that node to the bonded nodes
+						canvas.setBondStep(3); //increment the bond step
+						break;
+					} // if
+				} // loop
 				break;
 			} // switch
 
@@ -131,6 +142,19 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		} // if
 	} // end handleClick
 
+	/*
+	 * Increment the draw direction one step forward 
+	 */
+	private void incDirection() {
+		int pos = dir.ordinal();
+		if (pos == DrawDirection.values().length - 1) { //if last value in enum
+			dir = DrawDirection.values()[0]; //set to zero
+			
+		} else { //any other
+			dir = DrawDirection.values()[pos + 1]; //set to one further ahead
+		} // if
+	} // end incDirection
+	
 	/*
 	 * Check whether one point is within a radius around a target point int x1 -
 	 * current point x int y1 - current point y int x2 - goal point x int y2 - goal
@@ -168,6 +192,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		if (canvas.getSideStep() == 3) {
 			showSideNodes(m);
 			
+		//showing bonding nodes
 		} else if (canvas.getBondStep() == 2) {
 			showBondNodes(m);
 		} //if
@@ -176,19 +201,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		canvas.update();
 	} // end mouseMoved
 
-	/*
-	 * Increment the draw direction one step forward 
-	 */
-	private void incDirection() {
-		int pos = dir.ordinal();
-		if (pos == DrawDirection.values().length - 1) { //if last value in enum
-			dir = DrawDirection.values()[0]; //set to zero
-			
-		} else { //any other
-			dir = DrawDirection.values()[pos + 1]; //set to one further ahead
-		} // if
-	} // end incDirection
-
+	//MOTION//
+	
 	/*
 	 * Show the side nodes able to be clicked
 	 * MouseEvent m - holds information about the click event
@@ -196,7 +210,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	private void showSideNodes(MouseEvent m) {
 		// change node color based on mouse position
 		ArrayList<Node> nodes = canvas.getMainNodes();
-		Node ms = new Node(m.getX(), m.getY(), 10);
+		Node ms = new Node(m.getX(), m.getY(), nodes.get(0).getRad());
 
 		int start;
 		if (canvas.getMainCyclo()) {
@@ -214,8 +228,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				nodes.get(i).setColor(CanvasUtil.DARK_YELLOW); // dark yellow
 
 				if (!canvas.getMainCyclo()) {
-					// change direction of the ghost depending on the position of the node on the
-					// chain
+					//change direction of the ghost depending on node position on chain
 					if (i % 2 == 0) {
 						dir = DrawDirection.DOWN_RIGHT;
 					} else {
@@ -236,7 +249,32 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 * MouseEvent m - holds information about the click event
 	 */
 	private void showBondNodes(MouseEvent m) {
+		// change node color based on mouse position
+		ArrayList<Node> nodes = canvas.getMainNodes();
+		Node ms = new Node(m.getX(), m.getY(), nodes.get(0).getRad());
 		
+		for (int i = 0; i < nodes.size()-1; i++) {
+			// if mouse is over the node
+			if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(),
+					nodes.get(i).getCenterY(), nodes.get(i).getRad())) {
+				// make its color darker
+				nodes.get(i).setColor(CanvasUtil.DARK_RED); // dark yellow
+
+				if (!canvas.getMainCyclo()) {
+					//change direction of the ghost depending on node position on chain
+					if (i % 2 == 0) {
+						dir = DrawDirection.DOWN_RIGHT;
+					} else {
+						dir = DrawDirection.UP_RIGHT;
+					} // if
+
+					canvas.setGhostDirection(dir);
+				}
+			} else {
+				// return to the default lighter color
+				nodes.get(i).setColor(CanvasUtil.LIGHT_RED); // light yellow
+			} // if
+		}
 	} //showBondNodes
 	
 	public String toString() {

@@ -21,6 +21,7 @@ import ochem.drawing.CanvasUtil.ActionType;
 import ochem.drawing.CanvasUtil.DrawDirection;
 import ochem.organic.Chain;
 import ochem.organic.Compound;
+import ochem.organic.OrganicUtil;
 
 public class Canvas extends JComponent {
 	//Attributes
@@ -41,14 +42,18 @@ public class Canvas extends JComponent {
 	private ArrayList<Node> sideNodes; //nodes for the side chain
 	private ArrayList<DrawDirection> directions; //directions for side chains
 	
+	//bond
+	private ArrayList<Node> bondNodes; //bonded nodes
+	
 	private boolean mainOnScreen; //whether a main chain is on the screen
 
 	private ActionType type; //type of action
+	
+	private DrawDirection ghostDir; //direction of the ghost chain
+	
 	private int mainStep; //step for the "main" button
 	private int sideStep; //step for the "side" button
 	private int bondStep; //step for the "bond" button
-	
-	private DrawDirection ghostDir; //direction of the ghost chain
 	
 	/*
 	 * Create a canvas with its parent's width and height
@@ -84,9 +89,10 @@ public class Canvas extends JComponent {
 		
 		sideChains = new ArrayList<Chain>();
 		
-		//instantiate lists for the nodes on the main chain and side chains
+		//instantiate all node lists
 		mainNodes = new ArrayList<Node>();
 		sideNodes = new ArrayList<Node>();
+		bondNodes = new ArrayList<Node>();
 		
 		//set the step numbers to zero when not being used, increment when needed
 		mainStep = 0;
@@ -150,6 +156,7 @@ public class Canvas extends JComponent {
 			//clear the lists of nodes
 			mainNodes.clear();
 			sideNodes.clear();
+			bondNodes.clear();
 			
 			//clear the directions
 			directions.clear();
@@ -163,8 +170,7 @@ public class Canvas extends JComponent {
 			mainStep = 0;
 			sideStep = 0;
 		} //if
-	} //end clearAction
-	
+	} //end clearAction	
 	
 	/*
 	 * Handles the actions for the main flow
@@ -249,7 +255,7 @@ public class Canvas extends JComponent {
 			//size definition step
 			case 1: 
 				DrawingGUI.showMessage("Enter size of side chain: (ENTER)");
-				g2.setColor(CanvasUtil.TRANS_RED);
+				g2.setColor(CanvasUtil.TRANS_YELLOW);
 				drawNode(g2, mouse);
 				
 				drawSides(g2);
@@ -317,19 +323,32 @@ public class Canvas extends JComponent {
 			//enter size step
 			case 1:
 				DrawingGUI.showMessage("Enter size of the bond (2,3)");
-				g2.setColor(CanvasUtil.TRANS_GREEN);
+				g2.setColor(CanvasUtil.TRANS_RED);
 				drawNode(g2, mouse);
+				
+				g2.setColor(CanvasUtil.CHAIN_COLOR);
+				drawBonds(g2);
 				break;
 				
 			//select location step
 			case 2:
 				DrawingGUI.showMessage("Select node for the bond");
-				g2.setColor(CanvasUtil.TRANS_GREY);
+				
+				//show nodes that can be clicked
+				for (int i = 0; i < mainNodes.size()-1; i++) {
+					g2.setColor(mainNodes.get(i).getColor());
+					drawNode(g2, mainNodes.get(i));
+				} //loop
+				
+				g2.setColor(CanvasUtil.CHAIN_COLOR);
+				drawBonds(g2);
 				break;
 				
 			//fixed on screen step
 			case 3:
-				
+				DrawingGUI.showMessage("");
+				g2.setColor(CanvasUtil.CHAIN_COLOR);
+				drawBonds(g2);
 				break;			
 		} //switch
 	} //end bondAction
@@ -351,6 +370,46 @@ public class Canvas extends JComponent {
 			} //if
 		} //loop
 	} //end drawSides
+	
+	/*
+	 * Draw all the bonded pairs
+	 * Graphics2D g2 - object responsible for drawing
+	 */
+	private void drawBonds(Graphics2D g2) throws NumberFormatException {
+		//thinner lines
+		BasicStroke bs = new BasicStroke(10.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		g2.setStroke(bs);
+		
+		//if there are nodes in the list
+		if (!bondNodes.isEmpty()) {
+			
+			//draw lines between each pair
+			for (int i = 0; i < bondNodes.size(); i += 2) {
+				//cyclo main chain
+				if (compound.getMainChain().isCyclo()) {
+					
+				//regular main chain
+				} else {
+					int xOffset = 0; //not as long as a single bond
+					
+					int flip = Integer.parseInt(bondNodes.get(i).getTag());
+					int yOffset = flip * 30; //flip up or down based on index
+					
+					//start point
+					int x1 = bondNodes.get(i).getX() + xOffset;
+					int y1 = bondNodes.get(i).getY() + yOffset;
+					
+					//end point
+					int x2 = bondNodes.get(i+1).getX() - xOffset;
+					int y2 = bondNodes.get(i+1).getY() + yOffset;
+					
+					g2.drawLine(x1, y1, x2, y2);
+					
+					System.out.println(x1 +" "+ y1 +" "+ x2 +" "+ y2);
+				} //if
+			} //loop
+		} //big if 
+	} //end drawBonds
 	
 	/*
 	 * Draw a node to the screen
@@ -480,12 +539,14 @@ public class Canvas extends JComponent {
 			
 			if (i >= tagStart) {
 				if (side) {
-					nodes.add(new Node(x1,y1,20, "" + (i))); //add the current node to the list
+					//set the location, radius, tag and save the node to the list
+					nodes.add(new Node(x1,y1,20, "" + (i))); 
 				} else {
-					nodes.add(new Node(x1,y1,20, "" + (i+1))); //add the current node to the list
+					//set the location, radius, tag, color and save the node to the list
+					nodes.add(new Node(x1,y1,20, "" + (i+1), CanvasUtil.LIGHT_YELLOW)); 
 				} //small if
 			} //big if
-			
+		
 			//change the start point to this end for next loop
 			x1 = x2;
 			y1 = y2;
@@ -495,7 +556,7 @@ public class Canvas extends JComponent {
 		if (side) 
 			nodes.add(new Node(x1,y1,20, "" + (chainSize-1))); 
 		else 
-			nodes.add(new Node(x1,y1,20, "" + (chainSize)));
+			nodes.add(new Node(x1,y1,20, "" + (chainSize), CanvasUtil.LIGHT_YELLOW));
 		
 		return nodes;
 	} //end drawChain
@@ -745,8 +806,29 @@ public class Canvas extends JComponent {
 	 */
 	public void setBondSize(int bond) {
 		compound.getMainChain().setBond(bond);
-//		compound.getMainChain().setEnding(bond+1); was throwing null pointer
+//		compound.getMainChain().setEnding(bond+1); //was throwing null pointer
 	} //end setBondSize
+	
+	/*
+	 * Add a pair of bonded nodes to the compound
+	 * int idx - position of the node in the main chain
+	 */
+	public void addBondNode(int idx) {
+		//nodes to add to the bond nodes list
+		Node start = mainNodes.get(idx);
+		Node end = mainNodes.get(idx+1);
+		
+		//change the tag based on the index
+		if (idx % 2 == 0) {
+			start.setTag("1");
+		} else {
+			start.setTag("-1");
+		} //if
+		
+		//add to list
+		bondNodes.add(start);
+		bondNodes.add(end);
+	} //end addBondedNode
 	
 	//COMPOUND//
 	

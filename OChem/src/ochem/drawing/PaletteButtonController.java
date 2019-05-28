@@ -74,6 +74,10 @@ public class PaletteButtonController implements MouseListener {
 			if (canvas.getMainOnScreen()) {
 				palette.setSelectedType(ActionType.BOND);
 				canvas.setBondStep(1);
+				
+				for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+					canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED);
+				}
 			} //if
 			
 		} else if (text.equals("Clear")) {

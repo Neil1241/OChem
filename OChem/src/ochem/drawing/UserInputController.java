@@ -2,6 +2,7 @@
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 public class UserInputController implements KeyListener {
 	//Attributes
@@ -49,7 +50,7 @@ public class UserInputController implements KeyListener {
 						
 					//bond action
 					case BOND: 
-						bondNum(num);
+						bondAction(num);
 						break;
 				} //switch
 			
@@ -110,6 +111,7 @@ public class UserInputController implements KeyListener {
 			//set the size and step forward
 			canvas.setMainSize(num);
 			canvas.setMainStep(2);
+				
 			DrawingGUI.clear();
 		} //if
 	} //end bondAction
@@ -180,7 +182,7 @@ public class UserInputController implements KeyListener {
 	 * Handles the bond action
 	 * int num - num entered by user
 	 */
-	private void bondNum(int num) {
+	private void bondAction(int num) {
 		if (num < 2) { //too small
 			DrawingGUI.reportError("Number entered too small!");
 			

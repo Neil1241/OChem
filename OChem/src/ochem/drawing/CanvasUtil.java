@@ -10,13 +10,25 @@ import java.awt.Color;
  */
 
 public class CanvasUtil {
-	//Static colors
+	//Static values
+	//transparent colors
 	public static Color TRANS_RED = new Color(238,50,50,100);
 	public static Color TRANS_GREEN = new Color(50,238,50,100);
 	public static Color TRANS_BLUE = new Color(50,50,238,100);
 	public static Color TRANS_GREY = new Color(200,200,200,100);
+	public static Color TRANS_YELLOW = new Color(255,242,0,100);
+	
+	//light and dark colors
+	//yellow
 	public static Color DARK_YELLOW = new Color(219, 194, 52);
 	public static Color LIGHT_YELLOW = new Color(244, 217, 66);
+	
+	//red
+	public static Color DARK_RED = new Color(183, 33, 33);
+	public static Color LIGHT_RED = new Color(255, 45, 45);
+	
+	//chain colors
+	public static Color CHAIN_COLOR = Color.BLACK;
 	
 	/*
 	 * Types of action to determine different drawing features

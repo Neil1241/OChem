@@ -56,6 +56,21 @@ public class Node {
 	} //end constructor
 	
 	/*
+	 * Creates a node with an (x,y) coordinate for its top left corner and a radius
+	 * int x - x value for top left
+	 * int y - y value for top left
+	 * String tag - tag of the node
+	 * Color color - color of the node
+	 */
+	public Node(int x, int y, int rad, String tag, Color color) {
+		this.x = x;
+		this.y = y;
+		this.rad = rad;
+		this.tag = tag;
+		this.color = color;
+	} //end constructor
+	
+	/*
 	 * Set the (x,y) of the node
 	 * int x - x of node
 	 * int y - y of node 
