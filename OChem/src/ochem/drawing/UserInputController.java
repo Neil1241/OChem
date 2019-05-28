@@ -102,7 +102,7 @@ public class UserInputController implements KeyListener {
 		} else if (num > 10) { //too big
 			DrawingGUI.reportError("Size entered too big!");
 			
-		} else if (num > 6 || num < 3) { //too big or too small for cyclo
+		} else if (num > 8 || num < 3) { //too big or too small for cyclo
 			canvas.setMainSize(num);
 			canvas.setMainStep(3);
 			DrawingGUI.clear();

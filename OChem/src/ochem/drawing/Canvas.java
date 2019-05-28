@@ -44,6 +44,7 @@ public class Canvas extends JComponent {
 	
 	//bond
 	private ArrayList<Node> bondNodes; //bonded nodes
+	private ArrayList<Integer> bondSizes; //size of bonds
 	
 	private boolean mainOnScreen; //whether a main chain is on the screen
 
@@ -54,6 +55,8 @@ public class Canvas extends JComponent {
 	private int mainStep; //step for the "main" button
 	private int sideStep; //step for the "side" button
 	private int bondStep; //step for the "bond" button
+	
+	private int bondNum; //global bond number counter
 	
 	/*
 	 * Create a canvas with its parent's width and height
@@ -84,9 +87,8 @@ public class Canvas extends JComponent {
 		//set the main on screen to false
 		mainOnScreen = false;
 		
-		//instantiate the chains
+		//instantiate the compound and the chain
 		compound = new Compound(0);		
-		
 		sideChains = new ArrayList<Chain>();
 		
 		//instantiate all node lists
@@ -105,9 +107,16 @@ public class Canvas extends JComponent {
 		//initialize the directions list
 		directions = new ArrayList<DrawDirection>();
 		
+		//set the global bond counter to zero
+		bondNum = 0;
+		
+		//size of all the bonds
+		bondSizes = new ArrayList<Integer>();
+		
 		//add the controllers to the canvas
 		registerControllers();
 	} //end constructor
+	
 	
 	/*
 	 * Draw all nodes, bonds and functional groups to the screen
@@ -134,6 +143,7 @@ public class Canvas extends JComponent {
 		sideAction(g2);
 		bondAction(g2);
 	}  //end paintComponent 
+	
 	
 	/*
 	 * Handles the actions for the clear flow
@@ -166,11 +176,15 @@ public class Canvas extends JComponent {
 			compound = new Compound(0);
 			sideChains.clear();
 			
+			//clear the list of bonds
+			bondSizes.clear();
+			
 			//reset the steps
 			mainStep = 0;
 			sideStep = 0;
 		} //if
 	} //end clearAction	
+	
 	
 	/*
 	 * Handles the actions for the main flow
@@ -241,6 +255,7 @@ public class Canvas extends JComponent {
 		} //switch
 	} //end mainAction
 	
+	
 	/*
 	 * Handles the actions for the side flow
 	 * Graphics2D g2 - object responsible for drawing
@@ -310,6 +325,7 @@ public class Canvas extends JComponent {
 		} //switch
 	} //end sideAction
 	
+	
 	/*
 	 * Handles the action for the bond flow
 	 * Graphics2D g2 - object responsible for drawing
@@ -346,12 +362,13 @@ public class Canvas extends JComponent {
 				
 			//fixed on screen step
 			case 3:
-				DrawingGUI.showMessage("");
+//				DrawingGUI.showMessage("");
 				g2.setColor(CanvasUtil.CHAIN_COLOR);
 				drawBonds(g2);
 				break;			
 		} //switch
 	} //end bondAction
+	
 	
 	/*
 	 * Draw all the side chains to the screen
@@ -370,6 +387,7 @@ public class Canvas extends JComponent {
 			} //if
 		} //loop
 	} //end drawSides
+	
 	
 	/*
 	 * Draw all the bonded pairs
@@ -390,6 +408,8 @@ public class Canvas extends JComponent {
 					
 				//regular main chain
 				} else {
+					int bondNum = bondSizes.get(i / 2); //size of bond being drawn
+					
 					int xOffset = 0; //not as long as a single bond
 					
 					int flip = Integer.parseInt(bondNodes.get(i).getTag());
@@ -405,11 +425,26 @@ public class Canvas extends JComponent {
 					
 					g2.drawLine(x1, y1, x2, y2);
 					
-					System.out.println(x1 +" "+ y1 +" "+ x2 +" "+ y2);
+					//recalculate to the opposite side and draw
+					if (bondNum == 3) {
+						flip = -flip;
+						yOffset = flip * 30; //flip up or down based on index 
+						
+						//start point
+						x1 = bondNodes.get(i).getX() + xOffset;
+						y1 = bondNodes.get(i).getY() + yOffset;
+						
+						//end point
+						x2 = bondNodes.get(i+1).getX() - xOffset;
+						y2 = bondNodes.get(i+1).getY() + yOffset;
+						
+						g2.drawLine(x1, y1, x2, y2);
+					} //draw the 3rd bond
 				} //if
 			} //loop
 		} //big if 
 	} //end drawBonds
+	
 	
 	/*
 	 * Draw a node to the screen
@@ -419,6 +454,7 @@ public class Canvas extends JComponent {
 	private void drawNode(Graphics2D g2, Node n) {
 		g2.fillOval(n.getCenterX(), n.getCenterY(), n.getDia(), n.getDia());
 	} //end drawNode
+	
 	
 	/*
 	 * Draw a cycloidal chain
@@ -433,7 +469,7 @@ public class Canvas extends JComponent {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		
 		//offset length in pixels
-		int r = 120;
+		int r = 140;
 		
 		//start point
 		int x1 = start.getX();
@@ -490,6 +526,7 @@ public class Canvas extends JComponent {
 			g2.drawLine(start.getX(), start.getY(), start.getX() + xOffset, start.getY() + yOffset);
 		} //if
 		
+		//draw the #s for debugging
 		g2.setFont(g2.getFont().deriveFont(50.0F));
 		g2.setColor(Color.RED);
 		for (Node n : mainNodes) {
@@ -499,6 +536,7 @@ public class Canvas extends JComponent {
 		
 		return nodes;
 	} //end drawCyclo
+	
 	
 	/*
 	 * Draws the main chain from a starting point
@@ -560,6 +598,7 @@ public class Canvas extends JComponent {
 		
 		return nodes;
 	} //end drawChain
+	
 
 	/*
 	 * Set the size of the main chain
@@ -569,12 +608,14 @@ public class Canvas extends JComponent {
 		compound.setMainSize(main);
 	} //end setMainSize
 	
+	
 	/*
 	 * Update the screen
 	 */
 	public void update() {
 		repaint();
 	} //end update
+	
 	
 	/*
 	 * Add the CanvasController to this component
@@ -585,6 +626,7 @@ public class Canvas extends JComponent {
 		this.addMouseMotionListener(cc);
 	} //end registerControllers
 	
+	
 	/*
 	 * Set the x and y of the mouse
 	 * int x - mouse x
@@ -593,6 +635,7 @@ public class Canvas extends JComponent {
 	public void setMouseXY(int x, int y) {
 		mouse.setXY(x, y);
 	} //end setMouseXY
+	
 	
 	/*
 	 * Set the node for the start position of the main chain
@@ -607,6 +650,7 @@ public class Canvas extends JComponent {
 		} //inner if
 	} //end setMainStart
 	
+	
 	/*
 	 * Get whether there is a main chain on the screen
 	 * return mainOnScreen - whether the main chain is on the screen
@@ -614,6 +658,7 @@ public class Canvas extends JComponent {
 	public boolean getMainOnScreen() {
 		return mainOnScreen;
 	} //end getMainOnScreen
+	
 	
 	/*
 	 * Get the current type for the canvas
@@ -623,6 +668,7 @@ public class Canvas extends JComponent {
 		return type;
 	} //end getType
 	
+	
 	/*
 	 * Get the nodes on the main chain
 	 * return nodes - list of all the nodes of the main chain
@@ -631,13 +677,15 @@ public class Canvas extends JComponent {
 		return mainNodes;
 	} //end getMainNodes
 	
+	
 	/*
 	 * Set the nodes on the main chain to the list passed
 	 * ArrayList<Node> mainNodes - list to change nodes to
 	 */
 	public void setMainNodes(ArrayList<Node> mainNodes) {
 		this.mainNodes = mainNodes;
-	} //end setMainNodes h
+	} //end setMainNodes
+	
 	
 	/*
 	 * Update the type of the canvas from the palette type
@@ -651,9 +699,11 @@ public class Canvas extends JComponent {
 		} //if
 	} //end updateActionType
 	
+	
 	public String toString() {
 		return "Canvas"; //dbg
 	}
+	
 	
 	/*
 	 * Set the direction for the ghost to be drawn
@@ -663,6 +713,7 @@ public class Canvas extends JComponent {
 		ghostDir = dir;
 	} //end setGhostDirection
 	
+	
 	/*
 	 * Set the main chain to be cycloidal
 	 * boolean val - whether main chain is cyclo or not
@@ -670,6 +721,7 @@ public class Canvas extends JComponent {
 	public void setMainCyclo(boolean val) {
 		compound.getMainChain().setCyclo(val);
 	} //end setMainCyclo
+	
 	
 	/*
 	 * Get whether the main chain is a cyclo or not
@@ -689,6 +741,7 @@ public class Canvas extends JComponent {
 		sideChains.get(sideChains.size() - 1).setCyclo(val);
 	} //end addSideCyclo
 	
+	
 	/*
 	 * Add a direction for a side chain
 	 * DrawDirection dir - direction for latest side chain
@@ -696,6 +749,7 @@ public class Canvas extends JComponent {
 	public void addSideDirection(DrawDirection dir) {
 		directions.add(dir);
 	} //end addSideDirection
+	
 	
 	/*
 	 * Add a side size to the screen
@@ -709,6 +763,7 @@ public class Canvas extends JComponent {
 		} //if
 	} //end addSideSize
 	
+	
 	/*
 	 * Add side node to the side nodes list
 	 * Node n - node to add to the side Nodes
@@ -720,6 +775,7 @@ public class Canvas extends JComponent {
 		compound.addSideChain(lastSide.getSize(), lastSide.getLocation(), lastSide.isCyclo(), lastSide.isBenzene());
 		compound.addFunctionalLocation(lastSide.getLocation());
 	} //end addSideNode
+	
 	
 	/*
 	 * Get the side chains
@@ -746,6 +802,7 @@ public class Canvas extends JComponent {
 		this.update();
 	} //end setMainStep
 	
+	
 	/*
 	 * Get the step for main drawing
 	 * return mainStep - step for the main drawing
@@ -753,6 +810,7 @@ public class Canvas extends JComponent {
 	public int getMainStep() {
 		return mainStep;
 	} //end getMainStep
+	
 	
 	/*
 	 * Set the step for side drawing
@@ -767,6 +825,7 @@ public class Canvas extends JComponent {
 		
 		this.update();
 	} //end sideStep
+	
 	
 	/*
 	 * Get the side step for drawing
@@ -805,7 +864,11 @@ public class Canvas extends JComponent {
 	 * int bond - size of bond
 	 */
 	public void setBondSize(int bond) {
-		compound.getMainChain().setBond(bond);
+		if (compound.getMainChain().getBond() < bond) {
+			compound.getMainChain().setBond(bond);
+		}
+		
+		bondSizes.add(bond);
 //		compound.getMainChain().setEnding(bond+1); //was throwing null pointer
 	} //end setBondSize
 	
@@ -828,6 +891,9 @@ public class Canvas extends JComponent {
 		//add to list
 		bondNodes.add(start);
 		bondNodes.add(end);
+		
+		//add the location to the main chain
+		compound.getMainChain().addFunctionalLocation("" + idx);
 	} //end addBondedNode
 	
 	//COMPOUND//
@@ -839,4 +905,19 @@ public class Canvas extends JComponent {
 	public Compound getCompound() {
 		return compound;
 	} //end getCompound
+	
+	/*
+	 * Get the endings String list
+	 * return - list of endings for the main chain
+	 */
+	public ArrayList<String> getEndings() {
+		//add the number of groups
+		bondNum++;
+		compound.getMainChain().addNumOfGroups(bondNum);
+		
+		//set the ending
+		compound.getMainChain().setEnding(compound.getMainChain().getBond() - 1); //position in organic util array
+		
+		return compound.getMainChain().getEndings();
+	} //end getEndings
 } //end class

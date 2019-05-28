@@ -65,6 +65,12 @@ public class PaletteButtonController implements MouseListener {
 			if (canvas.getMainOnScreen()) {
 				palette.setSelectedType(ActionType.SIDE);
 				canvas.setSideStep(1);
+				System.out.println(this.toString() + " changed side");
+				
+				//set the colors for all the main nodes
+				for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+					canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_YELLOW);
+				} //loop
 			} //if
 			
 		} else if (text.equals("Function")) {
@@ -75,9 +81,10 @@ public class PaletteButtonController implements MouseListener {
 				palette.setSelectedType(ActionType.BOND);
 				canvas.setBondStep(1);
 				
+				//set the colors for all the main nodes
 				for (int i = 0; i < canvas.getMainNodes().size(); i++) {
 					canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED);
-				}
+				} //loop
 			} //if
 			
 		} else if (text.equals("Clear")) {
@@ -87,6 +94,10 @@ public class PaletteButtonController implements MouseListener {
 		} else if (text.equals("Name")) {
 			if (canvas.getMainOnScreen()) {
 				System.out.println(canvas.getCompound().toString());
+				for (String s : canvas.getEndings()) {
+					System.out.println(s);
+				}
+				System.out.println();
 			} //if
 		} //big if
 		
