@@ -393,7 +393,7 @@ public class Canvas extends JComponent {
 					int xOffset = 0; //not as long as a single bond
 					
 					int flip = Integer.parseInt(bondNodes.get(i).getTag());
-					int yOffset = flip * 30; //flip up or down based on index
+					int yOffset = flip * 30; //flip up or down based on index 
 					
 					//start point
 					int x1 = bondNodes.get(i).getX() + xOffset;
