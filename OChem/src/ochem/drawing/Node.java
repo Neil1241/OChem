@@ -38,7 +38,7 @@ public class Node {
 		this.x = x;
 		this.y = y;
 		this.rad = rad;
-		this.tag = "-1";
+		this.tag = "";
 	} //end constructor
 	
 	/*
@@ -144,10 +144,6 @@ public class Node {
 		return color;
 	} //end getColor
 	
-	public String toString() {
-		return "" + x + " " + y;
-	}
-	
 	/*
 	 * Set the tag of the node
 	 * String tag - tag for the node
@@ -164,4 +160,10 @@ public class Node {
 		return tag;
 	} //end getTag
 	
+	/*
+	 * Coordinates of the node as a String for debugging
+	 */
+	public String toString() {
+		return "" + x + " " + y;
+	} //end toString
 } //end class

@@ -17,25 +17,22 @@ import ochem.drawing.CanvasUtil.ActionType;
 
 public class Palette extends JPanel {
 	//Attributes
-	private int width;
-	private int height;
+	private int width; //width of palette in pixels
+	private int height; //height of palette in pixels
 	
 	//feature buttons
-	private OBox main;
-	private OBox side;
-	private OBox func;
-	private OBox bond;
-	private OBox clear;
-	private OBox name;
+	private OBox main; //main button
+	private OBox side; //side button
+	private OBox func; //functional group button
+	private OBox bond; //bond button
+	private OBox clear; //clear button
+	private OBox name; //name button
 	
-	//number of buttons on the screen
-	private final int NUM_BUTTONS = 5;
+	private final int NUM_BUTTONS = 5; //number of buttons on the screen
 	
-	//instance of the Canvas
-	private Canvas canvas;
+	private Canvas canvas; //instance of the Canvas
 	
-	//current type
-	private ActionType selectedType;
+	private ActionType selectedType; //current type
 	
 	/*
 	 * Creates a palette with a width and a height

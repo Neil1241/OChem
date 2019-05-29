@@ -1,4 +1,11 @@
-	package ochem.drawing;
+package ochem.drawing;
+
+/*
+ * UserInputController
+ * Created by: Neil Balaskandarajah
+ * Last modified: 05/20/2019
+ * The controller for the user interactive text field
+ */
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -6,35 +13,35 @@ import java.util.ArrayList;
 
 public class UserInputController implements KeyListener {
 	//Attributes
-	private Canvas canvas;
-	private Palette palette;
+	private Canvas canvas; //instance of the canvas to communicate with
+	private Palette palette; //instance of the palette to communicate with
 	
 	//Constants
-	private final int ENTER_KEY = 10;
+	private final int ENTER_KEY = 10; //int value representing an enter key press
 	
+	/*
+	 * Creates an input controller with instances of canvas and palette
+	 * Canvas canvas - instance of the canvas
+	 * Palette palette - instance of the palette
+	 */
 	public UserInputController(Canvas canvas, Palette palette) {
 		this.canvas = canvas;
 		this.palette = palette;
-	}
+	} //end constructor
 
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
+	/*
+	 * Responsible for dealing with a key typed into the text field
+	 * KeyEvent k - holds information about the key type
+	 */
 	public void keyTyped(KeyEvent k) {
+		//if the enter key is pressed
 		if ((int) k.getKeyChar() == ENTER_KEY ) {
+			
+			//if the text in the text field is a number
 			if (isNumber(DrawingGUI.getUserInput())) {
-				int num = Integer.parseInt(DrawingGUI.getUserInput());
+				int num = Integer.parseInt(DrawingGUI.getUserInput()); //store the number
 				
+				//actions depend on the palette type
 				switch (palette.getSelectedType()) {
 					//main action
 					case MAIN:
@@ -54,22 +61,22 @@ public class UserInputController implements KeyListener {
 						break;
 				} //switch
 			
-				//if letter was typed
-				} else {				
-					String in = DrawingGUI.getUserInput();
-					
-					switch (palette.getSelectedType()) {
-						//main button
-						case MAIN:
-							mainAction(in);					
-							break;
-							
-						//side button
-						case SIDE:
-							sideAction(in);
-							break;
-				} //switch
+			//if letter was typed
+			} else {				
+				String in = DrawingGUI.getUserInput();
 				
+				switch (palette.getSelectedType()) {
+					//main button
+					case MAIN:
+						mainAction(in);					
+						break;
+						
+					//side button
+					case SIDE:
+						sideAction(in);
+						break;
+				} //switch
+			
 			} //if
 		} //outer if
 	} //end keyTyped
@@ -81,21 +88,21 @@ public class UserInputController implements KeyListener {
 	private boolean isNumber(String text) {
 		//if parse succeeds, string is a number and true is returned
 		try {
-			Integer.parseInt(text);
+			Integer.parseInt(text); //no need to save; if error isn't caught, text is number
 			return true;
 		} catch (NumberFormatException n) {
 			return false;
 		} //try-catch
 	} //end isNumber
 	
-	//MAIN//
+	//MAIN TYPE//
 	
 	/*
 	 * Handles the main action
 	 * int num - num entered by user
 	 */
 	private void mainAction(int num) {
-		//check to see if number entered is within range
+		//check to see if number entered is within range for a main chain
 		if (num < 2) { //too small
 			DrawingGUI.reportError("Size entered too small!");
 			
@@ -108,55 +115,60 @@ public class UserInputController implements KeyListener {
 			DrawingGUI.clear();
 			
 		} else {
-			//set the size and step forward
+			//set the size of the main chain and step forward
 			canvas.setMainSize(num);
 			canvas.setMainStep(2);
-				
+			
+			//clear the dialog box
 			DrawingGUI.clear();
 		} //if
-	} //end bondAction
+	} //end mainAction
 	
 	/*
 	 * Handles the main action
-	 * String key - key entered by user
+	 * String in - text entered by user
 	 */
 	private void mainAction(String in) {
+		//if on deciding cyclo step
 		if (canvas.getMainStep() == 2) {
+			
+			//if text entered is Y (yes)
 			if (in.equalsIgnoreCase("Y")) {
-				canvas.setMainCyclo(true);
-				canvas.setMainStep(3);
-				DrawingGUI.clear();
+				canvas.setMainCyclo(true); //set the main chain to be a cyclo
+				canvas.setMainStep(3); //step forward
+				DrawingGUI.clear(); //clear the dialog box
+				
+			//else if N (no)
 			} else if (in.equalsIgnoreCase("N")) {
-				canvas.setMainCyclo(false);
-				canvas.setMainStep(3);
-				DrawingGUI.clear();
+				canvas.setMainCyclo(false); //set the main chain to be regular
+				canvas.setMainStep(3); //step forward
+				DrawingGUI.clear(); //clear the dialog box
 			} //if
 		} //big if
 	} //end mainAction
 	
-	//SIDE//
+	//SIDE TYPE//
 	
 	/*
 	 * Handles the side action
 	 * int num - num entered by user
 	 */
 	private void sideAction(int num) {
-		//add a size and step forward
-		
-		if (num < 1) { //invalidly small
+		//add a size to the list of chains and step forward
+		if (num < 1) { //too small to be a chain
 			DrawingGUI.reportError("Size enter too small!");
 			
-		} else if (num < 3 || num > 5) { //too small or too big for cyclo
-			canvas.addSideSize(num);
-			canvas.addSideCyclo(false);
+		} else if (num < 3 || num > 5) { //valid size, can't be cyclo
+			canvas.addSideSize(num); //add number to the list
+			canvas.addSideCyclo(false); //set it to false
 			canvas.setSideStep(3); //skip over cyclo step
 			
-		} else if (num > 10) { //invalidly big
+		} else if (num > 10) { //to big to be a side chain
 			DrawingGUI.reportError("Size entered too big");		
 			
-		} else {
-			canvas.addSideSize(num);
-			canvas.setSideStep(2);
+		} else { //valid and can be cyclo
+			canvas.addSideSize(num); //add size to list
+			canvas.setSideStep(2); //step forward
 		} //if
 	} //end sideAction
 	
@@ -165,33 +177,47 @@ public class UserInputController implements KeyListener {
 	 * String in - key entered by user
 	 */
 	private void sideAction(String in) {
+		//cyclo deciding step
 		if (canvas.getSideStep() == 2) {
+			
+			//if text entered is Y (yes)
 			if (in.equalsIgnoreCase("Y")) {
-				canvas.addSideCyclo(true);
-				canvas.setSideStep(3);
+				canvas.addSideCyclo(true); //set that side chain to be a cyclo
+				canvas.setSideStep(3); //step forward
+				
 			} else if (in.equalsIgnoreCase("N")) {
-				canvas.addSideCyclo(false);
-				canvas.setSideStep(3);
+				canvas.addSideCyclo(false); //set that side chain to be regular
+				canvas.setSideStep(3); //step forward
 			} //if
 		} //big if
 	} //end sideAction
 	
-	//BOND//
+	//BOND TYPE//
 	
 	/*
 	 * Handles the bond action
 	 * int num - num entered by user
 	 */
 	private void bondAction(int num) {
-		if (num < 2) { //too small
+		if (num < 2) { //too small for a bond 
 			DrawingGUI.reportError("Number entered too small!");
 			
-		} else if (num > 3) { //too big
+		} else if (num > 3) { //too big for a bond
 			DrawingGUI.reportError("Number entered too big!");
 			
 		} else { //valid
-			canvas.setBondSize(num);
-			canvas.setBondStep(2);
+			canvas.setBondSize(num); //set the size of the bond
+			canvas.setBondStep(2); //step forward
 		} //if
 	} //end bondAction
+	
+	/*
+	 * Required by interface
+	 */
+	public void keyPressed(KeyEvent arg0) {}
+
+	/*
+	 * Required by interface
+	 */
+	public void keyReleased(KeyEvent arg0) {}
 } //end class

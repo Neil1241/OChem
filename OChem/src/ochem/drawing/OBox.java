@@ -36,6 +36,7 @@ public class OBox extends JComponent {
 	 */
 	public OBox(int width, int height, String text) {
 		super();
+		
 		this.text = text;	
 		
 		//set the size of the box
@@ -44,7 +45,7 @@ public class OBox extends JComponent {
 		//set the font size
 		fontSize = 96.0F;	
 		
-		//try to create and set the font if the file 
+		//try to create and set the font if the file is present
 		try {
 			f = Font.createFont(Font.TRUETYPE_FONT, new File("src/resources/HelveticaNeue.ttf"));
 		} catch (Exception e) {

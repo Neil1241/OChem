@@ -59,7 +59,7 @@ public class CanvasUtil {
 	 * return angles - pair of angles to alternate between when drawing chains
 	 */
 	public static double[] angleFromDirection(DrawDirection dir) {
-		double[] angles; //array of angles to draw with
+		double[] angles = new double[2]; //array of angles to draw with
 		
 		//different directions require different pairs of numbers to switch between
 		switch (dir) {
@@ -86,9 +86,6 @@ public class CanvasUtil {
 			case UP_RIGHT:
 				angles = new double[] {270,330};
 				break;
-				
-			default:
-				throw new IllegalArgumentException("What direction is this???");
 		} //switch
 		
 		return angles;
@@ -122,10 +119,51 @@ public class CanvasUtil {
 			case 5:
 				return Math.toRadians(60);
 			
-			//soft limited to not go here
+			case 6:
+				return Math.toRadians(30);
+			
+			//square
+			case 7:
+				return Math.toRadians(45);
+			
+			//pentagon
+			case 8:
+				return Math.toRadians(60);
+				
+			//default; numbers not in the cases are never passed
 			default:
 				return 0;
 		} //switch
 	} //end cycloAngOffset
-
+	
+	/*
+	 * Calculate the angle between two nodes
+	 * Node n1 - first node
+	 * Node n2 - second node
+	 * return angle - angle in radians between n1 and n2
+	 */
+	public static double angleBetweenNodes(Node n1, Node n2) {
+		double angle = 0;
+		double dx = n2.getX() - n1.getX();
+		double dy = n2.getY() - n1.getY();
+		
+		//cases where angle is straight, atan2 would return null
+		if (dy == 0) { //no change in y
+			if (dx > 0) //right
+				angle = 0;
+			else if (dx < 0) //left
+				angle = 180;
+			
+		} else if (dx == 0) { //no change in x
+			if (dy > 0) //up
+				angle = 270;
+			else if (dy < 0) //down
+				angle = 90;
+			
+		} else { //regular case
+			angle = -Math.atan2(dy, dx);
+		} //if
+		
+		return angle;
+	} //end angleBetweenNodes
 } //end class

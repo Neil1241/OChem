@@ -53,59 +53,109 @@ public class PaletteButtonController implements MouseListener {
 	public void mouseClicked(MouseEvent m) {
 		//get the text in the button 
 		String text = button.getText();
-
-		//set type based on button text
-		if (text.equals("Main")) {
-			if (!canvas.getMainOnScreen()) {
-				palette.setSelectedType(ActionType.MAIN);
-				canvas.setMainStep(1);
-			} //if
-			
-		} else if (text.equals("Side")) {
-			if (canvas.getMainOnScreen()) {
-				palette.setSelectedType(ActionType.SIDE);
-				canvas.setSideStep(1);
-				System.out.println(this.toString() + " changed side");
-				
-				//set the colors for all the main nodes
-				for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-					canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_YELLOW);
-				} //loop
-			} //if
-			
-		} else if (text.equals("Function")) {
-			palette.setSelectedType(ActionType.FUNC_GROUP);
-			
-		} else if (text.equals("Bond")) {
-			if (canvas.getMainOnScreen()) {
-				palette.setSelectedType(ActionType.BOND);
-				canvas.setBondStep(1);
-				
-				//set the colors for all the main nodes
-				for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-					canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED);
-				} //loop
-			} //if
-			
-		} else if (text.equals("Clear")) {
-			palette.setSelectedType(ActionType.CLEAR);
-			DrawingGUI.showMessage("Screen cleared!");
 		
-		} else if (text.equals("Name")) {
-			if (canvas.getMainOnScreen()) {
-				System.out.println(canvas.getCompound().toString());
-				for (String s : canvas.getEndings()) {
-					System.out.println(s);
-				}
-				System.out.println();
-			} //if
+		//check button text to see what action to perform
+		if (text.equals("Main")) { //main button was pressed
+			mainAction();
+			
+		} else if (text.equals("Side")) { //side button was pressed
+			sideAction();
+			
+		} else if (text.equals("Bond")) { //bond button was pressed
+			bondAction();
+			
+		} else if (text.equals("Function")) { //functional group button was pressed
+			funcAction();
+			
+		} else if (text.equals("Clear")) { //clear button was pressed
+			clearAction();
+		
+		} else if (text.equals("Name")) { //name button was pressed
+			nameAction();
 		} //big if
 		
-		//update the button
+		//update the button and canvas
 		button.update();
 		canvas.update();
 	} //end mouseClicked
 
+	//BUTTON ACTIONS//
+	
+	/*
+	 * Action for when the "main" button is pressed
+	 */
+	private void mainAction() {
+		//if there is no main chain on the screen
+		if (!canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.MAIN); //set type to main
+			canvas.setMainStep(1); //step forward
+		} //if
+	} //end mainAction
+	
+	/*
+	 * Action for when the "side" button is pressed
+	 */
+	private void sideAction() {
+		//if there is a main chain on the screen
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.SIDE); //set type to side
+			canvas.setSideStep(1); //step forward
+			
+			//set the colors for all the main nodes to yellow
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_YELLOW);
+			} //loop
+		} //if
+	} //end sideAction
+	
+	/*
+	 * Action for when the "bond" button is pressed
+	 */
+	private void bondAction() {
+		//if there is a main chain on screen
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.BOND); //set type to bond
+			canvas.setBondStep(1); //step forward
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED);
+			} //loop
+		} //if
+	} //end bondAction
+	
+	/*
+	 * Action for when the "functional group" button is pressed
+	 */
+	private void funcAction() {
+		palette.setSelectedType(ActionType.FUNC_GROUP); //set type to functional group
+	} //end funcAction
+	
+	/*
+	 * Action for when the "clear" button is pressed
+	 */
+	private void clearAction() {
+		palette.setSelectedType(ActionType.CLEAR); //set the type to clear
+		DrawingGUI.showMessage("Screen cleared!"); //notify on the dialog box
+	} //end clearAction
+	
+	/*
+	 * Action for when the "name" button is pressed
+	 */
+	private void nameAction() {
+		//if main chain is on the screen
+		if (canvas.getMainOnScreen()) {
+			//dbg
+			System.out.println(canvas.getCompound().toString());
+			for (String s : canvas.getEndings()) {
+				System.out.println(s);
+			}
+			System.out.println();
+		} //if
+	} //end nameAction
+	
+	//UPDATE VISUALS//
+	
 	/*
 	 * Update the color of the button to "entered"
 	 * MouseEvent m - object holding click data
