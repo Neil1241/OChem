@@ -21,7 +21,7 @@ public class Interpreter {
 	private static String delimit; // holds the delimited version of the orignal name
 	private static int mainBond; // holds the type of bond
 	private static ArrayList<Integer> endingPosition = new ArrayList<Integer>();
-	private static ArrayList<Integer> numOfGroups = new ArrayList<Integer>();
+	private static int [] numOfGroups = new int[2];
 	private static String front = ""; // the prefix of the main chain
 	private static ArrayList<String> chainNames; // all the side chains
 	private static ArrayList<String> chainLocations; // locations of the side chains
@@ -62,8 +62,8 @@ public class Interpreter {
 
 		// set the mainchain bond type and get their locations
 		compound.getMainChain().setBond(mainBond);
-		for (int i = 1; i <= additionalGroups; i++) {
-			compound.addFunctionalLocation(chainLocations.get(chainLocations.size() - i));
+		for (int i = chainLocations.size() - additionalGroups; i < chainLocations.size(); i++) {
+			compound.addFunctionalLocation(chainLocations.get(i));
 		}
 
 		// add sidechains
@@ -220,7 +220,7 @@ public class Interpreter {
 
 		// check if mid has a prefix on the suffix and if it does set it to itself
 		// without the prefix
-		mid = checkPrefix(mid);
+		mid = checkPrefix(mid,0);
 
 		// gets digits if there are any
 		try {
@@ -247,6 +247,7 @@ public class Interpreter {
 			// check bond type and add locations if needed
 			if (mid.substring(0, 2).equalsIgnoreCase("an")) {
 				mainBond = 1;
+				endingPosition.add(0,0);
 
 			} else if (mid.substring(0, 2).equalsIgnoreCase("en")) {
 				mainBond = 2;
@@ -266,7 +267,7 @@ public class Interpreter {
 		try {
 			mid = mid.substring(2);
 			System.out.println("--------------MID--------------\n" + mid); // dbg
-			mid = checkPrefix(mid);
+			mid = checkPrefix(mid,1);
 			System.out.println(mid); // dbg
 
 		} catch (StringIndexOutOfBoundsException e) {
@@ -281,12 +282,12 @@ public class Interpreter {
 	}// end preSuffix
 
 	// checks for the prefix of a given name
-	private static String checkPrefix(String mid) {
+	private static String checkPrefix(String mid, int timeRan) {
 		for (int i = 0; i < OrganicUtil.PREFIX.length; i++) {
 			try {
 				if (OrganicUtil.PREFIX[i].equalsIgnoreCase(mid.substring(0, OrganicUtil.PREFIX[i].length()))) {
 					additionalGroups += i + 2;
-					numOfGroups.add(i + 2);
+					numOfGroups[timeRan] = (i + 2);
 					mid = mid.substring(OrganicUtil.PREFIX[i].length());
 					return mid;
 				} // end if
@@ -298,7 +299,7 @@ public class Interpreter {
 		if (mid.length() >= 2)
 			if (!mid.substring(0, 2).equalsIgnoreCase("an")) {
 				additionalGroups++;
-				numOfGroups.add(1);
+				numOfGroups[timeRan] = 1;
 			}
 		return mid;
 	}

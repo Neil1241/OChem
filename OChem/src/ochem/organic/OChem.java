@@ -33,6 +33,8 @@ public class OChem {
 		out.println("------------------BOND--------------------");
 		out.println(compound.getMainChain().getBond());
 		
+		out.println(OrganicUtil.nameFromCompound(compound));
+		
 
 		in.close();
 	} // end main
