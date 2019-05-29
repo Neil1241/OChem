@@ -30,6 +30,12 @@ public class CanvasUtil {
 	//chain colors
 	public static Color CHAIN_COLOR = Color.BLACK;
 	
+	//angles for bond drawing
+	public static double DOWN_BOND_ODD = Math.toRadians(45);
+	public static double DOWN_BOND_EVEN = Math.toRadians(105);
+	public static double UP_BOND_ODD = Math.toRadians(225);
+	public static double UP_BOND_EVEN = Math.toRadians(315);
+	
 	/*
 	 * Types of action to determine different drawing features
 	 */

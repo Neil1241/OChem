@@ -141,10 +141,20 @@ public class Canvas extends JComponent {
 		mainAction(g2);
 		sideAction(g2);
 		bondAction(g2);
+
+		/*
+		 * //rot test
+		 * int r = 200;
+		 * drawNode(g2, new Node(300,300,10));
+		 * g2.setColor(Color.RED);
+		 * int x1 = (int) (r * Math.cos(Math.toRadians(315)) + 300);
+		 * int y1 = (int) (r * Math.sin(Math.toRadians(315)) + 300);
+		 * drawNode(g2, new Node(x1,y1, 10));
+		 */
 	} // end paintComponent
 
-	//ACTIONS//
-	
+	// ACTIONS//
+
 	/*
 	 * Handles the actions for the clear flow
 	 * Graphics2D g2 - object responsible for drawing
@@ -300,14 +310,17 @@ public class Canvas extends JComponent {
 				drawSides(g2);
 
 				int start;
+				int end;
 				if (compound.getMainChain().isCyclo()) {
 					start = 0;
+					end = mainNodes.size();
 				} else {
 					start = 1;
+					end = mainNodes.size() - 1;
 				}
 
 				// show nodes that can be clicked
-				for (int i = start; i < mainNodes.size() - 1; i++) {
+				for (int i = start; i < end; i++) {
 					g2.setColor(mainNodes.get(i).getColor());
 					drawNode(g2, mainNodes.get(i));
 				} // loop
@@ -363,8 +376,8 @@ public class Canvas extends JComponent {
 		} // switch
 	} // end bondAction
 
-	//DRAWING//
-	
+	// DRAWING//
+
 	/*
 	 * Draw all the side chains to the screen
 	 * Graphics2D g2 - object responsible for drawing
@@ -400,45 +413,29 @@ public class Canvas extends JComponent {
 				// cyclo main chain
 				if (compound.getMainChain().isCyclo()) {
 
-				// regular main chain
+					// regular main chain
 				} else {
-					int bondNum = bondSizes.get(i / 2); // size of bond being drawn
-
-					int xOffset = 0; // not as long as a single bond
-
-					int flip = Integer.parseInt(bondNodes.get(i).getTag()); //node tag is 1 or -1 based on even/odd
-					int yOffset = flip * 30; // flip up or down based on index
-
-					// start point
-					int x1 = bondNodes.get(i).getX() + xOffset;  
-					int y1 = bondNodes.get(i).getY() + yOffset;
-
-					// end point
-					int x2 = bondNodes.get(i + 1).getX() - xOffset;
-					int y2 = bondNodes.get(i + 1).getY() + yOffset;
-
-					//dbg
-					System.out.println(toString() + ": " + CanvasUtil.angleBetweenNodes(bondNodes.get(i), bondNodes.get(i+1)));
+					int bondNum = bondSizes.get(i / 2); // number on main chain of start nodes
 					
-					//draw bond line
+					double ang1 = Math.toRadians(315);
+					double ang2 = Math.toRadians(135);
+					
+					int r = 30; // arm offset
+
+					// start point coordinates
+					int x1 = bondNodes.get(i).getX() + (int) (r * Math.cos(ang1));
+					int y1 = bondNodes.get(i).getY() + (int) (r * Math.sin(ang1)) - 50;
+
+					// end point coordinates
+					int x2 = bondNodes.get(i + 1).getX() + (int) (r * Math.cos(ang2));
+					int y2 = bondNodes.get(i + 1).getY() + (int) (r * Math.sin(ang2)) - 50;
+
+					// draw the bond line
 					g2.drawLine(x1, y1, x2, y2);
-
-					// recalculate to the opposite side and draw
-					if (bondNum == 3) {
-						flip = -flip; //flip the flip to go to the other side
-						yOffset = flip * 30; // flip up or down based on index
-						
-						//recalculate y values (x values are same)
-						y1 = bondNodes.get(i).getY() + yOffset;
-						y2 = bondNodes.get(i + 1).getY() + yOffset;
-
-						//draw bond line
-						g2.drawLine(x1, y1, x2, y2);
-					} // draw the 3rd bond
-				} // if
-			} // loop
-		} // big if
-	} // end drawBonds
+				} //if
+			} //loop
+		} //big if
+	} //end drawBonds
 
 	/*
 	 * Draw a node to the screen
@@ -519,7 +516,6 @@ public class Canvas extends JComponent {
 			g2.drawLine(start.getX(), start.getY(), start.getX() + xOffset, start.getY() + yOffset);
 		} // if
 
-		/*
 		// draw the #s for debugging
 		g2.setFont(g2.getFont().deriveFont(50.0F));
 		g2.setColor(Color.RED);
@@ -527,7 +523,6 @@ public class Canvas extends JComponent {
 			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
 		}
 		g2.setColor(Color.BLACK);
-		*/
 
 		return nodes;
 	} // end drawCyclo
@@ -589,13 +584,13 @@ public class Canvas extends JComponent {
 			nodes.add(new Node(x1, y1, 20, "" + (chainSize - 1)));
 		} else {
 			nodes.add(new Node(x1, y1, 20, "" + (chainSize), CanvasUtil.LIGHT_YELLOW));
-		} //if
-			
+		} // if
+
 		return nodes;
 	} // end drawChain
 
-	//ATTRIBUTES//
-	
+	// ATTRIBUTES//
+
 	/*
 	 * Set the size of the main chain
 	 * int main - size of the main chain
@@ -855,9 +850,9 @@ public class Canvas extends JComponent {
 
 		// change the tag based on the index
 		if (idx % 2 == 0) {
-			start.setTag("1");
+			start.setTag("1"); // even, positive
 		} else {
-			start.setTag("-1");
+			start.setTag("-1"); // odd, negative
 		} // if
 
 		// add to list
@@ -885,18 +880,18 @@ public class Canvas extends JComponent {
 	public ArrayList<String> getEndings() {
 		// add the number of groups
 		bondNum++;
-//		compound.getMainChain().addNumOfGroups(bondNum);
+		// compound.getMainChain().addNumOfGroups(bondNum);
 
 		// set the ending
 		compound.getMainChain().setEnding(compound.getMainChain().getBond() - 1); // position in organic util array
 
 		return compound.getMainChain().getEndings();
 	} // end getEndings
-	
+
 	/*
 	 * String representation of the String used for debugging
 	 */
 	public String toString() {
-		return "Canvas"; 
-	} //end toString
+		return "Canvas";
+	} // end toString
 } // end class
