@@ -885,7 +885,7 @@ public class Canvas extends JComponent {
 	public ArrayList<String> getEndings() {
 		// add the number of groups
 		bondNum++;
-		compound.getMainChain().addNumOfGroups(bondNum);
+//		compound.getMainChain().addNumOfGroups(bondNum);
 
 		// set the ending
 		compound.getMainChain().setEnding(compound.getMainChain().getBond() - 1); // position in organic util array
