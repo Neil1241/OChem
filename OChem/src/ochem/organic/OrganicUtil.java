@@ -7,6 +7,8 @@ package ochem.organic;
  * A static class with constants and methods for creating Compounds
  */
 
+import java.util.*;
+
 public class OrganicUtil {
 	// prefixes for all numbers one to ten
 	public static final String[] PREFIX = { "di", "tri", "tetra", "penta", "hexa", "hepta", "octa", "nona", "deca",
@@ -28,14 +30,22 @@ public class OrganicUtil {
 	public static final String[] CHAIN = { "meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec",
 			"benzene" };
 
+	private static final String[] ALL_CHAIN = { "methyl", "ethyl", "propyl", "butyl", "pentyl", "hexyl", "heptyl",
+			"octyl", "nonyl", "decyl", "cyclopropyl", "cyclobutyl", "cyclopentyl", "cyclohexyl", "phenyl", "bromo",
+			"iodo", "fluro", "chloro", "oxo", "hydroxy", "oxy", "amino" };
+
 	// numbers 1 thru 9 for side chain location identification
 	public static final String[] LOCATIONS = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "N" };
+	// private static final String [] LOCATIONO = { "1", "2", "3", "4", "5", "6",
+	// "7", "8", "9", "O"};
+	// private static final String [] LOCATIONSNO = {"1", "2", "3", "4", "5", "6",
+	// "7", "8", "9", "N","O"};
 
 	// method used to generate a random compound
 	public static Compound generateRandomCompound() {
 		// declare variables
 		Compound c;
-		int mainSize = 0; // size of main chaing
+		int mainSize = 0; // size of main chain
 		int bondType = 0; // bond type
 		int ending = 0; // ending in reference to the functional names variable
 		int prefixBond = 0; // value of the to be prefix of the bond
@@ -43,27 +53,28 @@ public class OrganicUtil {
 		int numOfSideChains = 0;
 		String[] sideChainType = null;
 		int[] bondLocation = null;
-		int[] sideLocation = null;
+		String[] sideLocation = null;
 		int[] groupLocation = null;
 		boolean benzene = false;
 		boolean cyclo = false;
 
-		// generate main chain size and create the compound
+		// generate main chain size
 		mainSize = random(2, 10);
-		c = new Compound(mainSize);
-
 		pass();
 
 		// generate type of bond and functional group
 		bondType = random(1, 3);
 		ending = random(0, FUNCTIONAL_NAMES.length - 1);
-		
 
 		// check for benzene and cyclo and set the main chain accordingly
-		if (ending == 9)
+		if (ending == 10) {
 			benzene = true;
-		else if (mainSize > 2)
+			mainSize = 6;
+		}
+		else if (mainSize > 2 && mainSize < 7)
 			cyclo = cyclo();
+		
+		c = new Compound(mainSize);
 		c.getMainChain().setBenzene(benzene);
 		c.getMainChain().setCyclo(cyclo);
 
@@ -72,10 +83,17 @@ public class OrganicUtil {
 		// set bond type if it turns out to be an alkane set to one
 		if (ending == 0) {
 			bondType = 1;
-		} else {
-			prefixBond = random(1, 3);
-		}
+		}else if (ending == 1) {
+			bondType = 2;
+		}else if (ending == 2) {
+			bondType = 3;
+		}//end if
 		c.getMainChain().setBond(bondType);
+		
+		//generate a prefix if there are double or triple bonds
+		if (ending!=0) {
+			prefixBond = random(1, 3);
+		}//end if
 
 		pass();
 
@@ -83,19 +101,15 @@ public class OrganicUtil {
 		if (bondType != 1) {
 			bondLocation = new int[prefixBond];
 			for (int i = 0; i < prefixBond; i++) {
-				int hold = random(1, mainSize-1);
-				boolean b = false;
+				int hold = random(1, mainSize - 1);
 				for (int j = 0; j < i; j++) {
 					if (bondLocation[j] == hold) {
-						b = true;
-						break;
+						while (bondLocation[j] == hold)
+							hold = random(1, mainSize - 1);
+						j = -1;
 					} // end if
 				} // end for
-
-				if (!b)
-					bondLocation[i] = hold;
-				else
-					i--;
+				bondLocation[i] = hold;
 			} // end for
 		} // end if
 
@@ -103,15 +117,17 @@ public class OrganicUtil {
 
 		// if ending position is an amide, acid, ester or aldehyde set the functional
 		// location to one
-		if (ending == 9 || ending == 8 || ending == 7 || ending == 4) {
+		if (ending == 9 || ending == 8 || ending == 7 || ending == 4	) {
 			c.getMainChain().addFunctionalLocation("1");
 			prefixGroup = 1;
-		} else if (ending == 10) {
+			c.getMainChain().addNumOfGroups(prefixGroup,1);
+			c.getMainChain().setEnding(ending , 1);
+		}else if (ending == 10) {
 			// set prefix on benzene to be one
 			prefixGroup = 1;
 			bondLocation = null;
 		} else if (ending != 0) {
-			// generate a random number between 1 and 4 for a prefix on the functional group
+			// generate a random number between 1 and 3 for a prefix on the functional group
 			// and generate a random location for the group
 			prefixGroup = random(1, 3);
 			groupLocation = new int[prefixGroup];
@@ -122,32 +138,46 @@ public class OrganicUtil {
 
 		pass();
 
-		// add locations to mainchain
-		if (groupLocation != null) {
-			bubbleSort(groupLocation);
-			for (int i = 0; i < prefixGroup; i++)
-				c.getMainChain().addFunctionalLocation(Integer.toString(groupLocation[i]));
-		}//end if
-		if (bondLocation != null) {
-			bubbleSort(bondLocation);
-			for (int i = 0; i < prefixBond; i++)
-				c.getMainChain().addFunctionalLocation(Integer.toString(bondLocation[i]));
-		}//end if
-		
-		//depending on the bondtype add the locations
-		if(bondType!=1) {
-			c.getMainChain().addNumOfGroups(prefixBond);
-			c.getMainChain().addNumOfGroups(prefixGroup);
-			c.getMainChain().setEnding(bondType-1);
-			c.getMainChain().setEnding(ending);
-		}else {
-			c.getMainChain().addNumOfGroups(prefixGroup);
-			c.getMainChain().setEnding(ending);
-		}//end if
-		
+		// depending on the bondtype add the locations
+		if (bondType > 1) {
+			// add locations to mainchain
+			if (groupLocation != null && ending > 3) {
+				bubbleSort(groupLocation);
+				for (int i = 0; i < prefixGroup; i++)
+					c.getMainChain().addFunctionalLocation(Integer.toString(groupLocation[i]));
+				c.getMainChain().addNumOfGroups(prefixGroup,1);
+				c.getMainChain().setEnding(ending , 1);
+			} // end if
+			if (bondLocation != null) {
+				bubbleSort(bondLocation);
+				for (int i = 0; i < prefixBond; i++)
+					c.getMainChain().addFunctionalLocation(Integer.toString(bondLocation[i]));
+				// end for
+
+				c.getMainChain().addNumOfGroups(prefixBond,0);
+				c.getMainChain().setEnding(bondType - 1 , 0);
+			}
+		} else {
+			// add locations to mainchain
+			if (groupLocation != null) {
+				bubbleSort(groupLocation);
+				for (int i = 0; i < prefixGroup; i++)
+					c.getMainChain().addFunctionalLocation(Integer.toString(groupLocation[i]));
+				c.getMainChain().addNumOfGroups(prefixGroup,1);
+				c.getMainChain().setEnding(ending, 1);
+			} // end if
+			
+		} // end if
+
+		// add sidechain if needed for esters and ethers
+		if (ending == 8 || ending == 11) {
+			int length = random(1, 4);
+			c.addSideChain(length, "O", cyclo(), false);
+		}
+
 		// determine amount of side chains
-		numOfSideChains = random(0, mainSize);
-		sideLocation = new int[numOfSideChains];
+		numOfSideChains = random(0, 4);
+		sideLocation = new String[numOfSideChains];
 		sideChainType = new String[numOfSideChains];
 
 		// add the sidechains to the compound
@@ -157,12 +187,12 @@ public class OrganicUtil {
 			boolean phenyl = false;
 			boolean sideCyclo = false;
 
-			sideLocation[i] = random(1, mainSize);
+			sideLocation[i] = location(ending, mainSize);
 			sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
 			if (sideChainType[i].equals("yl")) {
-				while(sideLocation[i] == 1 || sideLocation[i] == mainSize) {
-					sideLocation[i] = random(2,mainSize-1);
-				}//end while
+				while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
+					sideLocation[i] = location(ending, mainSize);
+				} // end while
 				sideCyclo = cyclo();
 				if (sideCyclo)
 					pre = random(3, mainSize);
@@ -180,7 +210,7 @@ public class OrganicUtil {
 					} // end if
 				} // end for
 			} // end if
-			c.addSideChain(pre, Integer.toString(sideLocation[i]), sideCyclo, phenyl);
+			c.addSideChain(pre, sideLocation[i], sideCyclo, phenyl);
 		} // end for
 
 		// output for debugging
@@ -205,6 +235,22 @@ public class OrganicUtil {
 		// return the compound
 		return c;
 	}// end generateRandomCompound
+
+	private static String location(int ending, int mainSize) {
+		String sideLocation = "";
+		if (ending == 6 || ending == 7) {
+			sideLocation = LOCATIONS[random(0, mainSize)];
+			if (sideLocation.equals("" + mainSize))
+				sideLocation = LOCATIONS[LOCATIONS.length - 1];
+		} /*
+			 * else if (ending == 8 || ending == 11) { sideLocation =
+			 * LOCATIONO[random(0,mainSize)]; if (sideLocation.equals(""+mainSize))
+			 * sideLocation = LOCATIONO[LOCATIONO.length-1]; }
+			 */else {
+			sideLocation = LOCATIONS[random(0, mainSize - 1)];
+		}
+		return sideLocation;
+	}
 
 	// returns true or false whether the a component should be a cyclo or not
 	private static boolean cyclo() {
@@ -237,9 +283,138 @@ public class OrganicUtil {
 		} // end for
 	}// end bubblesort
 
+	// gets the name of the compound from the compound object
+	public static String nameFromCompound(Compound c) {
+		String name = "";
+		name = assignPrefix(c.getSideChains());
+		name += mainToName(c.getMainChain());
+		return name;
+	}// end nameFromCompound
+
+	private static String mainToName(Chain main) {
+		String name = "";
+		int[] prefixes = main.getNumOfGroups();
+		ArrayList<String> endings = main.getEndings();
+		ArrayList<String> location = main.getFunctionalLocation();
+		String hold = "";
+		
+		//add cyclo to the name if the main chain is a cyclo, return benzene if the compound is a benzene
+		if (main.isCyclo()) {
+			name+="cyclo";
+		}
+		else if (main.isBenzene()) {
+			return "benzene";
+		}//end if
+		
+		name += CHAIN[main.getSize()-1];
+		if (prefixes[0] > 1) {
+			name+="-";
+			for (int i=0; i<prefixes[0];i++)
+				name +=location.get(i)+",";
+			name = name.substring(0, name.length()-1);
+			name += "-"+prefixFromNumber(prefixes[0]);
+		}else if (prefixes[0]==1) {
+			name+="-"+location.get(0)+"-";
+		}// end if
+
+		if (main.getBond() == 1)
+			name += "an";
+		else if (main.getBond() == 2)
+			name += "en";
+		else
+			name += "yn";
+		// end if
+
+		if (prefixes[1] > 1) {
+			name+="-";
+			for (int i=0; i<prefixes[0];i++)
+				name +=location.get(i+prefixes[0]-1)+",";
+			name = name.substring(0, name.length()-1);
+			name += "-"+prefixFromNumber(prefixes[1]);
+		}else if (prefixes[1]==1) {
+			name+="-"+location.get(prefixes[0])+"-";
+		}// end if
+
+		try {
+		hold = endings.get(endings.size()-prefixes[0]-1);
+		hold = hold.substring(0, hold.length() - 4);
+			if (hold.equals(FUNCTIONAL_NAMES[0]) || hold.equals(FUNCTIONAL_NAMES[1])
+					|| hold.equals(FUNCTIONAL_NAMES[2]) || hold.equals(FUNCTIONAL_NAMES[11]))
+			name+="e";
+		else {
+			for (int i = 3 ;i < FUNCTIONAL_NAMES.length-1; i++) {
+				if (hold.equalsIgnoreCase(FUNCTIONAL_NAMES[i])) {
+					name += MAIN_CHAIN_SUFFIX[i];
+					break;
+				}//end if
+			}//end for
+		}//end if
+		}
+		catch(ArrayIndexOutOfBoundsException e) {
+			//adds to the name if the compound is an alkane
+			name+="e";
+		}catch(IndexOutOfBoundsException e) {}
+
+		// return the mainchain name
+		return name;
+	}// end mainToName
+
+	private static String prefixFromNumber(int n) {
+		return PREFIX[n - 2];
+	}
+
+	private static String assignPrefix(Chain[] side) {
+		// declare temporary variables
+		String beforeMain = "";
+		ArrayList<String> toCheck = new ArrayList<String>();
+		ArrayList<String> position = new ArrayList<String>();
+		//ArrayList<String> preAdd = new ArrayList<String>();
+		int[] positions = new int[ALL_CHAIN.length];
+
+		// loop for the length of the side chain array to get the word and location
+		for (int i = 0; i < side.length; i++) {
+			toCheck.add(sizeToWord(side[i]));
+			position.add(side[i].getLocation());
+			for (int j = 0; j < CHAIN.length - 1; j++) {
+				if (toCheck.get(i).equalsIgnoreCase(ALL_CHAIN[j])) {
+					positions[j]++;
+				} // end if
+			} // end for
+		} // end for
+
+		for (int i = 0; i < positions.length; i++) {
+			if (positions[i] > 1) {
+				for (int j = 0; j < toCheck.size(); j++) {
+					if (ALL_CHAIN[j].equalsIgnoreCase(toCheck.get(j))) {
+						// preAdd.add();
+						toCheck.remove(j);
+					}
+				}
+			}
+		}
+		return beforeMain;
+	}// end assignPrefix
+
+	private static String sizeToWord(Chain s) {
+		int size = s.getSize();
+		String toReturn = "";
+		if (size > 0) {
+			if (size == 6 && s.isBenzene())
+				toReturn = "phenyl";
+			else if (s.isCyclo())
+				toReturn = "cyclo";
+			toReturn += CHAIN[size - 1] + "yl";
+		} else {
+			toReturn = SIDE_CHAIN_SUFFIX[size * -1];
+		} // end if
+		return toReturn;
+	}// end sizeToWord
+
 	// main for testing purposes
 	public static void main(String[] args) {
-		System.out.println(OrganicUtil.generateRandomCompound().toString());
+		Compound c = generateRandomCompound();
+		System.out.println(c.toString());
+		System.out.println(nameFromCompound(c));
 	}
 
 } // end OrganicUtil

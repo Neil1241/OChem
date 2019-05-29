@@ -17,7 +17,7 @@ public class Chain {
 	private boolean benzene;
 	private ArrayList<String> functionalLocation;
 	private ArrayList<String> functionalGroup;
-	private ArrayList<Integer> numOfGroups;
+	private int [] numOfGroups;
 	private int bond = 1;
 	private int idx2 = 0;
 	private int idx = 0;
@@ -44,12 +44,27 @@ public class Chain {
 		this.bond = 1;
 	} // end constructor
 
-	public void setEnding(int position) {
+	public void setEnding(int positionInArray) {
 		try {
-			int hold = functionalLocation.size() - 1;
-			for (int i = 0; i < this.numOfGroups.get(idx); i++) {
-				this.functionalGroup.add(OrganicUtil.FUNCTIONAL_NAMES[position] + " : "
-						+ this.functionalLocation.get(hold - this.idx2++));
+			System.out.println(numOfGroups[idx]);
+			for (int i = 0; i < numOfGroups[idx]; i++) {
+				System.out.println("WE HERE");
+				this.functionalGroup.add(OrganicUtil.FUNCTIONAL_NAMES[positionInArray] + " : "
+						+ this.functionalLocation.get(this.idx2++));
+			}
+			this.idx++;
+		} catch (IndexOutOfBoundsException e) {
+			System.out.println("oof");
+		}
+	}
+	
+	public void setEnding(int positionInArray, int idx) {
+		try {
+			System.out.println(numOfGroups[idx]);
+			for (int i = 0; i < numOfGroups[idx]; i++) {
+				System.out.println("WE HERE");
+				this.functionalGroup.add(OrganicUtil.FUNCTIONAL_NAMES[positionInArray] + " : "
+						+ this.functionalLocation.get(this.idx2++));
 			}
 			this.idx++;
 		} catch (IndexOutOfBoundsException e) {
@@ -65,17 +80,20 @@ public class Chain {
 		this.main = true;
 		this.functionalLocation = new ArrayList<String>();
 		this.functionalGroup = new ArrayList<String>();
-		this.numOfGroups = new ArrayList<Integer>();
+		this.numOfGroups = new int [2];
 	}
 
-	public void setNumOfGroups(ArrayList<Integer> n) {
+	public void setNumOfGroups(int[] n) {
 		this.numOfGroups = n;
 	}
 	
-	public void addNumOfGroups(int n) {
-		this.numOfGroups.add(n);
+	public void addNumOfGroups(int n , int position) {
+		this.numOfGroups[position] = n;
 	}
 
+	public int[] getNumOfGroups() {
+		return this.numOfGroups;
+	}
 	public boolean isMain() {
 		return this.main;
 	}
