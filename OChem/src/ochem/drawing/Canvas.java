@@ -410,7 +410,7 @@ public class Canvas extends JComponent {
 					int yOffset = flip * 30; // flip up or down based on index
 
 					// start point
-					int x1 = bondNodes.get(i).getX() + xOffset; 
+					int x1 = bondNodes.get(i).getX() + xOffset;  
 					int y1 = bondNodes.get(i).getY() + yOffset;
 
 					// end point
