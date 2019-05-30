@@ -443,7 +443,7 @@ public class Interpreter {
 			if (chain.equalsIgnoreCase(prefix + "phenyl")) {
 				size = 6;
 				break;
-			} else if (chain.equalsIgnoreCase(prefix + suffix)) {
+			} else if (chain.equalsIgnoreCase(prefix + OrganicUtil.SIDE_CHAIN_SUFFIX[i])) {
 				size = -i;
 				break;
 			} // end if
