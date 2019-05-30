@@ -463,7 +463,7 @@ public class Canvas extends JComponent {
 
 	/*
 	 * Draw a node to the screen
-	 * Graphics2D g2 - object responsible for drawing
+	 * Graphics2D g2 - object responsible for drawing 
 	 * Node n - node to draw
 	 */
 	private void drawNode(Graphics2D g2, Node n) {
