@@ -123,11 +123,18 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 */
 	private void bondLeft() {
 		// temporary list with all the nodes
-		ArrayList<Node> bondNodes = canvas.getMainNodes();
+		ArrayList<Node> mainNodes = canvas.getMainNodes();
 
+		int end;
+		if (canvas.getMainCyclo()) {
+			end = mainNodes.size();
+		} else {
+			end = mainNodes.size() - 1;
+		} //if
+		
 		// loop through main nodes (not last one, cannot have bond on last node)
-		for (int i = 0; i < bondNodes.size() - 1; i++) {
-			Node n = bondNodes.get(i); // current node
+		for (int i = 0; i < end; i++) {
+			Node n = mainNodes.get(i); // current node
 
 			// if the click was on a valid node
 			if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
@@ -210,7 +217,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		if (canvas.getMainCyclo()) {
 			start = 0;
 			end = mainNodes.size();
-			System.out.println(toString() +": "+ start +" "+ end);
 			// else, regular chain
 		} else {
 			start = 1;
@@ -250,22 +256,41 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 */
 	private void showBondNodes(MouseEvent m) {
 		// change node color based on mouse position
-		ArrayList<Node> nodes = canvas.getMainNodes();
-		Node ms = new Node(m.getX(), m.getY(), nodes.get(0).getRad());
+		ArrayList<Node> nodes = canvas.getMainNodes(); //list of main nodes
+		Node ms = new Node(m.getX(), m.getY(), nodes.get(0).getRad()); //node for mouse
+		boolean wasOver = false; //whether the mouse was over a node
 
-		for (int i = 0; i < nodes.size() - 1; i++) {
+		//change end node based on whether main chain is cyclo
+		int end;
+		if (canvas.getMainCyclo()) {
+			end = nodes.size();
+		} else {
+			end = nodes.size() - 1;
+		} //if
+		
+		//loop through selectable nodes	 to see if mouse is over
+		for (int i = 0; i < end; i++) {
 			// if mouse is over the node
 			if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), nodes.get(i).getCenterY(),
 					nodes.get(i).getRad())) {
 				// make its color darker
 				nodes.get(i).setColor(CanvasUtil.DARK_RED); // dark yellow
+				
+				//set the index for the ghost bond to the index of the mouse
+				canvas.setGhostBondIndex(i);
+				wasOver = true;
 
-			} else {
+			} else { //mouse is not over the node
 				// return to the default lighter color
 				nodes.get(i).setColor(CanvasUtil.LIGHT_RED); // light yellow
 			} // if
-		}
-	} // showBondNodes
+		} //loop
+		
+		//if the mouse wasn't over a selectable node, don't draw the bond index
+		if (!wasOver) {
+			canvas.setGhostBondIndex(-1);
+		} //if
+	} // end showBondNodes
 
 	/*
 	 * String representation of the object used for debugging

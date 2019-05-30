@@ -166,9 +166,9 @@ public class CanvasUtil {
 			
 		} else if (dx == 0) { //no change in x
 			if (dy > 0) //up
-				angle = Math.PI * 1.5;
+				angle = Math.PI * 0.5; 
 			else if (dy < 0) //down
-				angle = Math.PI * 0.5;
+				angle = Math.PI * 1.5;
 			
 		} else { //regular case
 			angle = Math.atan2(dy, dx);

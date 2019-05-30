@@ -50,7 +50,9 @@ public class Canvas extends JComponent {
 
 	private ActionType type; // type of action
 
-	private DrawDirection ghostDir; // direction of the ghost chain
+	// ghost drawing (showing where the final action would be)
+	private DrawDirection ghostDir; //direction of the ghost side chain
+	private int ghostBondIdx; //index of the main chain node for bond drawing
 
 	private int mainStep; // step for the "main" button
 	private int sideStep; // step for the "side" button
@@ -103,6 +105,9 @@ public class Canvas extends JComponent {
 
 		// default the ghost direction to up right
 		ghostDir = DrawDirection.UP_RIGHT;
+		
+		//default the ghost bond index to outside of regular range
+		ghostBondIdx = -1;
 
 		// initialize the directions list
 		directions = new ArrayList<DrawDirection>();
@@ -284,7 +289,7 @@ public class Canvas extends JComponent {
 				drawSides(g2);
 				break;
 
-			// location selection step
+			// determine cyclo step
 			case 2:
 				DrawingGUI.showMessage("Cyclo? (Y/N)");
 				g2.setColor(CanvasUtil.TRANS_GREY);
@@ -293,7 +298,7 @@ public class Canvas extends JComponent {
 				drawSides(g2);
 				break;
 
-			// determine cyclo step
+			// location selection step
 			case 3:
 				DrawingGUI.showMessage("Select location for side chain: (CLICK)");
 				g2.setColor(CanvasUtil.TRANS_GREY); // faint gray
@@ -342,6 +347,7 @@ public class Canvas extends JComponent {
 		switch (bondStep) {
 			// do nothing step
 			case 0:
+				ghostBondIdx = -1; //reset the bond index
 				break;
 
 			// enter size step
@@ -358,11 +364,49 @@ public class Canvas extends JComponent {
 			case 2:
 				DrawingGUI.showMessage("Select node for the bond");
 
+				int end;
+				if (compound.getMainChain().isCyclo()) {
+					end = mainNodes.size();
+				} else {
+					end = mainNodes.size() - 1;
+				} //if
+				
 				// show nodes that can be clicked
-				for (int i = 0; i < mainNodes.size() - 1; i++) {
+				for (int i = 0; i < end; i++) {
 					g2.setColor(mainNodes.get(i).getColor());
 					drawNode(g2, mainNodes.get(i));
 				} // loop
+				
+				//show ghost bond
+				g2.setColor(CanvasUtil.TRANS_GREY); //set ghost color
+				
+				//if a node has been selected
+				if (ghostBondIdx != -1) {
+					if (!bondSizes.isEmpty()) {
+						int bondSize = bondSizes.get(bondSizes.size() - 1); //most recent size
+						
+						//temporary nodes for drawing ghost
+						Node n1 = mainNodes.get(ghostBondIdx);
+						Node n2;
+						
+						//set the tag for the temporary nodes
+						if (ghostBondIdx % 2 == 0) {
+							n1.setTag("1");
+						} else {
+							n1.setTag("-1");
+						} //if
+						
+						//index of second bond
+						if (ghostBondIdx+1 == compound.getMainSize()) {
+							n2 = mainNodes.get(0);
+						} else {
+							n2 = mainNodes.get(ghostBondIdx + 1);
+						} //if 
+						
+						//draw the ghost bond
+						drawBond(g2, n1, n2, bondSize);
+					} //inner if
+				} //outer if
 
 				g2.setColor(CanvasUtil.CHAIN_COLOR);
 				drawBonds(g2);
@@ -399,67 +443,79 @@ public class Canvas extends JComponent {
 	/*
 	 * Draw all the bonded pairs
 	 * Graphics2D g2 - object responsible for drawing
+	 * int idx - index of main node to draw on
 	 */
 	private void drawBonds(Graphics2D g2) throws NumberFormatException {
-		// thinner lines
-		BasicStroke bs = new BasicStroke(8.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-		g2.setStroke(bs);
-
 		// if there are nodes in the list
 		if (!bondNodes.isEmpty()) {
 
 			// draw lines between each pair
 			for (int i = 0; i < bondNodes.size(); i += 2) {
-				int bondNum = bondSizes.get(i / 2); // size of bond being drawn
+				int bondSize = bondSizes.get(i / 2); // size of bond being drawn
 
 				Node n1 = bondNodes.get(i); // first node
 				Node n2 = bondNodes.get(i + 1); // second node
 
-				int flip = Integer.parseInt(n1.getTag()); // integer flip based on position on main chain
-
-				double ang1 = CanvasUtil.angleBetweenNodes(n1, n2); // angle from first node to second
-				double ang2 = CanvasUtil.angleBetweenNodes(n2, n1); // angle from second node to first
-				double perp = flip * Math.PI / 2; // perpendicular offset angle (+ or - PI/2 radians, or +/- 90 degrees)
-
-				int arm = (int) (CanvasUtil.CHAIN_ARM * 0.5); // length of bond line
-				int r = (int) (CanvasUtil.CHAIN_ARM - arm) / 2; // distance between chain end and bond line end
-
-				// bond points are translated along the chain from their starting node
-				// then translated perpendicular from the line out depending on if the node # is even/odd
-
-				// start point coordinates
-				int x1 = n1.getX() + (int) (r * (Math.cos(ang1) + Math.cos(ang1 + perp)));
-				int y1 = n1.getY() + (int) (r * (Math.sin(ang1) + Math.sin(ang1 + perp)));
-
-				// end point coordinates
-				int x2 = n2.getX() + (int) (r * (Math.cos(ang2) + Math.cos(ang2 - perp)));
-				int y2 = n2.getY() + (int) (r * (Math.sin(ang2) + Math.sin(ang2 - perp)));
-
-				// draw line
-				g2.drawLine(x1, y1, x2, y2);
-
-				// if a triple bond
-				if (bondNum == 3) {
-					// flip to the opposite side
-					flip = -flip;
-
-					// recalculate perpendicular offset
-					perp = flip * Math.PI / 2;
-
-					// recalculate start point coordinates
-					x1 = n1.getX() + (int) (r * (Math.cos(ang1) + Math.cos(ang1 + perp)));
-					y1 = n1.getY() + (int) (r * (Math.sin(ang1) + Math.sin(ang1 + perp))) - flip;
-
-					// recalculate end point coordinates
-					x2 = n2.getX() + (int) (r * (Math.cos(ang2) + Math.cos(ang2 - perp)));
-					y2 = n2.getY() + (int) (r * (Math.sin(ang2) + Math.sin(ang2 - perp)));
-
-					// draw opposite line
-					g2.drawLine(x1, y1, x2, y2);
-				}
+				drawBond(g2, n1, n2, bondSize);
 			} // loop
-		} // big if
+		}  //big iff
 	} // end drawBonds
+	
+	/*
+	 * Draws a bond between two nodes
+	 * Graphics2D g2 - object responsible for drawing
+	 * Node n1 - first node
+	 * Node n2 - second node
+	 * int size - size of bond
+	 */
+	private void drawBond(Graphics2D g2, Node n1, Node n2, int bondSize) {
+		// thinner lines
+		BasicStroke bs = new BasicStroke(8.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		g2.setStroke(bs);
+		
+		int flip = Integer.parseInt(n1.getTag()); // integer flip based on position on main chain
+
+		double ang1 = CanvasUtil.angleBetweenNodes(n1, n2); // angle from first node to second
+		double ang2 = CanvasUtil.angleBetweenNodes(n2, n1); // angle from second node to first
+		double perp = flip * Math.PI / 2; // perpendicular offset angle (+ or - PI/2 radians, or +/- 90 degrees)
+
+		int arm = (int) (CanvasUtil.CHAIN_ARM * 0.5); // length of bond line
+		int r = (int) (CanvasUtil.CHAIN_ARM - arm) / 2; // distance between chain end and bond line end
+
+		// bond points are translated along the chain from their starting node
+		// then translated perpendicular from the line out depending on if the node # is even/odd
+
+		// start point coordinates
+		int x1 = n1.getX() + (int) (r * (Math.cos(ang1) + Math.cos(ang1 + perp)));
+		int y1 = n1.getY() + (int) (r * (Math.sin(ang1) + Math.sin(ang1 + perp)));
+
+		// end point coordinates
+		int x2 = n2.getX() + (int) (r * (Math.cos(ang2) + Math.cos(ang2 - perp)));
+		int y2 = n2.getY() + (int) (r * (Math.sin(ang2) + Math.sin(ang2 - perp)));
+
+		// draw line
+		g2.drawLine(x1, y1, x2, y2);
+
+		// if a triple bond
+		if (bondSize == 3) {
+			// flip to the opposite side
+			flip = -flip;
+
+			// recalculate perpendicular offset
+			perp = flip * Math.PI / 2;
+
+			// recalculate start point coordinates
+			x1 = n1.getX() + (int) (r * (Math.cos(ang1) + Math.cos(ang1 + perp)));
+			y1 = n1.getY() + (int) (r * (Math.sin(ang1) + Math.sin(ang1 + perp))) - flip;
+
+			// recalculate end point coordinates
+			x2 = n2.getX() + (int) (r * (Math.cos(ang2) + Math.cos(ang2 - perp)));
+			y2 = n2.getY() + (int) (r * (Math.sin(ang2) + Math.sin(ang2 - perp)));
+
+			// draw opposite line
+			g2.drawLine(x1, y1, x2, y2);
+		} //little if
+	} //end drawBond
 
 	/*
 	 * Draw a node to the screen
@@ -826,8 +882,6 @@ public class Canvas extends JComponent {
 		return sideStep;
 	} // end getSideStep
 
-	// BOND//
-
 	/*
 	 * Set the step for side drawing
 	 * int step - step for side drawing
@@ -850,6 +904,8 @@ public class Canvas extends JComponent {
 		return bondStep;
 	} // end getSideStep
 
+	//BONDS
+	
 	/*
 	 * Set the bond size for main drawing
 	 * int bond - size of bond
@@ -869,8 +925,15 @@ public class Canvas extends JComponent {
 	 */
 	public void addBondNode(int idx) {
 		// nodes to add to the bond nodes list
-		Node start = mainNodes.get(idx);
-		Node end = mainNodes.get(idx + 1);
+		Node start = mainNodes.get(idx); //first node of the bond
+		Node end; //second and lost node for the bond
+		
+		//change second node index depending on index pos
+		if (idx+1 == compound.getMainSize()) { //if position in array exceeds the list capacity
+			end = mainNodes.get(0); //roll over to zero
+		} else { //regular case
+			end = mainNodes.get(idx+1); //second node is one right after
+		} //if
 
 		// change the tag based on the index
 		if (idx % 2 == 0) {
@@ -879,7 +942,7 @@ public class Canvas extends JComponent {
 			start.setTag("-1"); // odd, negative
 		} // if
 
-		// add to list
+		// add nodes to list
 		bondNodes.add(start);
 		bondNodes.add(end);
 
@@ -887,6 +950,14 @@ public class Canvas extends JComponent {
 		compound.getMainChain().addFunctionalLocation("" + idx);
 	} // end addBondedNode
 
+	/*
+	 * Set the index of the node for ghost bonds
+	 * int idx - index of the node for the bond on the main chain
+	 */
+	public void setGhostBondIndex(int idx) {
+		ghostBondIdx = idx;
+	} //end setGhostBondIndex
+	
 	// COMPOUND//
 
 	/*
