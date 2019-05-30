@@ -411,7 +411,7 @@ public class Interpreter {
 	private static void ether(String chainName, String prefix, boolean cyclo, String location) {
 		String chain = chainName.substring(0, chainName.length() - 3);
 		compound.addSideChain(chainToNumber(chain + "yl", "yl", prefix), "O", cyclo, false);
-		compound.addSideChain(1, location, false, false);
+		compound.addSideChain(-8, location, false, false);
 	}
 
 	/*
