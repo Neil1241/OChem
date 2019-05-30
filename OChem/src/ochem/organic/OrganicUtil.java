@@ -86,22 +86,21 @@ public class OrganicUtil {
 		c.getMainChain().setBond(bondType);
 
 		// generate a prefix if there are double or triple bonds
-		if (ending != 0) {
-			prefixBond = random(1, 3);
-		} // end if
-
 		if (mainSize == 2) {
 			prefixBond = 1;
-		}
-		if (mainSize == 3) {
+		}else if (mainSize == 3) {
 			prefixBond = random(1, 2);
-		}
+		}else if (ending != 0) {
+			prefixBond = random(1, 3);
+		} // end if
 
 		pass();
 		// creates random values but with no duplicate values
 		if (bondType != 1) {
 			bondLocation = new int[prefixBond];
 			for (int i = 0; i < prefixBond; i++) {
+				System.out.println(mainSize);
+				System.out.println(prefixBond);
 				int hold = random(1, mainSize - 1);
 				for (int j = 0; j < i; j++) {
 					while (bondLocation[j] == hold)
@@ -372,29 +371,52 @@ public class OrganicUtil {
 		TreeMap<String, Integer> groups;
 		ArrayList<String> toCheck = new ArrayList<String>();
 		ArrayList<String> position = new ArrayList<String>();
-
+		ArrayList<Integer> etherSpots = new ArrayList<Integer>();
 		groups = initializeMap();
 
 		// loop for the length of the side chain array to get the word and location
 		for (int i = 0; i < side.length; i++) {
 			toCheck.add(sizeToWord(side[i]));
 			position.add(side[i].getLocation());
+			if (side[i].getLocation().equalsIgnoreCase("o"))
+				etherSpots.add(i);
 		} // end for
+		
+		for (int j=0;j<toCheck.size();j++) {
+			if (toCheck.get(j).equalsIgnoreCase("oxy")) {
+				for (int i=0;i<position.size();i++) {
+					if (position.get(i).equalsIgnoreCase("o")) {
+						toCheck.set(j, toCheck.get(i).substring(0,toCheck.get(i).length()-2));
+						toCheck.remove(i);
+						j--;
+					}
+				}
+			}
+				
+		}
 
 		// uses the treemap key of the sidechain name to be added to the value which
 		// starts at 0
-		for (int i = 0; i < side.length; i++) {
+		for (int i = 0; i < toCheck.size(); i++) {
 			try {
 			int temp = groups.get(toCheck.get(i)) + 1;
-			groups.replace(toCheck.get(i), temp);
+			if (!position.get(i).equalsIgnoreCase("o"))
+				groups.replace(toCheck.get(i), temp);
+			
 			}catch(NullPointerException e) {}
 		} // end for
 		
 		for (String key: groups.keySet()){
 			int prefix = groups.get(key);
 			if (prefix!=0) {
-				
-				if (prefix>2)
+				for (int i=0;i<toCheck.size();i++) {
+					if (key.equals(toCheck.get(i))) {
+						if (!position.get(i).equalsIgnoreCase("o"))
+							beforeMain+=position.get(i)+",";
+					}//end if
+				}//end for
+				beforeMain = beforeMain.substring(0,beforeMain.length()-1) + "-";
+				if (prefix>=2)
 					beforeMain+=prefixFromNumber(prefix);
 				beforeMain += key+"-"; 
 			}//end if
@@ -404,6 +426,7 @@ public class OrganicUtil {
 		return beforeMain;
 	}// end assignPrefix
 
+	//creates a treemap and sets all the values to 0
 	private static TreeMap<String, Integer> initializeMap() {
 		TreeMap<String, Integer> t = new TreeMap<String, Integer>();
 
