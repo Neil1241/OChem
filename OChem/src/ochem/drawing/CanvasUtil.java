@@ -12,29 +12,33 @@ import java.awt.Color;
 public class CanvasUtil {
 	//Static values
 	//transparent colors
-	public static Color TRANS_RED = new Color(238,50,50,100);
-	public static Color TRANS_GREEN = new Color(50,238,50,100);
-	public static Color TRANS_BLUE = new Color(50,50,238,100);
-	public static Color TRANS_GREY = new Color(200,200,200,100);
-	public static Color TRANS_YELLOW = new Color(255,242,0,100);
+	public static final Color TRANS_RED = new Color(238,50,50,100);
+	public static final Color TRANS_GREEN = new Color(50,238,50,100);
+	public static final Color TRANS_BLUE = new Color(50,50,238,100);
+	public static final Color TRANS_GREY = new Color(200,200,200,100);
+	public static final Color TRANS_YELLOW = new Color(255,242,0,100);
 	
 	//light and dark colors
 	//yellow
-	public static Color DARK_YELLOW = new Color(219, 194, 52);
-	public static Color LIGHT_YELLOW = new Color(244, 217, 66);
+	public static final Color DARK_YELLOW = new Color(219, 194, 52);
+	public static final Color LIGHT_YELLOW = new Color(244, 217, 66);
 	
 	//red
-	public static Color DARK_RED = new Color(183, 33, 33);
-	public static Color LIGHT_RED = new Color(255, 45, 45);
+	public static final Color DARK_RED = new Color(183, 33, 33);
+	public static final Color LIGHT_RED = new Color(255, 45, 45);
 	
 	//chain colors
-	public static Color CHAIN_COLOR = Color.BLACK;
+	public static final Color CHAIN_COLOR = Color.BLACK;
 	
 	//angles for bond drawing
-	public static double DOWN_BOND_ODD = Math.toRadians(45);
-	public static double DOWN_BOND_EVEN = Math.toRadians(105);
-	public static double UP_BOND_ODD = Math.toRadians(225);
-	public static double UP_BOND_EVEN = Math.toRadians(315);
+	public static final double DOWN_BOND_ODD = Math.toRadians(45);
+	public static final double DOWN_BOND_EVEN = Math.toRadians(105);
+	public static final double UP_BOND_ODD = Math.toRadians(225);
+	public static final double UP_BOND_EVEN = Math.toRadians(315);
+	
+	//lengths
+	public static final int CHAIN_ARM = 120;
+	public static final int CYCLO_RAD = 140;
 	
 	/*
 	 * Types of action to determine different drawing features
@@ -158,16 +162,16 @@ public class CanvasUtil {
 			if (dx > 0) //right
 				angle = 0;
 			else if (dx < 0) //left
-				angle = 180;
+				angle = Math.PI;
 			
 		} else if (dx == 0) { //no change in x
 			if (dy > 0) //up
-				angle = 270;
+				angle = Math.PI * 1.5;
 			else if (dy < 0) //down
-				angle = 90;
+				angle = Math.PI * 0.5;
 			
 		} else { //regular case
-			angle = -Math.atan2(dy, dx);
+			angle = Math.atan2(dy, dx);
 		} //if
 		
 		return angle;

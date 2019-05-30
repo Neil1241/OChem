@@ -402,7 +402,7 @@ public class Canvas extends JComponent {
 	 */
 	private void drawBonds(Graphics2D g2) throws NumberFormatException {
 		// thinner lines
-		BasicStroke bs = new BasicStroke(10.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		BasicStroke bs = new BasicStroke(8.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
 
 		// if there are nodes in the list
@@ -410,32 +410,56 @@ public class Canvas extends JComponent {
 
 			// draw lines between each pair
 			for (int i = 0; i < bondNodes.size(); i += 2) {
-				// cyclo main chain
-				if (compound.getMainChain().isCyclo()) {
+				int bondNum = bondSizes.get(i / 2); // size of bond being drawn
 
-					// regular main chain
-				} else {
-					int bondNum = bondSizes.get(i / 2); // number on main chain of start nodes
-					
-					double ang1 = Math.toRadians(315);
-					double ang2 = Math.toRadians(135);
-					
-					int r = 30; // arm offset
+				Node n1 = bondNodes.get(i); // first node
+				Node n2 = bondNodes.get(i + 1); // second node
 
-					// start point coordinates
-					int x1 = bondNodes.get(i).getX() + (int) (r * Math.cos(ang1));
-					int y1 = bondNodes.get(i).getY() + (int) (r * Math.sin(ang1)) - 50;
+				int flip = Integer.parseInt(n1.getTag()); // integer flip based on position on main chain
 
-					// end point coordinates
-					int x2 = bondNodes.get(i + 1).getX() + (int) (r * Math.cos(ang2));
-					int y2 = bondNodes.get(i + 1).getY() + (int) (r * Math.sin(ang2)) - 50;
+				double ang1 = CanvasUtil.angleBetweenNodes(n1, n2); // angle from first node to second
+				double ang2 = CanvasUtil.angleBetweenNodes(n2, n1); // angle from second node to first
+				double perp = flip * Math.PI / 2; // perpendicular offset angle (+ or - PI/2 radians, or +/- 90 degrees)
 
-					// draw the bond line
+				int arm = (int) (CanvasUtil.CHAIN_ARM * 0.5); // length of bond line
+				int r = (int) (CanvasUtil.CHAIN_ARM - arm) / 2; // distance between chain end and bond line end
+
+				// bond points are translated along the chain from their starting node
+				// then translated perpendicular from the line out depending on if the node # is even/odd
+
+				// start point coordinates
+				int x1 = n1.getX() + (int) (r * (Math.cos(ang1) + Math.cos(ang1 + perp)));
+				int y1 = n1.getY() + (int) (r * (Math.sin(ang1) + Math.sin(ang1 + perp)));
+
+				// end point coordinates
+				int x2 = n2.getX() + (int) (r * (Math.cos(ang2) + Math.cos(ang2 - perp)));
+				int y2 = n2.getY() + (int) (r * (Math.sin(ang2) + Math.sin(ang2 - perp)));
+
+				// draw line
+				g2.drawLine(x1, y1, x2, y2);
+
+				// if a triple bond
+				if (bondNum == 3) {
+					// flip to the opposite side
+					flip = -flip;
+
+					// recalculate perpendicular offset
+					perp = flip * Math.PI / 2;
+
+					// recalculate start point coordinates
+					x1 = n1.getX() + (int) (r * (Math.cos(ang1) + Math.cos(ang1 + perp)));
+					y1 = n1.getY() + (int) (r * (Math.sin(ang1) + Math.sin(ang1 + perp))) - flip;
+
+					// recalculate end point coordinates
+					x2 = n2.getX() + (int) (r * (Math.cos(ang2) + Math.cos(ang2 - perp)));
+					y2 = n2.getY() + (int) (r * (Math.sin(ang2) + Math.sin(ang2 - perp)));
+
+					// draw opposite line
 					g2.drawLine(x1, y1, x2, y2);
-				} //if
-			} //loop
-		} //big if
-	} //end drawBonds
+				}
+			} // loop
+		} // big if
+	} // end drawBonds
 
 	/*
 	 * Draw a node to the screen
@@ -459,7 +483,7 @@ public class Canvas extends JComponent {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 
 		// offset length in pixels
-		int r = 140;
+		int r = CanvasUtil.CYCLO_RAD;
 
 		// start point
 		int x1 = start.getX();
@@ -517,12 +541,12 @@ public class Canvas extends JComponent {
 		} // if
 
 		// draw the #s for debugging
-		g2.setFont(g2.getFont().deriveFont(50.0F));
+		/*g2.setFont(g2.getFont().deriveFont(50.0F));
 		g2.setColor(Color.RED);
 		for (Node n : mainNodes) {
 			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
 		}
-		g2.setColor(Color.BLACK);
+		g2.setColor(Color.BLACK);*/
 
 		return nodes;
 	} // end drawCyclo
@@ -542,7 +566,7 @@ public class Canvas extends JComponent {
 		int y1 = start.getY();
 
 		double[] angles = CanvasUtil.angleFromDirection(dir); // get the angles based on the direction
-		int arm = 120; // length of bonds in pixels
+		int arm = CanvasUtil.CHAIN_ARM; // length of bonds in pixels
 
 		ArrayList<Node> nodes = new ArrayList<Node>(); // list of nodes
 
