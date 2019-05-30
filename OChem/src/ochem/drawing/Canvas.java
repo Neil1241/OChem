@@ -356,7 +356,7 @@ public class Canvas extends JComponent {
 				g2.setColor(CanvasUtil.TRANS_RED);
 				drawNode(g2, mouse);
 
-				g2.setColor(CanvasUtil.CHAIN_COLOR);
+				g2.setColor(CanvasUtil.CHAIN_COLOR); 
 				drawBonds(g2);
 				break;
 
