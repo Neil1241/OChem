@@ -461,6 +461,7 @@ public class Canvas extends JComponent {
 				g2.setColor(CanvasUtil.TRANS_GREY);
 				drawFunc(g2, mouse, ghostGroup);
 				
+				g2.setColor(CanvasUtil.CHAIN_COLOR);
 				drawGroups(g2);
 				break;
 				
