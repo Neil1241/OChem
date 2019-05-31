@@ -286,7 +286,7 @@ public class Canvas extends JComponent {
 				drawSides(g2);
 				break;
 
-			// determine cyclo step
+			// determine cyclo step 
 			case 2:
 				DrawingGUI.showMessage("Cyclo? (Y/N)");
 				g2.setColor(CanvasUtil.TRANS_GREY);
