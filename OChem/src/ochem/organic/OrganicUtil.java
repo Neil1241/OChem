@@ -88,9 +88,9 @@ public class OrganicUtil {
 		// generate a prefix if there are double or triple bonds
 		if (mainSize == 2) {
 			prefixBond = 1;
-		}else if (mainSize == 3) {
+		} else if (mainSize == 3) {
 			prefixBond = random(1, 2);
-		}else if (ending != 0) {
+		} else if (ending != 0) {
 			prefixBond = random(1, 3);
 		} // end if
 
@@ -367,6 +367,7 @@ public class OrganicUtil {
 
 	private static String assignPrefix(Chain[] side) {
 		// declare temporary variables
+		boolean space = false;
 		String beforeMain = "";
 		TreeMap<String, Integer> groups;
 		ArrayList<String> toCheck = new ArrayList<String>();
@@ -381,52 +382,78 @@ public class OrganicUtil {
 			if (side[i].getLocation().equalsIgnoreCase("o"))
 				etherSpots.add(i);
 		} // end for
-		
-		for (int j=0;j<toCheck.size();j++) {
+
+		System.out.println(toCheck);
+		System.out.println(position);
+
+		for (int j = 0; j < toCheck.size(); j++) {
 			if (toCheck.get(j).equalsIgnoreCase("oxy")) {
-				for (int i=0;i<position.size();i++) {
+				for (int i = 0; i < position.size(); i++) {
 					if (position.get(i).equalsIgnoreCase("o")) {
-						toCheck.set(j, toCheck.get(i).substring(0,toCheck.get(i).length()-2));
+						toCheck.set(j, toCheck.get(i).substring(0, toCheck.get(i).length() - 2) + "oxy");
 						toCheck.remove(i);
+						position.remove(i);
+						System.out.println(toCheck);
+						System.out.println(position);
 						j--;
+						break;
 					}
 				}
 			}
-				
+
 		}
 
 		// uses the treemap key of the sidechain name to be added to the value which
 		// starts at 0
 		for (int i = 0; i < toCheck.size(); i++) {
 			try {
-			int temp = groups.get(toCheck.get(i)) + 1;
-			if (!position.get(i).equalsIgnoreCase("o"))
-				groups.replace(toCheck.get(i), temp);
-			
-			}catch(NullPointerException e) {}
+				int temp = groups.get(toCheck.get(i)) + 1;
+				//if (!position.get(i).equalsIgnoreCase("o"))
+					groups.replace(toCheck.get(i), temp);
+
+			} catch (NullPointerException e) {
+			}
 		} // end for
-		
-		for (String key: groups.keySet()){
+
+		for (String key : groups.keySet()) {
 			int prefix = groups.get(key);
-			if (prefix!=0) {
-				for (int i=0;i<toCheck.size();i++) {
+			space = false;
+			if (prefix != 0) {
+				for (int i = 0; i < toCheck.size(); i++) {
 					if (key.equals(toCheck.get(i))) {
 						if (!position.get(i).equalsIgnoreCase("o"))
-							beforeMain+=position.get(i)+",";
-					}//end if
-				}//end for
-				beforeMain = beforeMain.substring(0,beforeMain.length()-1) + "-";
-				if (prefix>=2)
-					beforeMain+=prefixFromNumber(prefix);
-				beforeMain += key+"-"; 
-			}//end if
-		}//end for
-		if (side.length>0)
-			beforeMain = beforeMain.substring(0,beforeMain.length()-1);
+							beforeMain += position.get(i) + ",";
+						else
+							space=true;
+					} // end if
+				} // end for
+				if (!space) {
+					beforeMain = beforeMain.substring(0, beforeMain.length() - 1) + "-";
+				}
+				if (prefix >= 2) {
+					beforeMain += prefixFromNumber(prefix);
+				}
+				if (key.substring(key.length()-3, key.length()).equals("oxy") && !key.equals("hydroxy")) {
+					beforeMain += key + " ";
+				}else if (space) {
+					beforeMain += key + " ";
+				}else {
+					beforeMain += key + "-";
+				}
+			} // end if
+		} // end for
+		if (side.length > 0 && space)
+			beforeMain = beforeMain.substring(0, beforeMain.length() - 1);
 		return beforeMain;
 	}// end assignPrefix
 
-	//creates a treemap and sets all the values to 0
+	
+	/*else if (toCheck.get(i).substring(toCheck.get(i).length() - 3, toCheck.get(i).length())
+							.equalsIgnoreCase("oxy")) {
+						beforeMain = position.get(i);
+					}
+	 */ 
+	// creates a treemap and sets all the values to 0
 	private static TreeMap<String, Integer> initializeMap() {
 		TreeMap<String, Integer> t = new TreeMap<String, Integer>();
 
@@ -434,12 +461,16 @@ public class OrganicUtil {
 		for (int i = 0; i < CHAIN.length - 1; i++)
 			t.put(CHAIN[i] + "yl", 0);
 		// end for
+		
+		for (int i = 0; i < CHAIN.length - 1; i++)
+			t.put(CHAIN[i] + "oxy", 0);
 
 		// add in the side unique side chains
 		for (int i = 0; i < SIDE_CHAIN_SUFFIX.length; i++) {
 			if (i != 1)
 				t.put(SIDE_CHAIN_SUFFIX[i], 0);
 		} // end for
+		t.remove("oxy");
 
 		// add in the cyclo side chains
 		for (int i = 2; i < CHAIN.length - 3; i++)
