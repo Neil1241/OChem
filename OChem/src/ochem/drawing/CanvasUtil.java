@@ -30,6 +30,9 @@ public class CanvasUtil {
 	//chain colors
 	public static final Color CHAIN_COLOR = Color.BLACK;
 	
+	//background color
+	public static final Color BACKGROUND_COLOR = new Color(224, 255, 253); // background color
+	
 	//angles for bond drawing
 	public static final double DOWN_BOND_ODD = Math.toRadians(45);
 	public static final double DOWN_BOND_EVEN = Math.toRadians(105);
@@ -129,10 +132,11 @@ public class CanvasUtil {
 			case 5:
 				return Math.toRadians(60);
 			
+			//hexagon
 			case 6:
-				return Math.toRadians(30);
+				return Math.toRadians(60);
 			
-			//square
+			//heptagon
 			case 7:
 				return Math.toRadians(45);
 			

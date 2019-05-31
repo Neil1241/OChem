@@ -129,9 +129,15 @@ public class UserInputController implements KeyListener {
 	 * String in - text entered by user
 	 */
 	private void mainAction(String in) {
-		//if on deciding cyclo step
-		if (canvas.getMainStep() == 2) {
+		if (canvas.getMainStep() == 1) { //if on size deciding step
+			//if text entered is B (benzene)
+			if (in.equalsIgnoreCase("B")) { 
+				canvas.setMainBenzene(true); //set the main chain to be a benzene
+				canvas.setMainStep(3); //step forward
+				DrawingGUI.clear(); //clear the dialog box
+			} //if
 			
+		} else if (canvas.getMainStep() == 2) { //if on deciding cyclo step
 			//if text entered is Y (yes)
 			if (in.equalsIgnoreCase("Y")) {
 				canvas.setMainCyclo(true); //set the main chain to be a cyclo
@@ -158,7 +164,7 @@ public class UserInputController implements KeyListener {
 		if (num < 1) { //too small to be a chain
 			DrawingGUI.reportError("Size enter too small!");
 			
-		} else if (num < 3 || num > 5) { //valid size, can't be cyclo
+		} else if (num < 3 || num > 7) { //valid size, can't be cyclo
 			canvas.addSideSize(num); //add number to the list
 			canvas.addSideCyclo(false); //set it to false
 			canvas.setSideStep(3); //skip over cyclo step
@@ -178,7 +184,16 @@ public class UserInputController implements KeyListener {
 	 */
 	private void sideAction(String in) {
 		//cyclo deciding step
-		if (canvas.getSideStep() == 2) {
+		if (canvas.getSideStep() == 1) { //size deciding step
+			//benzene ring
+			if (in.equalsIgnoreCase("B")) { 
+				canvas.addSideSize(6); //6 for benzene
+				canvas.addSideBenzene(true); //set the main chain to be a benzene
+				canvas.setSideStep(3); //skip over cyclo step
+				DrawingGUI.clear(); //clear the dialog box
+			} //if
+			
+		} else if (canvas.getSideStep() == 2) { //cyclo deciding step
 			
 			//if text entered is Y (yes)
 			if (in.equalsIgnoreCase("Y")) {

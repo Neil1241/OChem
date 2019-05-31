@@ -113,7 +113,7 @@ public class PaletteButtonController implements MouseListener {
 	 */
 	private void bondAction() {
 		//if there is a main chain on screen
-		if (canvas.getMainOnScreen()) {
+		if (canvas.getMainOnScreen() && !canvas.getMainBenzene()) { //if main chain on screen and its not a benzene ring
 			palette.setSelectedType(ActionType.BOND); //set type to bond
 			canvas.setBondStep(1); //step forward
 			

@@ -35,6 +35,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		this.canvas = canvas;
 
 		dir = DrawDirection.UP_RIGHT; // default draw direction
+		canvas.setGhostDirection(dir); //set it to the canvas
+		
 		current = new Node(0, 0, 20); // instantiate a node at origin
 	} // end constructor
 
@@ -214,7 +216,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		int end; // end of loop
 
 		// if cycloidal chain
-		if (canvas.getMainCyclo()) {
+		if (canvas.getMainCyclo() || canvas.getMainBenzene()) {
 			start = 0;
 			end = mainNodes.size();
 			// else, regular chain
@@ -233,7 +235,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				mainNodes.get(i).setColor(CanvasUtil.DARK_YELLOW); // dark yellow
 
 				// if not a cycloidal chain
-				if (!canvas.getMainCyclo()) {
+				if (!canvas.getMainCyclo() && !canvas.getMainBenzene()) {
 					// change direction of the ghost chain depending on node position on chain
 					if (i % 2 == 0) {
 						dir = DrawDirection.DOWN_RIGHT; // even, down
@@ -259,7 +261,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		ArrayList<Node> nodes = canvas.getMainNodes(); //list of main nodes
 		Node ms = new Node(m.getX(), m.getY(), nodes.get(0).getRad()); //node for mouse
 		boolean wasOver = false; //whether the mouse was over a node
-
+		
 		//change end node based on whether main chain is cyclo
 		int end;
 		if (canvas.getMainCyclo()) {

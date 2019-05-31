@@ -31,8 +31,6 @@ public class Canvas extends JComponent {
 
 	private Node mouse; // for hovering effects
 
-	public static Color BACKGROUND_COLOR; // background color
-
 	// main
 	private Compound compound; // compound being drawn
 	private ArrayList<Node> mainNodes; // nodes for the main chain
@@ -51,8 +49,8 @@ public class Canvas extends JComponent {
 	private ActionType type; // type of action
 
 	// ghost drawing (showing where the final action would be)
-	private DrawDirection ghostDir; //direction of the ghost side chain
-	private int ghostBondIdx; //index of the main chain node for bond drawing
+	private DrawDirection ghostDir; // direction of the ghost side chain
+	private int ghostBondIdx; // index of the main chain node for bond drawing
 
 	private int mainStep; // step for the "main" button
 	private int sideStep; // step for the "side" button
@@ -80,9 +78,6 @@ public class Canvas extends JComponent {
 		// instantiate the nodes list, create the mouse node
 		mouse = new Node(20);
 
-		// pale blue
-		BACKGROUND_COLOR = new Color(224, 255, 253);
-
 		// set the type
 		type = ActionType.CLEAR;
 
@@ -105,8 +100,8 @@ public class Canvas extends JComponent {
 
 		// default the ghost direction to up right
 		ghostDir = DrawDirection.UP_RIGHT;
-		
-		//default the ghost bond index to outside of regular range
+
+		// default the ghost bond index to outside of regular range
 		ghostBondIdx = -1;
 
 		// initialize the directions list
@@ -135,7 +130,7 @@ public class Canvas extends JComponent {
 		g2.setStroke(bs);
 
 		// background
-		g2.setBackground(BACKGROUND_COLOR);
+		g2.setBackground(CanvasUtil.BACKGROUND_COLOR);
 		g2.clearRect(View.PAD / 2, View.PAD, width - 2 * View.PAD, height - 2 * View.PAD);
 
 		// update the type to the palette's type
@@ -146,16 +141,6 @@ public class Canvas extends JComponent {
 		mainAction(g2);
 		sideAction(g2);
 		bondAction(g2);
-
-		/*
-		 * //rot test
-		 * int r = 200;
-		 * drawNode(g2, new Node(300,300,10));
-		 * g2.setColor(Color.RED);
-		 * int x1 = (int) (r * Math.cos(Math.toRadians(315)) + 300);
-		 * int y1 = (int) (r * Math.sin(Math.toRadians(315)) + 300);
-		 * drawNode(g2, new Node(x1,y1, 10));
-		 */
 	} // end paintComponent
 
 	// ACTIONS//
@@ -185,7 +170,7 @@ public class Canvas extends JComponent {
 
 			// clear the directions
 			directions.clear();
-			ghostDir = DrawDirection.RIGHT;
+			ghostDir = DrawDirection.UP_RIGHT;
 
 			// clear the compound and the chains
 			compound = new Compound(0);
@@ -219,7 +204,7 @@ public class Canvas extends JComponent {
 				drawNode(g2, mouse);
 				break;
 
-			// location selection step
+			// determine cyclo step
 			case 2:
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Cyclo? (Y/N)");
@@ -227,15 +212,19 @@ public class Canvas extends JComponent {
 				drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
 				break;
 
-			// determine cyclo step
+			// location selection step
 			case 3:
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Select location for main chain: (CLICK)");
 				g2.setColor(CanvasUtil.TRANS_GREY);
 
-				if (compound.getMainChain().isCyclo()) {
+				if (compound.getMainChain().isCyclo()) { // cycloidal chain
 					drawCyclo(g2, mouse, compound.getMainSize(), false, null);
-				} else {
+
+				} else if (compound.getMainChain().isBenzene()) { // benzene ring
+					drawBenzene(g2, mouse, false, null);
+
+				} else { // regular chain
 					drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
 				} // if
 
@@ -248,17 +237,25 @@ public class Canvas extends JComponent {
 				g2.setColor(Color.BLACK);
 
 				if (!mainOnScreen) { // first time called
-					if (compound.getMainChain().isCyclo()) {
+					if (compound.getMainChain().isCyclo()) { // cycloidal chain
 						mainNodes = drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
-					} else {
+
+					} else if (compound.getMainChain().isBenzene()) { // benzene ring
+						mainNodes = drawBenzene(g2, mainNodes.get(0), false, null);
+
+					} else { // regular chain
 						mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
 					} // if
-					mainOnScreen = true;
+					mainOnScreen = true; // tell other components and actions there is a main chain on the screen
 
 				} else { // all other times
-					if (compound.getMainChain().isCyclo()) {
+					if (compound.getMainChain().isCyclo()) { // cycloidal chain
 						drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
-					} else {
+
+					} else if (compound.getMainChain().isBenzene()) { // benzene ring
+						drawBenzene(g2, mainNodes.get(0), false, null);
+
+					} else { // regular chain
 						drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
 					} // if
 
@@ -293,7 +290,7 @@ public class Canvas extends JComponent {
 			case 2:
 				DrawingGUI.showMessage("Cyclo? (Y/N)");
 				g2.setColor(CanvasUtil.TRANS_GREY);
-				drawChain(g2, mouse, DrawDirection.RIGHT, sideChains.get(sideChains.size() - 1).getSize() + 1, true);
+				drawChain(g2, mouse, ghostDir, sideChains.get(sideChains.size() - 1).getSize() + 1, true);
 
 				drawSides(g2);
 				break;
@@ -305,24 +302,29 @@ public class Canvas extends JComponent {
 
 				// create and draw the would-be chain
 				Chain ghost = sideChains.get(sideChains.size() - 1);
-				if (ghost.isCyclo()) {
+				if (ghost.isCyclo()) { //cycloidal chain
 					drawCyclo(g2, mouse, ghost.getSize(), true, ghostDir);
-				} else {
+					
+				} else if (ghost.isBenzene()) { //benzene ring
+					drawBenzene(g2, mouse, true, ghostDir);
+					
+				} else { //regular chain
 					drawChain(g2, mouse, ghostDir, ghost.getSize() + 1, true);
-				}
+				} //if
 
 				// draw the side chains already on the compound
 				drawSides(g2);
 
+				//start positions
 				int start;
 				int end;
-				if (compound.getMainChain().isCyclo()) {
+				if (compound.getMainChain().isCyclo() || compound.getMainChain().isBenzene()) {
 					start = 0;
 					end = mainNodes.size();
 				} else {
 					start = 1;
 					end = mainNodes.size() - 1;
-				}
+				} //if
 
 				// show nodes that can be clicked
 				for (int i = start; i < end; i++) {
@@ -347,7 +349,7 @@ public class Canvas extends JComponent {
 		switch (bondStep) {
 			// do nothing step
 			case 0:
-				ghostBondIdx = -1; //reset the bond index
+				ghostBondIdx = -1; // reset the bond index
 				break;
 
 			// enter size step
@@ -356,7 +358,7 @@ public class Canvas extends JComponent {
 				g2.setColor(CanvasUtil.TRANS_RED);
 				drawNode(g2, mouse);
 
-				g2.setColor(CanvasUtil.CHAIN_COLOR); 
+				g2.setColor(CanvasUtil.CHAIN_COLOR);
 				drawBonds(g2);
 				break;
 
@@ -369,44 +371,44 @@ public class Canvas extends JComponent {
 					end = mainNodes.size();
 				} else {
 					end = mainNodes.size() - 1;
-				} //if
-				
+				} // if
+
 				// show nodes that can be clicked
 				for (int i = 0; i < end; i++) {
 					g2.setColor(mainNodes.get(i).getColor());
 					drawNode(g2, mainNodes.get(i));
 				} // loop
-				
-				//show ghost bond
-				g2.setColor(CanvasUtil.TRANS_GREY); //set ghost color
-				
-				//if a node has been selected
+
+				// show ghost bond
+				g2.setColor(CanvasUtil.TRANS_GREY); // set ghost color
+
+				// if a node has been selected
 				if (ghostBondIdx != -1) {
 					if (!bondSizes.isEmpty()) {
-						int bondSize = bondSizes.get(bondSizes.size() - 1); //most recent size
-						
-						//temporary nodes for drawing ghost
+						int bondSize = bondSizes.get(bondSizes.size() - 1); // most recent size
+
+						// temporary nodes for drawing ghost
 						Node n1 = mainNodes.get(ghostBondIdx);
 						Node n2;
-						
-						//set the tag for the temporary nodes
+
+						// set the tag for the temporary nodes
 						if (ghostBondIdx % 2 == 0) {
 							n1.setTag("1");
 						} else {
 							n1.setTag("-1");
-						} //if
-						
-						//index of second bond
-						if (ghostBondIdx+1 == compound.getMainSize()) {
+						} // if
+
+						// index of second bond
+						if (ghostBondIdx + 1 == compound.getMainSize()) {
 							n2 = mainNodes.get(0);
 						} else {
 							n2 = mainNodes.get(ghostBondIdx + 1);
-						} //if 
-						
-						//draw the ghost bond
+						} // if
+
+						// draw the ghost bond
 						drawBond(g2, n1, n2, bondSize);
-					} //inner if
-				} //outer if
+					} // inner if
+				} // outer if
 
 				g2.setColor(CanvasUtil.CHAIN_COLOR);
 				drawBonds(g2);
@@ -430,11 +432,14 @@ public class Canvas extends JComponent {
 		// draw side chains
 		// g2.setColor(Color.black);
 		for (int i = 0; i < sideNodes.size(); i++) {
-			if (sideChains.get(i).isCyclo()) {
-				g2.setColor(Color.BLACK);
+			g2.setColor(CanvasUtil.CHAIN_COLOR);
+			if (sideChains.get(i).isCyclo()) { //cycloidal chain
 				drawCyclo(g2, sideNodes.get(i), sideChains.get(i).getSize(), true, directions.get(i));
-			} else {
-				g2.setColor(Color.BLACK);
+				
+			} else if (sideChains.get(i).isBenzene()) { //benzene ring
+				drawBenzene(g2, sideNodes.get(i), true, directions.get(i));
+				
+			} else { //regular chain
 				drawChain(g2, sideNodes.get(i), directions.get(i), sideChains.get(i).getSize() + 1, true);
 			} // if
 		} // loop
@@ -458,9 +463,9 @@ public class Canvas extends JComponent {
 
 				drawBond(g2, n1, n2, bondSize);
 			} // loop
-		}  //big iff
+		} // big iff
 	} // end drawBonds
-	
+
 	/*
 	 * Draws a bond between two nodes
 	 * Graphics2D g2 - object responsible for drawing
@@ -472,7 +477,7 @@ public class Canvas extends JComponent {
 		// thinner lines
 		BasicStroke bs = new BasicStroke(8.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
-		
+
 		int flip = Integer.parseInt(n1.getTag()); // integer flip based on position on main chain
 
 		double ang1 = CanvasUtil.angleBetweenNodes(n1, n2); // angle from first node to second
@@ -514,12 +519,12 @@ public class Canvas extends JComponent {
 
 			// draw opposite line
 			g2.drawLine(x1, y1, x2, y2);
-		} //little if
-	} //end drawBond
+		} // little if
+	} // end drawBond
 
 	/*
 	 * Draw a node to the screen
-	 * Graphics2D g2 - object responsible for drawing 
+	 * Graphics2D g2 - object responsible for drawing
 	 * Node n - node to draw
 	 */
 	private void drawNode(Graphics2D g2, Node n) {
@@ -597,12 +602,14 @@ public class Canvas extends JComponent {
 		} // if
 
 		// draw the #s for debugging
-		/*g2.setFont(g2.getFont().deriveFont(50.0F));
-		g2.setColor(Color.RED);
-		for (Node n : mainNodes) {
-			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
-		}
-		g2.setColor(Color.BLACK);*/
+		/*
+		 * g2.setFont(g2.getFont().deriveFont(50.0F));
+		 * g2.setColor(Color.RED);
+		 * for (Node n : mainNodes) {
+		 * g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
+		 * }
+		 * g2.setColor(Color.BLACK);
+		 */
 
 		return nodes;
 	} // end drawCyclo
@@ -669,15 +676,46 @@ public class Canvas extends JComponent {
 		return nodes;
 	} // end drawChain
 
-	// ATTRIBUTES//
-
 	/*
-	 * Set the size of the main chain
-	 * int main - size of the main chain
+	 * Draw a benzene chain
+	 * Graphics2D g2 - object responsible for drawing
+	 * Node start - start position of the benzene
+	 * boolean extend - whether chain is side or not
+	 * DrawDirection dir - direction of the chain
 	 */
-	public void setMainSize(int main) {
-		compound.setMainSize(main);
-	} // end setMainSize
+	private ArrayList<Node> drawBenzene(Graphics2D g2, Node start, boolean extend, DrawDirection dir) {
+		ArrayList<Node> nodes = drawCyclo(g2, start, 6, extend, dir);
+
+		// create arrays for the x and y points
+		int[] x = new int[nodes.size()];
+		int[] y = new int[nodes.size()];
+
+		// fill those arrays with all the x coordinates
+		for (int i = 0; i < nodes.size(); i++) {
+			x[i] = nodes.get(i).getX();
+			y[i] = nodes.get(i).getY();
+		} // loop
+
+		// sort those values from least to greatest
+		OrganicUtil.bubbleSort(x);
+		OrganicUtil.bubbleSort(y);
+
+		// find the center point
+		int centerX = (x[0] + x[x.length - 1]) / 2; // avg of first and last; least and greatest
+		int centerY = (y[0] + y[y.length - 1]) / 2;
+
+		// radius of outer circle
+		int outRad = (int) (CanvasUtil.CYCLO_RAD * 0.7);
+
+		drawNode(g2, new Node(centerX, centerY, outRad));
+
+		g2.setColor(CanvasUtil.BACKGROUND_COLOR);
+		drawNode(g2, new Node(centerX, centerY, (int) (outRad * 0.85)));
+
+		return nodes;
+	} // end drawBenzene
+
+	// COMPONENT//
 
 	/*
 	 * Update the screen
@@ -696,6 +734,14 @@ public class Canvas extends JComponent {
 	} // end registerControllers
 
 	/*
+	 * Get the current type for the canvas
+	 * return type - action type of the canvas
+	 */
+	public ActionType getType() {
+		return type;
+	} // end getType
+
+	/*
 	 * Set the x and y of the mouse
 	 * int x - mouse x
 	 * int y - mouse y
@@ -703,6 +749,16 @@ public class Canvas extends JComponent {
 	public void setMouseXY(int x, int y) {
 		mouse.setXY(x, y);
 	} // end setMouseXY
+
+	// MAIN//
+
+	/*
+	 * Set the size of the main chain
+	 * int main - size of the main chain
+	 */
+	public void setMainSize(int main) {
+		compound.setMainSize(main);
+	} // end setMainSize
 
 	/*
 	 * Set the node for the start position of the main chain
@@ -724,14 +780,6 @@ public class Canvas extends JComponent {
 	public boolean getMainOnScreen() {
 		return mainOnScreen;
 	} // end getMainOnScreen
-
-	/*
-	 * Get the current type for the canvas
-	 * return type - action type of the canvas
-	 */
-	public ActionType getType() {
-		return type;
-	} // end getType
 
 	/*
 	 * Get the nodes on the main chain
@@ -785,15 +833,39 @@ public class Canvas extends JComponent {
 		return compound.getMainChain().isCyclo();
 	} // end getMainCyclo
 
+	/*
+	 * Set the main chain to be a benzene ring
+	 * boolean val - whether main chain is benzene or not
+	 */
+	public void setMainBenzene(boolean val) {
+		compound.getMainChain().setBenzene(val);
+	} // end setMainBenzene
+
+	/*
+	 * Get whether the main chain is a benzene ring or not
+	 * return - whether main chain is benzene ring or not
+	 */
+	public boolean getMainBenzene() {
+		return compound.getMainChain().isBenzene();
+	} // end getMainBenzene
+
 	// SIDE//
 
 	/*
 	 * Add a side cyclo to the list
-	 * boolean val - value to add to the side lists
+	 * boolean val - value to add to the side list
 	 */
 	public void addSideCyclo(boolean val) {
 		sideChains.get(sideChains.size() - 1).setCyclo(val);
 	} // end addSideCyclo
+	
+	/*
+	 * Add a side benzene to the list
+	 * boolean val - value to add to the side list
+	 */
+	public void addSideBenzene(boolean val) {
+		sideChains.get(sideChains.size() - 1).setBenzene(val);
+	} //end addSideBenzene
 
 	/*
 	 * Add a direction for a side chain
@@ -827,13 +899,59 @@ public class Canvas extends JComponent {
 		compound.addFunctionalLocation(lastSide.getLocation());
 	} // end addSideNode
 
+	// BONDS
+
 	/*
-	 * Get the side chains
-	 * return sideChains - list of all the side chains
+	 * Set the bond size for main drawing
+	 * int bond - size of bond
 	 */
-	public ArrayList<Chain> getSideChains() {
-		return sideChains;
-	} // end getSideChains
+	public void setBondSize(int bond) {
+		if (compound.getMainChain().getBond() < bond) {
+			compound.getMainChain().setBond(bond);
+		}
+
+		bondSizes.add(bond);
+		// compound.getMainChain().setEnding(bond+1); //was throwing null pointer
+	} // end setBondSize
+
+	/*
+	 * Add a pair of bonded nodes to the compound
+	 * int idx - position of the node in the main chain
+	 */
+	public void addBondNode(int idx) {
+		// nodes to add to the bond nodes list
+		Node start = mainNodes.get(idx); // first node of the bond
+		Node end; // second and lost node for the bond
+
+		// change second node index depending on index pos
+		if (idx + 1 == compound.getMainSize()) { // if position in array exceeds the list capacity
+			end = mainNodes.get(0); // roll over to zero
+		} else { // regular case
+			end = mainNodes.get(idx + 1); // second node is one right after
+		} // if
+
+		// change the tag based on the index
+		if (idx % 2 == 0) {
+			start.setTag("1"); // even, positive
+		} else {
+			start.setTag("-1"); // odd, negative
+		} // if
+
+		// add nodes to list
+		bondNodes.add(start);
+		bondNodes.add(end);
+
+		// add the location to the main chain
+		compound.getMainChain().addFunctionalLocation("" + idx);
+	} // end addBondedNode
+
+	/*
+	 * Set the index of the node for ghost bonds
+	 * int idx - index of the node for the bond on the main chain
+	 */
+	public void setGhostBondIndex(int idx) {
+		ghostBondIdx = idx;
+	} // end setGhostBondIndex
 
 	// STEPS//
 
@@ -904,60 +1022,6 @@ public class Canvas extends JComponent {
 		return bondStep;
 	} // end getSideStep
 
-	//BONDS
-	
-	/*
-	 * Set the bond size for main drawing
-	 * int bond - size of bond
-	 */
-	public void setBondSize(int bond) {
-		if (compound.getMainChain().getBond() < bond) {
-			compound.getMainChain().setBond(bond);
-		}
-
-		bondSizes.add(bond);
-		// compound.getMainChain().setEnding(bond+1); //was throwing null pointer
-	} // end setBondSize
-
-	/*
-	 * Add a pair of bonded nodes to the compound
-	 * int idx - position of the node in the main chain
-	 */
-	public void addBondNode(int idx) {
-		// nodes to add to the bond nodes list
-		Node start = mainNodes.get(idx); //first node of the bond
-		Node end; //second and lost node for the bond
-		
-		//change second node index depending on index pos
-		if (idx+1 == compound.getMainSize()) { //if position in array exceeds the list capacity
-			end = mainNodes.get(0); //roll over to zero
-		} else { //regular case
-			end = mainNodes.get(idx+1); //second node is one right after
-		} //if
-
-		// change the tag based on the index
-		if (idx % 2 == 0) {
-			start.setTag("1"); // even, positive
-		} else {
-			start.setTag("-1"); // odd, negative
-		} // if
-
-		// add nodes to list
-		bondNodes.add(start);
-		bondNodes.add(end);
-
-		// add the location to the main chain
-		compound.getMainChain().addFunctionalLocation("" + idx);
-	} // end addBondedNode
-
-	/*
-	 * Set the index of the node for ghost bonds
-	 * int idx - index of the node for the bond on the main chain
-	 */
-	public void setGhostBondIndex(int idx) {
-		ghostBondIdx = idx;
-	} //end setGhostBondIndex
-	
 	// COMPOUND//
 
 	/*
