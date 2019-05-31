@@ -49,6 +49,7 @@ public class Canvas extends JComponent {
 	private ArrayList<FuncGroup> groups; //functional groups
 	private FuncGroup ghostGroup; //current group
 	private ArrayList<Node> groupNodes; //list with all the group nodes
+	private ArrayList<DrawDirection> groupDirs; //all the directions for the groups
 
 	private boolean mainOnScreen; // whether a main chain is on the screen
 
@@ -116,6 +117,7 @@ public class Canvas extends JComponent {
 		// initialize the directions and groups lists
 		directions = new ArrayList<DrawDirection>();
 		groups = new ArrayList<FuncGroup>();
+		groupDirs = new ArrayList<DrawDirection>();
 
 		// set the global bond counter to zero
 		bondNum = 0;
@@ -152,6 +154,11 @@ public class Canvas extends JComponent {
 		sideAction(g2);
 		bondAction(g2);
 		funcAction(g2);
+		
+		//test
+		g2.setColor(Color.BLACK);
+		Node n = new Node(300,300, 10);
+//		drawDoubleOxygen(g2, n, DrawDirection.UP_RIGHT);
 	} // end paintComponent
 
 	// ACTIONS//
@@ -182,6 +189,7 @@ public class Canvas extends JComponent {
 
 			// clear the directions
 			directions.clear();
+			groupDirs.clear();
 			ghostDir = DrawDirection.UP_RIGHT;
 
 			// clear the compound and the chains
@@ -459,7 +467,7 @@ public class Canvas extends JComponent {
 				} // loop
 				
 				g2.setColor(CanvasUtil.TRANS_GREY);
-				drawFunc(g2, mouse, ghostGroup);
+				drawFunc(g2, mouse, ghostGroup, ghostDir);
 				
 				g2.setColor(CanvasUtil.CHAIN_COLOR);
 				drawGroups(g2);
@@ -773,7 +781,7 @@ public class Canvas extends JComponent {
 	private void drawGroups(Graphics2D g2) {
 		if (!groups.isEmpty() && !groupNodes.isEmpty()) {
 			for (int i = 0; i < groupNodes.size(); i++) {
-				drawFunc(g2, groupNodes.get(i), groups.get(i));
+				drawFunc(g2, groupNodes.get(i), groups.get(i), groupDirs.get(i));
 			} //loop
 		} //if
 	} //end drawGroups
@@ -781,110 +789,96 @@ public class Canvas extends JComponent {
 	/*
 	 * Draw a functional group
 	 * Graphics2D g2 - object responsible for drawing
+	 * Node start - start position of group
+	 * FuncGroup group - what group to draw
+	 * DrawDirectiond dir - what direction to draw group in
 	 */
-	private void drawFunc(Graphics2D g2, Node start, FuncGroup group) {
-		int r, x2, y2, fontR, textX, textY, flip;
+	private void drawFunc(Graphics2D g2, Node start, FuncGroup group, DrawDirection dir) {
+		int r, x2, y2, fontR, textX, textY;
+		int xFlip, yFlip;
 		double angle;
 		FontMetrics fm;
 		
 		switch (group) {
 			case FLUORINE:
-				r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
-				angle = Math.toRadians(CanvasUtil.angleFromDirection(ghostDir)[0]);
-				
-				x2 = start.getX() + (int) (r * Math.cos(angle));
-				y2 = start.getY() + (int) (r * Math.sin(angle));
-				
-				g2.drawLine(start.getX(), start.getY(), x2, y2);
-				
-				g2.setFont(g2.getFont().deriveFont(96.0F));
-				fm = g2.getFontMetrics();
-				fontR = 10;
-				
-				textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth("F")/4;
-				textY = y2 + (int) (fontR * Math.sin(angle)) - fm.getAscent()/6;
-
-				flip = (int) Math.signum(y2 - start.getY());
-				if (flip > 0) {
-					textY += fm.getAscent();
-				}
-				
-				g2.drawString("F", textX, textY);
+				drawHaloAlkane(g2, "F", start, dir);
 				break;
 				
 			case CHLORINE:
-				r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
-				angle = Math.toRadians(CanvasUtil.angleFromDirection(ghostDir)[0]);
-				
-				x2 = start.getX() + (int) (r * Math.cos(angle));
-				y2 = start.getY() + (int) (r * Math.sin(angle));
-				
-				g2.drawLine(start.getX(), start.getY(), x2, y2);
-				
-				g2.setFont(g2.getFont().deriveFont(96.0F));
-				fm = g2.getFontMetrics();
-				fontR = 10;
-				
-				textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth("Cl")/4;
-				textY = y2 + (int) (fontR * Math.sin(angle)) - fm.getAscent()/6;
-
-				flip = (int) Math.signum(y2 - start.getY());
-				if (flip > 0) {
-					textY += fm.getAscent();
-				}
-				
-				g2.drawString("Cl", textX, textY);
+				drawHaloAlkane(g2, "Cl", start, dir);
 				break;
 				
 			case BROMINE:
-				r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
-				angle = Math.toRadians(CanvasUtil.angleFromDirection(ghostDir)[0]);
-				
-				x2 = start.getX() + (int) (r * Math.cos(angle));
-				y2 = start.getY() + (int) (r * Math.sin(angle));
-				
-				g2.drawLine(start.getX(), start.getY(), x2, y2);
-				
-				g2.setFont(g2.getFont().deriveFont(96.0F));
-				fm = g2.getFontMetrics();
-				fontR = 10;
-				
-				textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth("Br")/4;
-				textY = y2 + (int) (fontR * Math.sin(angle)) - fm.getAscent()/6;
-
-				flip = (int) Math.signum(y2 - start.getY());
-				if (flip > 0) {
-					textY += fm.getAscent();
-				}
-				
-				g2.drawString("Br", textX, textY);
+				drawHaloAlkane(g2, "Br", start, dir);
 				break;
 				
 			case IODINE:
-				r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
-				angle = Math.toRadians(CanvasUtil.angleFromDirection(ghostDir)[0]);
-				
-				x2 = start.getX() + (int) (r * Math.cos(angle));
-				y2 = start.getY() + (int) (r * Math.sin(angle));
-				
-				g2.drawLine(start.getX(), start.getY(), x2, y2);
-				
-				g2.setFont(g2.getFont().deriveFont(96.0F));
-				fm = g2.getFontMetrics();
-				fontR = 10;
-				
-				textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth("I")/4;
-				textY = y2 + (int) (fontR * Math.sin(angle)) - fm.getAscent()/6;
-
-				flip = (int) Math.signum(y2 - start.getY());
-				if (flip > 0) {
-					textY += fm.getAscent();
-				}
-				
-				g2.drawString("I", textX, textY);
+				drawHaloAlkane(g2, "I", start, dir);
 				break;
 		} //switch
 	} //end drawFunc
+	
+	/*
+	 * Draw a haloalkane
+	 * Graphics2D g2 - object reponsible for drawing
+	 * String symbol - chemical symbol of element
+	 * Node start - start position of the haloalkane
+	 * DrawDirection dir - direction to draw in
+	 */
+	private void drawHaloAlkane(Graphics2D g2, String symbol, Node start, DrawDirection dir) {
+		int r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
+		double angle = 2 * Math.toRadians(CanvasUtil.cycloAngle(dir));
+		
+		int x2 = start.getX() + (int) (r * Math.cos(angle));
+		int y2 = start.getY() + (int) (r * Math.sin(angle));
+		
+		g2.drawLine(start.getX(), start.getY(), x2, y2);
+		
+		g2.setFont(g2.getFont().deriveFont(96.0F));
+		FontMetrics fm = g2.getFontMetrics();
+		int fontR = 60;
+		
+		int textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth(symbol)/2;
+		int textY = y2 + (int) (fontR * Math.sin(angle)) + fm.getAscent()/2;
+		
+		g2.drawString(symbol, textX, textY);
+	} //end drawHaloAlkane
+	
+	/*
+	 * Draw a double bonded oxygen group
+	 * Graphics2D g2 - object responsible for drawing
+	 * Node start - start position of the group
+	 * DrawDirection dir - direction to draw in
+	 */
+	private void drawDoubleOxygen(Graphics2D g2, Node start, DrawDirection dir) {
+		int arm = (int) (CanvasUtil.CHAIN_ARM * 0.8);
+		int offset = (int) (CanvasUtil.CHAIN_ARM * 0.1);
+		
+		//angle for chains
+		double angle = 2 * Math.toRadians(CanvasUtil.cycloAngle(dir));
+		
+		//perpendicular offsets for each line
+		double aPerp = angle + Math.PI/2;
+		double bPerp = angle - Math.PI/2;
+		
+		//first line
+		int ax1 = start.getX() - (int) (arm * Math.cos(angle) + offset * Math.cos(aPerp));
+		int ay1 = start.getY() - (int) (arm * Math.sin(angle) + offset * Math.sin(bPerp));
+		
+		int ax2 = ax1 + (int) (arm * Math.cos(angle) - offset * Math.cos(aPerp));
+		int ay2 = ay1 + (int) (arm * Math.sin(angle) - offset * Math.sin(bPerp));
+		
+		g2.drawLine(ax1, ay1, ax2, ay2);
+		
+		//second line
+		int bx1 = start.getX() - (int) (arm * Math.cos(angle) + offset * Math.cos(bPerp));
+		int by1 = start.getY() - (int) (arm * Math.sin(angle) + offset * Math.sin(bPerp));
+		
+		int bx2 = ax1 + (int) ((arm + offset) * Math.cos(angle) - offset * Math.cos(bPerp));
+		int by2 = ay1 + (int) ((arm + offset) * Math.sin(angle) - offset * Math.sin(bPerp));
+		
+		g2.drawLine(bx1, by1, bx2, by2);
+	} //end drawDoubleOxygen
 	
 	// COMPONENT//
 
@@ -981,14 +975,6 @@ public class Canvas extends JComponent {
 	} // end updateActionType
 
 	/*
-	 * Set the direction for the ghost to be drawn
-	 * DrawDirection dir - new direction for ghost chain
-	 */
-	public void setGhostDirection(DrawDirection dir) {
-		ghostDir = dir;
-	} // end setGhostDirection
-
-	/*
 	 * Set the main chain to be cycloidal
 	 * boolean val - whether main chain is cyclo or not
 	 */
@@ -1070,6 +1056,14 @@ public class Canvas extends JComponent {
 		compound.addFunctionalLocation(lastSide.getLocation());
 	} // end addSideNode
 
+	/*
+	 * Set the direction for the ghost to be drawn
+	 * DrawDirection dir - new direction for ghost chain
+	 */
+	public void setGhostDirection(DrawDirection dir) {
+		ghostDir = dir;
+	} // end setGhostDirection
+	
 	// BONDS
 
 	/*
@@ -1141,6 +1135,14 @@ public class Canvas extends JComponent {
 	public void addFuncNode(Node n) {
 		groupNodes.add(n);
 	} //end addFuncNode
+	
+	/*
+	 * Add a direction for a functional group
+	 * DrawDirection dir - direction for latest side chain
+	 */
+	public void addGroupDirection(DrawDirection dir) {
+		groupDirs.add(dir);
+	} // end addGroupDirection
 	
 	//STEPS//
 

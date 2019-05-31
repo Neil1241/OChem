@@ -8,7 +8,6 @@ public class OChem {
 	
 	/*
 	 * Instantiate the View, Model and show the frame
-	 * (Currently a test platform for the Interpreter)
 	 */
 	public static void main(String[] args) {
 		width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();

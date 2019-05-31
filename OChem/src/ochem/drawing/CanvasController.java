@@ -106,7 +106,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					n.getDia())) {
 				n.setTag("" + i); // set the location for that chain
 				canvas.addSideNode(n); // add that node to the side nodes list
-				canvas.addSideDirection(dir); // add a direction
+				canvas.addSideDirection(dir); // save that direction into the chain
 				canvas.setSideStep(4); // step forward
 				break; // exit loop (don't need to check other nodes)
 			} // if
@@ -167,6 +167,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 					n.getDia())) {
 				canvas.addFuncNode(n); // add that node to the bonded nodes
+				canvas.addGroupDirection(dir); //save that direction into the list
 				canvas.setFuncStep(2); // increment the bond step
 				break; // exit loop
 			} // if
