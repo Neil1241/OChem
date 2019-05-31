@@ -9,6 +9,8 @@ package ochem.drawing;
 
 import java.awt.Color;
 
+import ochem.drawing.CanvasUtil.FuncGroup;
+
 public class Node {
 	//Attributes
 	private int x; //x value of the top left point of the circle
@@ -16,6 +18,7 @@ public class Node {
 	private int rad; //radius of the node
 	private Color color; //color of the node
 	private String tag; //location of the node
+	private FuncGroup group; //group of the node
 	
 	/*
 	 * Creates a blank node at origin with a radius
@@ -159,6 +162,22 @@ public class Node {
 	public String getTag() {
 		return tag;
 	} //end getTag
+	
+	/*
+	 * Set the group of the node
+	 * FuncGroup group - group for the node
+	 */
+	public void setGroup(FuncGroup group) {
+		this.group = group;
+	} //end setGroup
+	
+	/*
+	 * Get the group of the node
+	 * return group - node group
+	 */
+	public FuncGroup getGroup() {
+		return group;
+	} //end getGroup
 	
 	/*
 	 * Coordinates of the node as a String for debugging

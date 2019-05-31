@@ -12,6 +12,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.io.File;
 
 import javax.swing.JComponent;
@@ -27,6 +29,7 @@ public class OBox extends JComponent {
 	private Font f; //Font for text
 	private float fontSize; //font size in pixels
 	private int cornerRad; //radius of the corners in pixels
+	private boolean border; //whether OBOX has border
 	
 	/*
 	 * Create an OBox with a width, height and text inside
@@ -47,7 +50,7 @@ public class OBox extends JComponent {
 		
 		//try to create and set the font if the file is present
 		try {
-			f = Font.createFont(Font.TRUETYPE_FONT, new File("src/resources/HelveticaNeue.ttf"));
+			f = Font.createFont(Font.TRUETYPE_FONT, new File("src/resources/Oxygen-Regular.ttf"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			f = new Font(Font.SANS_SERIF, Font.PLAIN, (int) fontSize);
@@ -55,8 +58,26 @@ public class OBox extends JComponent {
 		
 		//set the corner radius and colors
 		cornerRad = 60;		
-		backgroundColor = Color.BLACK;
-		textColor = Color.GREEN;
+		backgroundColor = DrawingGUI.BG_COLOR;
+		textColor = DrawingGUI.TEXT_COLOR;
+	} //end constructor
+	
+	/*
+	 * Create an OBox with a width, height and text inside
+	 * int width - width of the box
+	 * int height - height of the box
+	 * String text - text in the box
+	 * boolean straight - whether the box has straight corners or not
+	 * boolean border - whether the box has a border or not
+	 */
+	public OBox(int width, int height, String text, boolean straight, boolean border) {
+		this(width, height, text);
+		
+		if (straight) {
+			cornerRad = 0;
+		} else {
+			cornerRad = 60;
+		} //if
 	} //end constructor
 	
 	/*
@@ -65,13 +86,18 @@ public class OBox extends JComponent {
 	 */
 	public void paintComponent(Graphics g) {
 		//draw border
-		g.setColor(backgroundColor.darker());
-		g.fillRoundRect(View.PAD, 0, this.getWidth()-View.PAD*2, this.getHeight(), cornerRad, cornerRad);
+		int wall;
+		if (border) {
+			g.setColor(backgroundColor.darker());
+			g.fillRoundRect(View.PAD, 0, this.getWidth(), this.getHeight(), cornerRad, cornerRad);
+			wall = 10;
+		} else {
+			wall = 0;
+		} //if
 		
 		//draw the inside
-		int wall = 10;
 		g.setColor(backgroundColor);
-		g.fillRoundRect(View.PAD + wall, wall, this.getWidth()-View.PAD*2 - 2*wall, this.getHeight() - 2*wall, cornerRad, cornerRad);
+		g.fillRoundRect(View.PAD, wall, this.getWidth(), this.getHeight(), cornerRad, cornerRad);
 		
 		//set the text color
 		g.setColor(textColor);
@@ -80,9 +106,15 @@ public class OBox extends JComponent {
 		g.setFont(f.deriveFont(fontSize));
 		FontMetrics fm = g.getFontMetrics();
 		
+		//set the font to use antialiasing or not
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setRenderingHint(
+		        RenderingHints.KEY_TEXT_ANTIALIASING,
+		        RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+		
 		//draw the text centered on the button
 		g.drawString(text, (this.getWidth() / 2) - (fm.stringWidth(text) / 2), 
-							(this.getHeight() / 2) + (fm.getAscent() / 2) - 10);
+							(this.getHeight() / 2) + (fm.getAscent() / 2));
 	} //end paintComponent
 	
 	/*

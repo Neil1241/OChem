@@ -30,9 +30,10 @@ public class DrawingGUI extends JPanel {
 	
 	private JPanel dialogPanel; //panel for holding the bottom row of items
 	
-	private final double CANVAS_SCALE = 0.8; //how big the canvas is in terms of the whole container
+	private final double CANVAS_SCALE = 0.85; //how big the canvas is in terms of the whole container
 	private final double ERROR_SCALE = 0.1; //how big the bottom is in terms of the whole container
-	private final Color BG_COLOR = Color.WHITE; //background color for the panel
+	public static final Color BG_COLOR = new Color(86, 101, 115); //background color for the drawing GUI
+	public static final Color TEXT_COLOR = new Color(236, 240, 241); //text color for the drawing GUI
 	
 	/*
 	 * Create a new DrawingGUI with a width and height
@@ -75,7 +76,7 @@ public class DrawingGUI extends JPanel {
 		this.add(dialogPanel, BorderLayout.SOUTH);		
 		
 		//add padding to the panel and set a background color
-		this.setBorder(new EmptyBorder(View.PAD, View.PAD, View.PAD, View.PAD));
+		this.setBorder(new EmptyBorder(View.PAD, 0,0,0));
 		this.setBackground(BG_COLOR);
 	} //end layoutView
 	
@@ -89,8 +90,6 @@ public class DrawingGUI extends JPanel {
 		
 		//create and configure the dialog box
 		dialog = new OBox((int) (DIALOG_SCALE * width), (int) (height * ERROR_SCALE), "Start with a main chain");
-		dialog.setBackgroundColor(Color.BLACK);
-		dialog.setTextColor(Color.GREEN);
 		dialog.setCornerRadius(20);
 		dialog.setFontSize(80.0F);
 		dialogPanel.add(dialog);
@@ -124,7 +123,7 @@ public class DrawingGUI extends JPanel {
 	 * String message - message to show
 	 */
 	public static void showMessage(String message) {
-		dialog.setTextColor(Color.GREEN);
+		dialog.setTextColor(TEXT_COLOR);
 		dialog.setText(message);
 		dialog.update();
 	} //end showMessage
@@ -141,7 +140,6 @@ public class DrawingGUI extends JPanel {
 	 * Clear the dialog box and the text field
 	 */
 	public static void clear() {
-		dialog.setTextColor(Color.GREEN);
 		dialog.setText("");
 		dialog.update();
 		

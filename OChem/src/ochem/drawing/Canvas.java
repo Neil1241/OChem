@@ -10,15 +10,16 @@ package ochem.drawing;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
-import ochem.View;
 import ochem.drawing.CanvasUtil.ActionType;
 import ochem.drawing.CanvasUtil.DrawDirection;
+import ochem.drawing.CanvasUtil.FuncGroup;
 import ochem.organic.Chain;
 import ochem.organic.Compound;
 import ochem.organic.OrganicUtil;
@@ -43,6 +44,11 @@ public class Canvas extends JComponent {
 	// bond
 	private ArrayList<Node> bondNodes; // bonded nodes
 	private ArrayList<Integer> bondSizes; // size of bonds
+	
+	//func groups
+	private ArrayList<FuncGroup> groups; //functional groups
+	private FuncGroup ghostGroup; //current group
+	private ArrayList<Node> groupNodes; //list with all the group nodes
 
 	private boolean mainOnScreen; // whether a main chain is on the screen
 
@@ -55,6 +61,7 @@ public class Canvas extends JComponent {
 	private int mainStep; // step for the "main" button
 	private int sideStep; // step for the "side" button
 	private int bondStep; // step for the "bond" button
+	private int funcStep; //step for the "functional group" button
 
 	private int bondNum; // global bond number counter
 
@@ -92,11 +99,13 @@ public class Canvas extends JComponent {
 		mainNodes = new ArrayList<Node>();
 		sideNodes = new ArrayList<Node>();
 		bondNodes = new ArrayList<Node>();
+		groupNodes = new ArrayList<Node>();
 
 		// set the step numbers to zero when not being used, increment when needed
 		mainStep = 0;
 		sideStep = 0;
 		bondStep = 0;
+		funcStep = 0;
 
 		// default the ghost direction to up right
 		ghostDir = DrawDirection.UP_RIGHT;
@@ -104,8 +113,9 @@ public class Canvas extends JComponent {
 		// default the ghost bond index to outside of regular range
 		ghostBondIdx = -1;
 
-		// initialize the directions list
+		// initialize the directions and groups lists
 		directions = new ArrayList<DrawDirection>();
+		groups = new ArrayList<FuncGroup>();
 
 		// set the global bond counter to zero
 		bondNum = 0;
@@ -131,7 +141,7 @@ public class Canvas extends JComponent {
 
 		// background
 		g2.setBackground(CanvasUtil.BACKGROUND_COLOR);
-		g2.clearRect(View.PAD / 2, View.PAD, width - 2 * View.PAD, height - 2 * View.PAD);
+		g2.clearRect(0, 0, width, height);
 
 		// update the type to the palette's type
 		this.type = palette.getSelectedType();
@@ -141,6 +151,7 @@ public class Canvas extends JComponent {
 		mainAction(g2);
 		sideAction(g2);
 		bondAction(g2);
+		funcAction(g2);
 	} // end paintComponent
 
 	// ACTIONS//
@@ -159,6 +170,7 @@ public class Canvas extends JComponent {
 			mainStep = 0;
 			sideStep = 0;
 			bondStep = 0;
+			funcStep = 0;
 
 			// set mainOnScreen to false
 			mainOnScreen = false;
@@ -234,7 +246,7 @@ public class Canvas extends JComponent {
 			// fixed on screen step
 			case 4:
 				DrawingGUI.clear();
-				g2.setColor(Color.BLACK);
+				g2.setColor(CanvasUtil.CHAIN_COLOR);
 
 				if (!mainOnScreen) { // first time called
 					if (compound.getMainChain().isCyclo()) { // cycloidal chain
@@ -421,6 +433,44 @@ public class Canvas extends JComponent {
 				break;
 		} // switch
 	} // end bondAction
+	
+	/*
+	 * Handles the actions for the functional group flow
+	 * Graphics2D g2 - object responsible for drawing
+	 */
+	private void funcAction(Graphics2D g2) {
+		// stroke object for drawing
+		BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		g2.setStroke(bs);
+		
+		switch (funcStep) {
+			//do nothing step
+			case 0:
+				break;
+				
+			//select location step
+			case 1:
+				DrawingGUI.showMessage("Select location for " + ghostGroup.toString());
+				
+				// show nodes that can be clicked
+				for (int i = 0; i < mainNodes.size(); i++) {
+					g2.setColor(mainNodes.get(i).getColor());
+					drawNode(g2, mainNodes.get(i));
+				} // loop
+				
+				g2.setColor(CanvasUtil.TRANS_GREY);
+				drawFunc(g2, mouse, ghostGroup);
+				
+				drawGroups(g2);
+				break;
+				
+			//draw out step
+			case 2:
+				g2.setColor(CanvasUtil.CHAIN_COLOR);
+				drawGroups(g2);
+				break;
+		} //switch
+	} //end funcAction
 
 	// DRAWING//
 
@@ -715,6 +765,126 @@ public class Canvas extends JComponent {
 		return nodes;
 	} // end drawBenzene
 
+	/*
+	 * Draw all the functional groups
+	 * Graphics2D g2 - object responsible for drawing
+	 */
+	private void drawGroups(Graphics2D g2) {
+		if (!groups.isEmpty() && !groupNodes.isEmpty()) {
+			for (int i = 0; i < groupNodes.size(); i++) {
+				drawFunc(g2, groupNodes.get(i), groups.get(i));
+			} //loop
+		} //if
+	} //end drawGroups
+	
+	/*
+	 * Draw a functional group
+	 * Graphics2D g2 - object responsible for drawing
+	 */
+	private void drawFunc(Graphics2D g2, Node start, FuncGroup group) {
+		int r, x2, y2, fontR, textX, textY, flip;
+		double angle;
+		FontMetrics fm;
+		
+		switch (group) {
+			case FLUORINE:
+				r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
+				angle = Math.toRadians(CanvasUtil.angleFromDirection(ghostDir)[0]);
+				
+				x2 = start.getX() + (int) (r * Math.cos(angle));
+				y2 = start.getY() + (int) (r * Math.sin(angle));
+				
+				g2.drawLine(start.getX(), start.getY(), x2, y2);
+				
+				g2.setFont(g2.getFont().deriveFont(96.0F));
+				fm = g2.getFontMetrics();
+				fontR = 10;
+				
+				textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth("F")/4;
+				textY = y2 + (int) (fontR * Math.sin(angle)) - fm.getAscent()/6;
+
+				flip = (int) Math.signum(y2 - start.getY());
+				if (flip > 0) {
+					textY += fm.getAscent();
+				}
+				
+				g2.drawString("F", textX, textY);
+				break;
+				
+			case CHLORINE:
+				r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
+				angle = Math.toRadians(CanvasUtil.angleFromDirection(ghostDir)[0]);
+				
+				x2 = start.getX() + (int) (r * Math.cos(angle));
+				y2 = start.getY() + (int) (r * Math.sin(angle));
+				
+				g2.drawLine(start.getX(), start.getY(), x2, y2);
+				
+				g2.setFont(g2.getFont().deriveFont(96.0F));
+				fm = g2.getFontMetrics();
+				fontR = 10;
+				
+				textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth("Cl")/4;
+				textY = y2 + (int) (fontR * Math.sin(angle)) - fm.getAscent()/6;
+
+				flip = (int) Math.signum(y2 - start.getY());
+				if (flip > 0) {
+					textY += fm.getAscent();
+				}
+				
+				g2.drawString("Cl", textX, textY);
+				break;
+				
+			case BROMINE:
+				r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
+				angle = Math.toRadians(CanvasUtil.angleFromDirection(ghostDir)[0]);
+				
+				x2 = start.getX() + (int) (r * Math.cos(angle));
+				y2 = start.getY() + (int) (r * Math.sin(angle));
+				
+				g2.drawLine(start.getX(), start.getY(), x2, y2);
+				
+				g2.setFont(g2.getFont().deriveFont(96.0F));
+				fm = g2.getFontMetrics();
+				fontR = 10;
+				
+				textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth("Br")/4;
+				textY = y2 + (int) (fontR * Math.sin(angle)) - fm.getAscent()/6;
+
+				flip = (int) Math.signum(y2 - start.getY());
+				if (flip > 0) {
+					textY += fm.getAscent();
+				}
+				
+				g2.drawString("Br", textX, textY);
+				break;
+				
+			case IODINE:
+				r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
+				angle = Math.toRadians(CanvasUtil.angleFromDirection(ghostDir)[0]);
+				
+				x2 = start.getX() + (int) (r * Math.cos(angle));
+				y2 = start.getY() + (int) (r * Math.sin(angle));
+				
+				g2.drawLine(start.getX(), start.getY(), x2, y2);
+				
+				g2.setFont(g2.getFont().deriveFont(96.0F));
+				fm = g2.getFontMetrics();
+				fontR = 10;
+				
+				textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth("I")/4;
+				textY = y2 + (int) (fontR * Math.sin(angle)) - fm.getAscent()/6;
+
+				flip = (int) Math.signum(y2 - start.getY());
+				if (flip > 0) {
+					textY += fm.getAscent();
+				}
+				
+				g2.drawString("I", textX, textY);
+				break;
+		} //switch
+	} //end drawFunc
+	
 	// COMPONENT//
 
 	/*
@@ -952,8 +1122,26 @@ public class Canvas extends JComponent {
 	public void setGhostBondIndex(int idx) {
 		ghostBondIdx = idx;
 	} // end setGhostBondIndex
-
-	// STEPS//
+	
+	//FUNCTIONAL GROUPS//
+	/*
+	 * Add a group to the list
+	 * FuncGroup group - group to add to the list
+	 */
+	public void addFuncGroup(FuncGroup group) {
+		groups.add(group);
+		ghostGroup = group;
+	} //end addFuncGroup
+	
+	/*
+	 * Add a node to the functional groups list
+	 * Node n - node to add to list
+	 */
+	public void addFuncNode(Node n) {
+		groupNodes.add(n);
+	} //end addFuncNode
+	
+	//STEPS//
 
 	/*
 	 * Set the step for main drawing
@@ -1022,6 +1210,28 @@ public class Canvas extends JComponent {
 		return bondStep;
 	} // end getSideStep
 
+	/*
+	 * Set the step for functional group drawing
+	 * int step - step for group drawing
+	 */
+	public void setFuncStep(int step) {
+		if (step < 0 || step > 3) {
+			throw new IllegalArgumentException("Too much for me :(");
+		} else {
+			funcStep = step;
+		} // if
+
+		this.update();
+	} //end setFuncStep
+	
+	/*
+	 * Get the functional group step for drawing
+	 * return funcStep - step for drawing side chains
+	 */
+	public int getFuncStep() {
+		return funcStep;
+	} // end getFuncStep
+	
 	// COMPOUND//
 
 	/*

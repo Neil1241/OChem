@@ -14,7 +14,7 @@ public class OChem {
 		width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 		height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 		
-		View view = new View();
+		new View();
 	} //end main
 
 } //end OChem

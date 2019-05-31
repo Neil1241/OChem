@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import ochem.drawing.CanvasUtil.ActionType;
+import ochem.drawing.CanvasUtil.FuncGroup;
 
 public class PaletteButtonController implements MouseListener {
 	//Attributes
@@ -36,9 +37,13 @@ public class PaletteButtonController implements MouseListener {
 		this.canvas = canvas;
 		
 		//initialize the colors
-		NORMAL = new Color(140,255,0);
+		/*NORMAL = new Color(140,255,0);
 		ENTERED = new Color(124,226,0);
-		PRESSED = new Color(99,181,0);
+		PRESSED = new Color(99,181,0);*/
+		
+		NORMAL = DrawingGUI.BG_COLOR;
+		ENTERED = NORMAL.darker();
+		PRESSED = ENTERED.darker();
 		
 		//set the background color of the button
 		button.setBackgroundColor(NORMAL);
@@ -64,14 +69,25 @@ public class PaletteButtonController implements MouseListener {
 		} else if (text.equals("Bond")) { //bond button was pressed
 			bondAction();
 			
-		} else if (text.equals("Function")) { //functional group button was pressed
-			funcAction();
-			
 		} else if (text.equals("Clear")) { //clear button was pressed
 			clearAction();
 		
 		} else if (text.equals("Name")) { //name button was pressed
 			nameAction();
+			
+		//functional groups
+		} else if (text.equals("F")) { //fluorine
+			fluoroAction();
+			
+		} else if (text.equals("Cl")) { //chlorine
+			chloroAction();
+			
+		} else if (text.equals("Br")) { //bromine
+			bromoAction();
+			
+		} else if (text.equals("I")) { //iodine
+			iodoAction();
+			
 		} //big if
 		
 		//update the button and canvas
@@ -125,11 +141,68 @@ public class PaletteButtonController implements MouseListener {
 	} //end bondAction
 	
 	/*
-	 * Action for when the "functional group" button is pressed
+	 * Action for when the "fluorine" button is pressed
 	 */
-	private void funcAction() {
-		palette.setSelectedType(ActionType.FUNC_GROUP); //set type to functional group
-	} //end funcAction
+	private void fluoroAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.FLUORINE);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end fluoroAction
+	
+	/*
+	 * Action for when the "chlorine" button is pressed
+	 */
+	private void chloroAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.CHLORINE);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end chloroAction
+	
+	/*
+	 * Action for when the "bromine" button is pressed
+	 */
+	private void bromoAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.BROMINE);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end bromoAction
+	
+	/*
+	 * Action for when the "iodine" button is pressed
+	 */
+	private void iodoAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.IODINE);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end iodoAction
 	
 	/*
 	 * Action for when the "clear" button is pressed

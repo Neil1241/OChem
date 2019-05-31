@@ -28,10 +28,10 @@ public class CanvasUtil {
 	public static final Color LIGHT_RED = new Color(255, 45, 45);
 	
 	//chain colors
-	public static final Color CHAIN_COLOR = Color.BLACK;
+	public static final Color CHAIN_COLOR = new Color(44, 62, 80);
 	
-	//background color
-	public static final Color BACKGROUND_COLOR = new Color(224, 255, 253); // background color
+	//drawing colors
+	public static final Color BACKGROUND_COLOR = new Color(253, 254, 254); //canvas 224, 255, 253 old
 	
 	//angles for bond drawing
 	public static final double DOWN_BOND_ODD = Math.toRadians(45);
@@ -64,6 +64,16 @@ public class CanvasUtil {
 		DOWN_LEFT,
 		LEFT,
 		UP_LEFT
+	} //end enum
+	
+	/*
+	 * Different functional groups
+	 */
+	public static enum FuncGroup {
+		FLUORINE,
+		CHLORINE,
+		BROMINE,
+		IODINE
 	} //end enum
 	
 	/*
