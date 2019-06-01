@@ -137,11 +137,12 @@ public class Chain {
 		return this.location;
 	} // end getLocation
 
-	//returns if the chain is a cyclo
+	//sets the chain to be cyclo
 	public void setCyclo(boolean b) {
 		this.cyclo = b;
 	}
 
+	//returns if the chain is cyclo
 	public boolean isCyclo() {
 		return this.cyclo;
 	}
