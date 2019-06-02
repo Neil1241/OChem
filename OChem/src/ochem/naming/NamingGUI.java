@@ -7,6 +7,7 @@ package ochem.naming;
 //import packages
 import javax.swing.*;
 import ochem.drawing.*;
+import ochem.organic.OrganicUtil;
 
 public class NamingGUI extends JPanel {
 	//declare instance variables
@@ -41,7 +42,7 @@ public class NamingGUI extends JPanel {
 	
 	public void update() {
 		this.test.setText("IT WORKED");
-		this.a.setText(this.model.getCompound().toString());
+		this.a.setText(OrganicUtil.nameFromCompound(this.model.getCompound()));
 	}
 	
 	//main for testing purposes

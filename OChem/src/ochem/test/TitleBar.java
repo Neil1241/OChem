@@ -5,49 +5,73 @@ package ochem.test;
  */
 
 import javax.swing.*;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import javax.swing.plaf.synth.SynthLookAndFeel;
 
 import java.awt.*;
 
 import ochem.OChem;
-//import ochem.drawing.*;
+import ochem.drawing.*;
 
-public class TitleBar extends JComponent {
+public class TitleBar extends JPanel {
 	private String title;
 	public TitleBar (String title) {
 		super();
 		this.title =title;
-		this.setPreferredSize(new Dimension(OChem.height/10,OChem.width/10));
+		this.layoutView();
+		//this.setPreferredSize(new Dimension(OChem.height/10,OChem.width/10));
 	}
 	
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		Graphics2D g2= (Graphics2D)(g);
-		g2.scale(this.getWidth()/10, this.getHeight()/10);
-		g2.setStroke(new BasicStroke(1.0F/this.getWidth()));
+	private void layoutView() {
+		OBox exit = new OBox(100,100,"X",true,false);
+		OBox min = new OBox(100,100,"-",true,false);
+		OBox full = new OBox(100,100,"min",true,false);
 		
-		//g2.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, (int) 50));
-		g2.drawString(this.title, 1, 1);
-		g2.drawRect(2, 0, 2, 2);
+		this.add(min);
+		this.add(full);
+		this.add(exit);
 	}
 	
 	public static void main (String[] args) {
 		
-		SynthLookAndFeel s = new SynthLookAndFeel();
-		 try { 
-		        UIManager.setLookAndFeel(s); 
-		    } catch(Exception ignored){}
+		//JFrame.setDefaultLookAndFeelDecorated(true);
 		JFrame f = new JFrame();
-		JPanel p = new JPanel();
 		TitleBar t = new TitleBar("Hello");
-		JFrame.setDefaultLookAndFeelDecorated(true);
-		p.add(t);
-		f.setContentPane(p);
+		JDesktopPane d = new JDesktopPane();
+		JInternalFrame ff = new JInternalFrame("test",true,true,true,true);
+		/*SynthLookAndFeel s = new SynthLookAndFeel();
+		NimbusLookAndFeel n = new NimbusLookAndFeel();
+		 try { 
+		       // UIManager.setLookAndFeel(s); 
+			 n.installColors(t, "Black", "green");
+		        UIManager.setLookAndFeel(n);
+		    } catch(Exception ignored){}*/
+		
+		//JPanel p = new JPanel();
+		
+		try {
+	        // String name = UIManager.getSystemLookAndFeelClassName();
+	         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	         UIManager.put("InternalFrame.activeTitleBackground", Color.red);
+	         UIManager.put("InternalFrame.activeTitleForeground", Color.blue);
+	         UIManager.put("InternalFrame.inactiveTitleBackground", Color.black);
+	         UIManager.put("InternalFrame.inactiveTitleForeground", Color.yellow);
+	      }
+	      catch(Exception e) {
+	         e.printStackTrace();
+	      }
+		
+		ff.setContentPane(t);
+		ff.getContentPane().setBackground(Color.white);
 		//f.setUndecorated(true);
-		f.setVisible(true);
+		ff.setVisible(true);
 	    //f.getRootPane().setWindowDecorationStyle( JRootPane. COLOR_CHOOSER_DIALOG );
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.pack();
+		ff.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		ff.pack();
+		d.add(ff);
+		f.add(d);
+		f.setSize(500,500);
+		f.setVisible(true);
 	}
 
 }
