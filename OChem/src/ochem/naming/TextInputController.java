@@ -23,7 +23,7 @@ public class TextInputController implements ActionListener {
 		try {
 			this.c=Interpreter.compoundFromName(in);
 			this.model.giveCompound(c);
-		}catch(ArrayIndexOutOfBoundsException error) {
+		}catch(Exception error) {
 			this.model.giveInvalid();
 		}
 		

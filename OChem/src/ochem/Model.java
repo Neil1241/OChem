@@ -1,5 +1,7 @@
 package ochem;
 
+import java.awt.*;
+
 import javax.swing.*;
 /*import ochem.drawing.*;
 import ochem.naming.*;

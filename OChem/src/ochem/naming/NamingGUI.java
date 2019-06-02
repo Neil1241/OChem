@@ -6,6 +6,8 @@ package ochem.naming;
 
 //import packages
 import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Font;
 
 import ochem.OChem;
 import ochem.View;
@@ -17,7 +19,6 @@ public class NamingGUI extends JPanel {
 	private JTextField input;
 	private NamingModel model = new NamingModel();
 	private JLabel test= new JLabel("");
-	private JTextArea a= new JTextArea();
 	private Canvas c;
 	private int width = (int) (0.5 * OChem.width + 2 * View.PAD);
 	private int height = (int) (0.5 * OChem.height + 2 * View.PAD);
@@ -31,12 +32,21 @@ public class NamingGUI extends JPanel {
 	
 	private void layoutView()
 	{
+		//create and set layout
+		BoxLayout shell = new BoxLayout(this,BoxLayout.Y_AXIS);
+		this.setLayout(shell);
+	
+		//configure the heights and widths
 		input= new JTextField(20);
+		input.setPreferredSize(new Dimension(OChem.width/10,OChem.height/20));
+		input.setFont(new Font("Arial", Font.PLAIN, 30));
+		test.setFont(new Font("Arial", Font.PLAIN, 30));
 		c = new Canvas(this.width,this.height);
+		
+		//add components to panel
 		this.add(c);
-		this.add(input);
 		this.add(test);
-		this.add(a);
+		this.add(input);
 		
 	}
 	
@@ -46,7 +56,14 @@ public class NamingGUI extends JPanel {
 	}
 	
 	public void update() {
-		this.test.setText("IT WORKED");
+		if (!this.model.isValid()) {
+			this.test.setText("Not A Valid Compound");
+			this.model.setValid(true);
+		}
+		else {
+			this.test.setText(OrganicUtil.nameFromCompound(this.model.getCompound()));
+			this.input.setText(null);
+		}
 	}
 	
 	//main for testing purposes
@@ -59,7 +76,7 @@ public class NamingGUI extends JPanel {
 		f.setContentPane(g);
 		f.setVisible(true);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setSize(g.width,g.height);		
+		f.pack();		
 	}
 	
 }//end class

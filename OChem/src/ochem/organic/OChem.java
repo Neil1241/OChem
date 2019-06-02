@@ -21,6 +21,7 @@ public class OChem {
 		Scanner in = new Scanner(System.in);
 		PrintStream out = System.out;
 
+		for (int i=0;i<3;i++) {
 		out.println("Enter name of compound: ");
 		String cmpnd = in.nextLine();
 
@@ -34,7 +35,7 @@ public class OChem {
 		out.println(compound.getMainChain().getBond());
 		
 		out.println(OrganicUtil.nameFromCompound(compound));
-		
+		}
 
 		in.close();
 	} // end main

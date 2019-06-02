@@ -12,6 +12,7 @@ public class NamingModel extends Object {
 	private Compound c;
 	private Chain mainChain;
 	private Chain[] sideChains;
+	private boolean valid = true;
 	
 	public NamingModel() {
 		super();
@@ -33,7 +34,16 @@ public class NamingModel extends Object {
 	}
 	
 	public void giveInvalid() {
+		this.valid = false;
 		this.g.update();
+	}
+	
+	public boolean isValid() {
+		return this.valid;
+	}
+	
+	public void setValid(boolean b) {
+		this.valid=b;
 	}
 	
 }//end class
