@@ -49,18 +49,6 @@ public class TitleBar extends JPanel {
 		
 		//JPanel p = new JPanel();
 		
-		try {
-	        // String name = UIManager.getSystemLookAndFeelClassName();
-	         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	         UIManager.put("InternalFrame.activeTitleBackground", Color.red);
-	         UIManager.put("InternalFrame.activeTitleForeground", Color.blue);
-	         UIManager.put("InternalFrame.inactiveTitleBackground", Color.black);
-	         UIManager.put("InternalFrame.inactiveTitleForeground", Color.yellow);
-	      }
-	      catch(Exception e) {
-	         e.printStackTrace();
-	      }
-		
 		ff.setContentPane(t);
 		ff.getContentPane().setBackground(Color.white);
 		//f.setUndecorated(true);

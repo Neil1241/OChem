@@ -6,6 +6,9 @@ package ochem.naming;
 
 //import packages
 import javax.swing.*;
+
+import ochem.OChem;
+import ochem.View;
 import ochem.drawing.*;
 import ochem.organic.OrganicUtil;
 
@@ -16,6 +19,8 @@ public class NamingGUI extends JPanel {
 	private JLabel test= new JLabel("");
 	private JTextArea a= new JTextArea();
 	private Canvas c;
+	private int width = (int) (0.5 * OChem.width + 2 * View.PAD);
+	private int height = (int) (0.5 * OChem.height + 2 * View.PAD);
 
 	public NamingGUI() {
 		super();
@@ -27,8 +32,8 @@ public class NamingGUI extends JPanel {
 	private void layoutView()
 	{
 		input= new JTextField(20);
-		//c = new Canvas(200,200,null);
-		//this.add(c);
+		c = new Canvas(this.width,this.height);
+		this.add(c);
 		this.add(input);
 		this.add(test);
 		this.add(a);
@@ -42,7 +47,6 @@ public class NamingGUI extends JPanel {
 	
 	public void update() {
 		this.test.setText("IT WORKED");
-		this.a.setText(OrganicUtil.nameFromCompound(this.model.getCompound()));
 	}
 	
 	//main for testing purposes
@@ -50,10 +54,12 @@ public class NamingGUI extends JPanel {
 		JFrame f= new JFrame();
 		NamingGUI g= new NamingGUI();
 		
+		
+		f.setLocation(OChem.width/2 - g.width/2, OChem.height/2 - 3*g.height/4);
 		f.setContentPane(g);
 		f.setVisible(true);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setSize(500,500);		
+		f.setSize(g.width,g.height);		
 	}
 	
 }//end class

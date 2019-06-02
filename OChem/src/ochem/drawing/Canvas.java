@@ -65,6 +65,7 @@ public class Canvas extends JComponent {
 	private int funcStep; //step for the "functional group" button
 
 	private int bondNum; // global bond number counter
+	private boolean draw;
 
 	/*
 	 * Create a canvas with its parent's width and height
@@ -79,6 +80,7 @@ public class Canvas extends JComponent {
 		this.width = width;
 		this.height = height;
 		this.palette = palette;
+		this.draw = true;
 
 		// set the size of the component
 		this.setPreferredSize(new Dimension(this.width, this.height));
@@ -128,6 +130,14 @@ public class Canvas extends JComponent {
 		// add the controllers to the canvas
 		registerControllers();
 	} // end constructor
+	
+	public Canvas(int width, int height) {
+		super();
+		this.width = width;
+		this.height = height;
+		this.setPreferredSize(new Dimension(this.width, this.height));
+		this.draw = false;
+	}
 
 	/*
 	 * Draw all nodes, bonds and functional groups to the screen
@@ -145,6 +155,7 @@ public class Canvas extends JComponent {
 		g2.setBackground(CanvasUtil.BACKGROUND_COLOR);
 		g2.clearRect(0, 0, width, height);
 
+		if (draw) {
 		// update the type to the palette's type
 		this.type = palette.getSelectedType();
 
@@ -154,6 +165,7 @@ public class Canvas extends JComponent {
 		sideAction(g2);
 		bondAction(g2);
 		funcAction(g2);
+		}
 		
 		//test
 		g2.setColor(Color.BLACK);

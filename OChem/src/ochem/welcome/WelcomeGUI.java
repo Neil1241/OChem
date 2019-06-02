@@ -6,36 +6,39 @@ package ochem.welcome;
  * 
  */
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
 
 //import packages
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import ochem.*;
+import java.awt.*;
+import javax.swing.*;
 
 public class WelcomeGUI extends JPanel
 {
 	//declare instance variables
-	private WelcomeButton quiz= new WelcomeButton("Quiz");
+	private WelcomeButton quizing= new WelcomeButton("Quiz");
 	private WelcomeButton naming= new WelcomeButton("Naming");
 	private WelcomeButton drawing = new WelcomeButton("Drawing");
 	private JLabel quote= new JLabel("Best Period of The Day!");
 	private JLabel title= new JLabel("OCHEM");
+	private Model model = new Model();
 	
 	//constructor
 	public WelcomeGUI()
 	{
 		super();
 		this.layoutView();
+		this.model.setGUI(this);
 		this.registerControllers();
 	}
 	
 	private void registerControllers()
 	{
-		
+		WelcomeController name = new WelcomeController(this.model);
+		WelcomeController draw = new WelcomeController(this.model);
+		WelcomeController quiz = new WelcomeController (this.model);
+		this.naming.addActionListener(name);
+		this.drawing.addActionListener(draw);
+		this.quizing.addActionListener(quiz);
 	}
 	private void layoutView()
 	{
@@ -54,8 +57,8 @@ public class WelcomeGUI extends JPanel
 		
 		
 		//set the colors of buttons
-		quiz.setHoverBackgroundColor(hover);
-		quiz.setPressedBackgroundColor(press);
+		quizing.setHoverBackgroundColor(hover);
+		quizing.setPressedBackgroundColor(press);
 		naming.setHoverBackgroundColor(hover);
 		naming.setPressedBackgroundColor(press);
 		drawing.setHoverBackgroundColor(hover);
@@ -68,7 +71,7 @@ public class WelcomeGUI extends JPanel
 		//add buttons to button panel
 		buttons.add(naming);
 		buttons.add(drawing);
-		buttons.add(quiz);
+		buttons.add(quizing);
 
 		//add components to this panel
 		this.add(buttons,BorderLayout.CENTER);
@@ -81,12 +84,6 @@ public class WelcomeGUI extends JPanel
 	//main for testing purposes
 	public static void main(String args[])
 	{
-		JFrame frame= new JFrame();
 		WelcomeGUI view= new WelcomeGUI();
-		
-		frame.setContentPane(view);
-		frame.pack();
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
