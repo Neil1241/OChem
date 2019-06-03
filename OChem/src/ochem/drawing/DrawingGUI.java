@@ -32,9 +32,9 @@ public class DrawingGUI extends JPanel {
 	
 	private final double CANVAS_SCALE = 0.85; //how big the canvas is in terms of the whole container
 	private final double ERROR_SCALE = 0.1; //how big the bottom is in terms of the whole container
-	public static final Color BG_COLOR = new Color(86, 101, 115); //background color for the drawing GUI
+	public static final Color BG_COLOR = new Color(128,0,0); //background color for the drawing GUI
 	//86 101 115
-	public static final Color TEXT_COLOR = new Color(236, 240, 241); //text color for the drawing GUI
+	public static final Color TEXT_COLOR = new Color(255,215,0); //text color for the drawing GUI
 	
 	/*
 	 * Create a new DrawingGUI with a width and height

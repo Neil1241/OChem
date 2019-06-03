@@ -45,7 +45,7 @@ public class View extends JFrame {
 		this.setLocation(OChem.width/2 - width/2, OChem.height/2 - 3*height/4);
 		this.setResizable(false);
 		this.dispose();
-		this.setUndecorated(true);
+		this.setUndecorated(false);
 		this.setVisible(true);
 	} //end constructor
 	

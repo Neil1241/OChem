@@ -103,7 +103,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			// if click was on a main node
 			if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 					n.getDia())) {
-				n.setTag("" + i); // set the location for that chain
+				n.setTag("" + (i+1)); // set the location for that chain
 				canvas.addSideNode(n); // add that node to the side nodes list
 				canvas.addSideDirection(dir); // save that direction into the chain
 				canvas.setSideStep(4); // step forward
@@ -165,6 +165,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			case IODINE:
 			case BROMINE:
 			case ALCOHOL:
+			case AMINE:
 				//show all nodes
 				for (int i = 0; i < mainNodes.size(); i++) {
 					Node n = mainNodes.get(i);
@@ -372,6 +373,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			case IODINE:
 			case BROMINE:
 			case ALCOHOL:
+			case AMINE:
+				
 				//show all nodes
 				for (int i = 0; i < nodes.size(); i++) {
 					// if mouse is over the node

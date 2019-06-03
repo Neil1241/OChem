@@ -99,6 +99,9 @@ public class PaletteButtonController implements MouseListener {
 			
 		} else if (text.equals("CA")) { //carboxylic acid
 			acidAction();
+			
+		} else if (text.equals("N")) { //amine
+			amineAction();
 		}
 		
 		//update the button and canvas
@@ -278,6 +281,22 @@ public class PaletteButtonController implements MouseListener {
 			} //loop
 		} //if 
 	} //end ketoneAction
+	
+	/*
+	 * Action for when the "amine" button is pressed
+	 */
+	private void amineAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.AMINE);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end amineAction
 	
 	/*
 	 * Action for when the "clear" button is pressed

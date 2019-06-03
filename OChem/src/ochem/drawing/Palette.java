@@ -37,11 +37,15 @@ public class Palette extends JPanel {
 	private OBox ketone;
 	private OBox alcohol;
 	private OBox carbox;
+	private OBox amine;
+	private OBox amide;
+	private OBox ether;
+	private OBox ester;
 	
 	//list of buttons so adding controllers is easier
 	private ArrayList<OBox> buttons;
 	
-	private final int NUM_ROWS = 9; //number of buttons on the screen
+	private final int NUM_ROWS = 11; //number of buttons on the screen
 	
 	private Canvas canvas; //instance of the Canvas
 	
@@ -152,6 +156,21 @@ public class Palette extends JPanel {
 		this.add(row4);
 		row4.setBackground(DrawingGUI.BG_COLOR);
 	
+		JPanel row5 = new JPanel(); //row 5
+		
+		//amine
+		amine = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "N", true, false);
+		buttons.add(amine);
+		row5.add(amine);
+		
+		//amide
+		amide = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "ON", true, false);
+		buttons.add(amide);
+		row5.add(amide);
+		
+		this.add(row5);
+		row5.setBackground(DrawingGUI.BG_COLOR);
+		
 		//clear button
 		clear = new OBox(width, height/NUM_ROWS - 2*View.PAD, "Clear", true, false);
 		buttons.add(clear);
@@ -176,6 +195,7 @@ public class Palette extends JPanel {
 	 */
 	private void registerControllers() {
 		for (int i = 0; i < buttons.size(); i++) {
+			buttons.get(i).setFontSize(80.0F);
 			buttons.get(i).addMouseListener(new PaletteButtonController(this, buttons.get(i), canvas));
 		} //loop
 	} //end registerControllers

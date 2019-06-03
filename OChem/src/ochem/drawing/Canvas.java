@@ -485,6 +485,7 @@ public class Canvas extends JComponent {
 					case IODINE:
 					case BROMINE:
 					case ALCOHOL:
+					case AMINE:
 						//show all nodes
 						for (int i = 0; i < mainNodes.size(); i++) {
 							g2.setColor(mainNodes.get(i).getColor());
@@ -702,14 +703,12 @@ public class Canvas extends JComponent {
 		} // if
 
 		// draw the #s for debugging
-		/*
-		 * g2.setFont(g2.getFont().deriveFont(50.0F));
-		 * g2.setColor(Color.RED);
-		 * for (Node n : mainNodes) {
-		 * g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
-		 * }
-		 * g2.setColor(Color.BLACK);
-		 */
+		 g2.setFont(g2.getFont().deriveFont(50.0F));
+		 g2.setColor(Color.RED);
+		 for (Node n : nodes) {
+			 g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
+		 }
+		 g2.setColor(CanvasUtil.CHAIN_COLOR);
 
 		return nodes;
 	} // end drawCyclo
@@ -773,6 +772,14 @@ public class Canvas extends JComponent {
 			nodes.add(new Node(x1, y1, 20, "" + (chainSize), CanvasUtil.LIGHT_YELLOW));
 		} // if
 
+		// draw the #s for debugging
+		 g2.setFont(g2.getFont().deriveFont(50.0F));
+		 g2.setColor(Color.RED);
+		 for (Node n : nodes) {
+			 g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
+		 }
+		 g2.setColor(CanvasUtil.CHAIN_COLOR);
+		
 		return nodes;
 	} // end drawChain
 
@@ -865,6 +872,18 @@ public class Canvas extends JComponent {
 				drawDoubleOxygen(g2, start, dir);
 				drawLetterFunc(g2, "OH", start, CanvasUtil.incDirection(dir, 2));
 				break;
+				
+			case AMINE: //save location to node
+				try {
+					mainNodes.set(compound.getMainSize(), drawLetterFunc(g2, "N", start, dir));
+				} catch (IndexOutOfBoundsException i) {
+					mainNodes.add(drawLetterFunc(g2, "N", start, dir));
+				}
+				break;
+				
+			case ETHER: //save location to node
+				drawLetterFunc(g2, "O", start, dir);
+				break;
 		} //switch
 	} //end drawFunc
 	
@@ -875,7 +894,7 @@ public class Canvas extends JComponent {
 	 * Node start - start position of the haloalkane
 	 * DrawDirection dir - direction to draw in
 	 */
-	private void drawLetterFunc(Graphics2D g2, String symbol, Node start, DrawDirection dir) {
+	private Node drawLetterFunc(Graphics2D g2, String symbol, Node start, DrawDirection dir) {
 		int r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
 		double angle = 2 * Math.toRadians(CanvasUtil.cycloAngle(dir));
 		
@@ -892,6 +911,11 @@ public class Canvas extends JComponent {
 		int textY = y2 + (int) (fontR * Math.sin(angle)) + (int) (fm.getAscent() * 0.375);
 		
 		g2.drawString(symbol, textX, textY);
+		
+		Node text = new Node(textX + fm.stringWidth(symbol)/2, textY - (int) (fm.getAscent() * 0.375), 20);
+		text.setTag(symbol);
+		
+		return text;
 	} //end drawHaloAlkane
 	
 	/*

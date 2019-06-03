@@ -83,7 +83,11 @@ public class CanvasUtil {
 		ALDEHYDE,
 		KETONE,
 		ALCOHOL,
-		CARBOXYLIC_ACID
+		CARBOXYLIC_ACID,
+		ETHER,
+		ESTER,
+		AMIDE,
+		AMINE
 	} //end enum
 	
 	/*
