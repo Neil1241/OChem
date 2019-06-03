@@ -169,7 +169,7 @@ public class Canvas extends JComponent {
 			sideAction(g2);
 			bondAction(g2);
 			funcAction(g2);
-		}
+		} // for drawing GUI
 	} // end paintComponent
 
 	// ACTIONS//
@@ -355,14 +355,23 @@ public class Canvas extends JComponent {
 					end = mainNodes.size();
 				} else {
 					start = 1;
-					end = mainNodes.size() - 1;
+					end = compound.getMainSize();
 				} //if
-
-				// show nodes that can be clicked
-				for (int i = start; i < end; i++) {
-					g2.setColor(mainNodes.get(i).getColor());
-					drawNode(g2, mainNodes.get(i));
-				} // loop
+				
+				//show all nodes
+				for (int i = 0; i < mainNodes.size(); i++) {
+					Node n = mainNodes.get(i);
+					if (!n.getTag().equals(Integer.toString(start)) && !n.getTag().equals(Integer.toString(end))) {
+						g2.setColor(mainNodes.get(i).getColor()); //set the color
+						
+						if (!n.getTag().equals("N") && !n.getTag().equals("O")) { //draw regular number
+							drawNode(g2, n);
+							
+						} else { //draw letter
+							drawSymbol(g2, n.getTag(), n);
+						} //if
+					}
+				} //loop
 				break;
 
 			// fixed on screen step
@@ -487,12 +496,27 @@ public class Canvas extends JComponent {
 					case IODINE:
 					case BROMINE:
 					case ALCOHOL:
-					case AMINE:
 						//show all nodes
 						for (int i = 0; i < mainNodes.size(); i++) {
 							g2.setColor(mainNodes.get(i).getColor());
-							drawNode(g2, mainNodes.get(i));
-						} // loop
+							
+							if (!mainNodes.get(i).getTag().equals("N") && !mainNodes.get(i).getTag().equals("O")) { //draw regular number
+								drawNode(g2, mainNodes.get(i));
+								
+							} else { //draw letter
+								drawSymbol(g2, mainNodes.get(i).getTag(), mainNodes.get(i));
+							} //if
+						} //loop
+						break;
+						
+					case AMINE:
+						//show all non-lettered nodes
+						for (int i = 0; i < mainNodes.size(); i++) {
+							if (!mainNodes.get(i).getTag().equals("N") && !mainNodes.get(i).getTag().equals("O")) {
+								g2.setColor(mainNodes.get(i).getColor());
+								drawNode(g2, mainNodes.get(i));
+							} //if
+						} //loop
 						break;
 						
 					case ALDEHYDE:
@@ -561,10 +585,7 @@ public class Canvas extends JComponent {
 			for (int i = 0; i < bondNodes.size(); i += 2) {
 				int bondSize = bondSizes.get(i / 2); // size of bond being drawn
 
-				Node n1 = bondNodes.get(i); // first node
-				Node n2 = bondNodes.get(i + 1); // second node
-
-				drawBond(g2, n1, n2, bondSize);
+				drawBond(g2, bondNodes.get(i), bondNodes.get(i+1), bondSize);
 			} // loop
 		} // big iff
 	} // end drawBonds
@@ -580,8 +601,10 @@ public class Canvas extends JComponent {
 		// thinner lines
 		BasicStroke bs = new BasicStroke(8.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
-
+		
 		int flip = Integer.parseInt(n1.getTag()); // integer flip based on position on main chain
+
+		System.out.println(flip); //dbg
 
 		double ang1 = CanvasUtil.angleBetweenNodes(n1, n2); // angle from first node to second
 		double ang2 = CanvasUtil.angleBetweenNodes(n2, n1); // angle from second node to first
@@ -634,6 +657,22 @@ public class Canvas extends JComponent {
 		g2.fillOval(n.getCenterX(), n.getCenterY(), n.getDia(), n.getDia());
 	} // end drawNode
 
+	/*
+	 * Draw a symbol to the screen centered around a node
+	 * Graphics2D g2 - object responsible for drawing
+	 * String symbol - symbol to draw
+	 * Node n - node to draw at
+	 */
+	private void drawSymbol(Graphics2D g2, String symbol, Node n) {
+		g2.setFont(g2.getFont().deriveFont(96.0F));
+		FontMetrics fm = g2.getFontMetrics();
+		
+		int textX = n.getX() - fm.stringWidth(symbol)/2;
+		int textY = n.getY() + (int) (fm.getAscent() * 0.375);
+		
+		g2.drawString(symbol, textX, textY);
+	} //end drawSymbol
+	
 	/*
 	 * Draw a cycloidal chain
 	 * Graphics2D g2 - object responsible for drawing
@@ -706,11 +745,12 @@ public class Canvas extends JComponent {
 
 		// draw the #s for debugging
 		 g2.setFont(g2.getFont().deriveFont(50.0F));
+		 Color oldClr = g2.getColor();
 		 g2.setColor(Color.RED);
 		 for (Node n : nodes) {
 			 g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
 		 }
-		 g2.setColor(CanvasUtil.CHAIN_COLOR);
+		 g2.setColor(oldClr);
 
 		return nodes;
 	} // end drawCyclo
