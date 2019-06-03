@@ -189,6 +189,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					canvas.addFuncNode(mainNodes.get(0)); //add the first node
 					canvas.addGroupDirection(dir); //save that direction into the list
 					canvas.setFuncStep(2); // increment the bond step
+					
 				} else if (isWithinBounds(current.getCenterX(), current.getCenterY(), 
 						mainNodes.get(mainNodes.size()-1).getCenterX(), mainNodes.get(mainNodes.size()-1).getCenterY(), 
 						mainNodes.get(mainNodes.size()-1).getDia())) {
@@ -285,8 +286,10 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			// else, regular chain
 		} else {
 			start = 1;
-			end = mainNodes.size() - 1;
+			end = canvas.getCompound().getMainSize()-1;
 		} // if
+		
+		System.out.println(start +" "+ end);
 
 		// loop through all main nodes
 		for (int i = start; i < end; i++) {
