@@ -6,87 +6,102 @@ package ochem.welcome;
  * 
  */
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-
 //import packages
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import ochem.*;
+import java.awt.*;
+import java.net.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
-public class WelcomeGUI extends JPanel
-{
-	//declare instance variables
-	private WelcomeButton quiz= new WelcomeButton("Quiz");
-	private WelcomeButton naming= new WelcomeButton("Naming");
+public class WelcomeGUI extends JPanel {
+	// declare instance variables
+	private WelcomeButton quizing = new WelcomeButton("Quiz");
+	private WelcomeButton naming = new WelcomeButton("Naming");
 	private WelcomeButton drawing = new WelcomeButton("Drawing");
-	private JLabel quote= new JLabel("Best Period of The Day!");
-	private JLabel title= new JLabel("OCHEM");
-	
-	//constructor
-	public WelcomeGUI()
-	{
+	private JLabel quote = new JLabel("Best Period of The Day!");
+	private JLabel title = new JLabel("OChem");
+	private Model model = new Model();
+
+	// constructor
+	public WelcomeGUI() {
 		super();
 		this.layoutView();
+		this.model.setGUI(this);
 		this.registerControllers();
 	}
-	
-	private void registerControllers()
-	{
-		
+
+	private void registerControllers() {
+		WelcomeController name = new WelcomeController(this.model);
+		WelcomeController draw = new WelcomeController(this.model);
+		WelcomeController quiz = new WelcomeController(this.model);
+		this.naming.addActionListener(name);
+		this.drawing.addActionListener(draw);
+		this.quizing.addActionListener(quiz);
 	}
-	private void layoutView()
-	{
-		Color hover=Color.CYAN;
-		Color press=Color.BLUE;
+
+	private void layoutView() {
+		Color hover = Color.CYAN;
+		Color press = Color.BLUE;
+		JLabel gif = new JLabel("");
+
+		try {
+			URL url = new URL("https://mir-s3-cdn-cf.behance.net/project_modules/disp/d2edcf29458309.55f3e6e7cc760.gif");
+			ImageIcon icon = new ImageIcon(url);
+			gif = new JLabel(icon);
+		} catch (MalformedURLException e) {
+			System.out.println("HAHAHAHAHA");
+		}
 		
-		//create layout managers and JPanels
-		JPanel buttons= new JPanel();
-		BorderLayout layout= new BorderLayout();
-		GridLayout buttonAligment= new GridLayout(3,1);
+		Border emptyBorder = BorderFactory.createEmptyBorder();
+		naming.setBorder(emptyBorder);
+		drawing.setBorder(emptyBorder);
+		quizing.setBorder(emptyBorder);
 		
-		//change JLabel justification
-		title.setFont(new Font("Arial",Font.PLAIN,25));
+		naming.setFont(new Font("Arial", Font.PLAIN, 25));
+		drawing.setFont(new Font("Arial", Font.PLAIN, 25));
+		quizing.setFont(new Font("Arial", Font.PLAIN, 25));
+		
+		
+
+		// create layout managers and JPanels
+		JPanel buttons = new JPanel();
+		BorderLayout layout = new BorderLayout();
+		GridLayout buttonAligment = new GridLayout(3, 1);
+
+		// change JLabel justification
+		title.setFont(new Font("Arial", Font.PLAIN, 45));
 		title.setHorizontalAlignment(JLabel.CENTER);
 		quote.setHorizontalAlignment(JLabel.CENTER);
-		
-		
-		//set the colors of buttons
-		quiz.setHoverBackgroundColor(hover);
-		quiz.setPressedBackgroundColor(press);
+		quote.setFont(new Font("Arial", Font.PLAIN, 25));
+
+		// set the colors of buttons
+		quizing.setHoverBackgroundColor(hover);
+		quizing.setPressedBackgroundColor(press);
 		naming.setHoverBackgroundColor(hover);
 		naming.setPressedBackgroundColor(press);
 		drawing.setHoverBackgroundColor(hover);
 		drawing.setPressedBackgroundColor(press);
-		
-		//set layouts
+
+		// set layouts
 		this.setLayout(layout);
 		buttons.setLayout(buttonAligment);
-		
-		//add buttons to button panel
+
+		// add buttons to button panel
 		buttons.add(naming);
 		buttons.add(drawing);
-		buttons.add(quiz);
+		buttons.add(quizing);
 
-		//add components to this panel
-		this.add(buttons,BorderLayout.CENTER);
-		this.add(quote,BorderLayout.SOUTH);
-		this.add(title,BorderLayout.NORTH);
-		
-		
+		// add components to this panel
+		this.add(buttons, BorderLayout.CENTER);
+		this.add(gif, BorderLayout.EAST);
+		this.add(quote, BorderLayout.SOUTH);
+		this.add(title, BorderLayout.NORTH);
+		this.setPreferredSize(new Dimension (OChem.width/3,OChem.height/3));
+		this.setBackground(Color.white);
 	}
-	
-	//main for testing purposes
-	public static void main(String args[])
-	{
-		JFrame frame= new JFrame();
-		WelcomeGUI view= new WelcomeGUI();
-		
-		frame.setContentPane(view);
-		frame.pack();
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+	// main for testing purposes
+	public static void main(String args[]) {
+		WelcomeGUI view = new WelcomeGUI();
 	}
 }

@@ -3,7 +3,7 @@ package ochem.welcome;
  * WelcomeButton
  * Jordan Lin
  * May 6 2019
- * Extend the JButton object ot be able to change the background
+ * Extend the JButton object to be able to change the background
  */
 
 import java.awt.Color;

@@ -20,7 +20,8 @@ public class OrganicUtil {
 	public static final String[] SIDE_CHAIN_SUFFIX = { "phenyl", "yl", "bromo", "iodo", "fluro", "chloro", "oxo",
 			"hydroxy", "oxy", "amino" };
 
-	// public static final String [] HALOALKYLS = {};
+	public static final String[] SIDE_CHAIN_PRIORITY = { "bromo", "iodo", "fluro", "chloro", "phenyl", "yl", "oxy",
+			"hydroxy", "oxo", "amino" };
 
 	// name of functional groups
 	public static final String[] FUNCTIONAL_NAMES = { "Alkane", "Alkene", "Alkyne", "Alcohol", "Aldehyde", "Ketone",
@@ -32,10 +33,6 @@ public class OrganicUtil {
 
 	// numbers 1 thru 9 for side chain location identification
 	public static final String[] LOCATIONS = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "N" };
-	// private static final String [] LOCATIONO = { "1", "2", "3", "4", "5", "6",
-	// "7", "8", "9", "O"};
-	// private static final String [] LOCATIONSNO = {"1", "2", "3", "4", "5", "6",
-	// "7", "8", "9", "N","O"};
 
 	// method used to generate a random compound
 	public static Compound generateRandomCompound() {
@@ -52,6 +49,7 @@ public class OrganicUtil {
 		String[] sideLocation = null;
 		int[] groupLocation = null;
 		boolean benzene = false;
+		boolean run = true;
 		boolean cyclo = false;
 
 		// generate main chain size
@@ -60,7 +58,7 @@ public class OrganicUtil {
 
 		// generate type of bond and functional group
 		bondType = random(1, 3);
-		ending = random(0, FUNCTIONAL_NAMES.length - 1);
+		ending = random(0, FUNCTIONAL_NAMES.length - 2);
 
 		// check for benzene and cyclo and set the main chain accordingly
 		if (ending == 10) {
@@ -88,27 +86,35 @@ public class OrganicUtil {
 		// generate a prefix if there are double or triple bonds
 		if (mainSize == 2) {
 			prefixBond = 1;
+			bondLocation = new int[1];
+			bondLocation[0] = 1;
+			run = false;
 		} else if (mainSize == 3) {
 			prefixBond = random(1, 2);
+			bondLocation = new int[prefixBond];
+			if (prefixBond == 1)
+				bondLocation[0] = random(1,mainSize);
+			else {
+				bondLocation[0] = 1;
+				bondLocation[1] = 2;
+			}
+			run = false;
 		} else if (ending != 0) {
 			prefixBond = random(1, 3);
 		} // end if
 
 		pass();
 		// creates random values but with no duplicate values
-		if (bondType != 1) {
+		if (bondType != 1 && run) {
+			int idx = 0;
 			bondLocation = new int[prefixBond];
-			for (int i = 0; i < prefixBond; i++) {
-				System.out.println(mainSize);
-				System.out.println(prefixBond);
-				int hold = random(1, mainSize - 1);
-				for (int j = 0; j < i; j++) {
-					while (bondLocation[j] == hold)
-						hold = random(1, mainSize - 1);
-					j = -1;
-				} // end for
-				bondLocation[i] = hold;
-			} // end for
+			HashSet<Integer> toBond = new HashSet<Integer>();
+			for (int i=0;i<prefixBond;i++) {
+				if (!toBond.add(random(1,mainSize-1)))
+					i--;
+			}//end for
+			for(Integer n: toBond)
+				bondLocation[idx++] = n;
 		} // end if
 
 		pass();
@@ -170,8 +176,11 @@ public class OrganicUtil {
 		// add sidechain if needed for esters and ethers
 		if (ending == 8 || ending == 11) {
 			int length = random(1, 4);
-			c.addSideChain(length, "O", cyclo(), false);
-		}
+			boolean cycloEster = false;
+			if (length > 2)
+				cycloEster = cyclo();
+			c.addSideChain(length, "O", cycloEster, false);
+		} // end if
 
 		// determine amount of side chains
 		numOfSideChains = random(0, 4);
@@ -185,8 +194,22 @@ public class OrganicUtil {
 			boolean phenyl = false;
 			boolean sideCyclo = false;
 
+			switch (ending) {
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 4)];
+				break;
+			case 5:
+			case 6:
+				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 3)];
+				break;
+			default:
+				sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
+			}//end switch case
 			sideLocation[i] = location(ending, mainSize);
-			sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
+
 			if (sideChainType[i].equals("yl")) {
 				while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
 					sideLocation[i] = location(ending, mainSize);
@@ -237,14 +260,13 @@ public class OrganicUtil {
 	private static String location(int ending, int mainSize) {
 		String sideLocation = "";
 		if (ending == 6 || ending == 7) {
-			sideLocation = LOCATIONS[random(0, mainSize)];
-			if (sideLocation.equals("" + mainSize))
+			int r = random(0,mainSize);
+			if (r == mainSize)
 				sideLocation = LOCATIONS[LOCATIONS.length - 1];
-		} /*
-			 * else if (ending == 8 || ending == 11) { sideLocation =
-			 * LOCATIONO[random(0,mainSize)]; if (sideLocation.equals(""+mainSize))
-			 * sideLocation = LOCATIONO[LOCATIONO.length-1]; }
-			 */else {
+			else
+				sideLocation = LOCATIONS[r];
+				
+		}else {
 			sideLocation = LOCATIONS[random(0, mainSize - 1)];
 		}
 		return sideLocation;
@@ -269,6 +291,7 @@ public class OrganicUtil {
 		System.out.println("PASSED");
 	}
 
+	// bubble sort the data
 	public static void bubbleSort(int[] a) {
 		for (int i = a.length - 1; i > 0; i--) {
 			for (int j = 0; j < i; j++) {
@@ -373,6 +396,8 @@ public class OrganicUtil {
 		ArrayList<String> toCheck = new ArrayList<String>();
 		ArrayList<String> position = new ArrayList<String>();
 		ArrayList<Integer> etherSpots = new ArrayList<Integer>();
+
+		// initialize the TreeMap
 		groups = initializeMap();
 
 		// loop for the length of the side chain array to get the word and location
@@ -383,9 +408,13 @@ public class OrganicUtil {
 				etherSpots.add(i);
 		} // end for
 
+		// dbg
 		System.out.println(toCheck);
 		System.out.println(position);
 
+		// checks if there are any oxy side chains, if so, find the next location at O
+		// and combine them to be a single compound name(i.e methoxy). Removes the
+		// element of a single chain on an oxygen as well as that posiition
 		for (int j = 0; j < toCheck.size(); j++) {
 			if (toCheck.get(j).equalsIgnoreCase("oxy")) {
 				for (int i = 0; i < position.size(); i++) {
@@ -397,62 +426,75 @@ public class OrganicUtil {
 						System.out.println(position);
 						j--;
 						break;
-					}
-				}
-			}
-
-		}
+					} // end if
+				} // end for
+			} // end if
+		} // end for
 
 		// uses the treemap key of the sidechain name to be added to the value which
 		// starts at 0
 		for (int i = 0; i < toCheck.size(); i++) {
 			try {
 				int temp = groups.get(toCheck.get(i)) + 1;
-				//if (!position.get(i).equalsIgnoreCase("o"))
-					groups.replace(toCheck.get(i), temp);
+				// if (!position.get(i).equalsIgnoreCase("o"))
+				groups.replace(toCheck.get(i), temp);
 
 			} catch (NullPointerException e) {
 			}
 		} // end for
 
+		// loop for all the keys in the treemap
 		for (String key : groups.keySet()) {
+			// place the value of the key into a variable for ease of use
 			int prefix = groups.get(key);
 			space = false;
+
+			// if the value is not equal to 0 see if there are any positions on an oxygen,
+			// if so ignore them. Else set the boolean space to true to indicate that the
+			// first element should be with a space
 			if (prefix != 0) {
 				for (int i = 0; i < toCheck.size(); i++) {
 					if (key.equals(toCheck.get(i))) {
 						if (!position.get(i).equalsIgnoreCase("o"))
 							beforeMain += position.get(i) + ",";
 						else
-							space=true;
+							space = true;
+						// end if
 					} // end if
 				} // end for
+
+				// add hyphens in between the the number and words
 				if (!space) {
 					beforeMain = beforeMain.substring(0, beforeMain.length() - 1) + "-";
 				}
+
+				// if the prefix is greater than or equal to 2 add the prefix infront of the key
 				if (prefix >= 2) {
 					beforeMain += prefixFromNumber(prefix);
 				}
-				if (key.substring(key.length()-3, key.length()).equals("oxy") && !key.equals("hydroxy")) {
+
+				// if the key has an oxy in the end and is not a hydroxy add a space; else if
+				// the
+				// boolean space is true, add a space or else add a hyphen
+				if (key.substring(key.length() - 3, key.length()).equals("oxy") && !key.equals("hydroxy")) {
 					beforeMain += key + " ";
-				}else if (space) {
+				} else if (space) {
 					beforeMain += key + " ";
-				}else {
+				} else {
 					beforeMain += key + "-";
 				}
 			} // end if
 		} // end for
-		if (side.length > 0 && space)
-			beforeMain = beforeMain.substring(0, beforeMain.length() - 1);
+
+		// if the length of side is greater than 0 and space is not true se, remove the
+		// hyphen at the end
+		if (side.length > 0) {
+			if (side.length != 1 && !space)
+				beforeMain = beforeMain.substring(0, beforeMain.length() - 1);
+		}
 		return beforeMain;
 	}// end assignPrefix
 
-	
-	/*else if (toCheck.get(i).substring(toCheck.get(i).length() - 3, toCheck.get(i).length())
-							.equalsIgnoreCase("oxy")) {
-						beforeMain = position.get(i);
-					}
-	 */ 
 	// creates a treemap and sets all the values to 0
 	private static TreeMap<String, Integer> initializeMap() {
 		TreeMap<String, Integer> t = new TreeMap<String, Integer>();
@@ -461,7 +503,7 @@ public class OrganicUtil {
 		for (int i = 0; i < CHAIN.length - 1; i++)
 			t.put(CHAIN[i] + "yl", 0);
 		// end for
-		
+
 		for (int i = 0; i < CHAIN.length - 1; i++)
 			t.put(CHAIN[i] + "oxy", 0);
 
@@ -479,12 +521,13 @@ public class OrganicUtil {
 		return t;
 	}
 
+	// changes the size to a word
 	private static String sizeToWord(Chain s) {
 		int size = s.getSize();
 		String toReturn = "";
 		if (size > 0) {
 			if (size == 6 && s.isBenzene())
-				toReturn = "phenyl";
+				return "phenyl";
 			else if (s.isCyclo())
 				toReturn = "cyclo";
 			toReturn += CHAIN[size - 1] + "yl";
