@@ -20,8 +20,8 @@ public class Interpreter {
 	private static String suffix = ""; // compound suffix made more general for future use
 	private static String delimit; // holds the delimited version of the orignal name
 	private static int mainBond; // holds the type of bond
-	private static ArrayList<Integer> endingPosition = new ArrayList<Integer>();
-	private static int [] numOfGroups = new int[2];
+	private static ArrayList<Integer> endingPosition;
+	private static int [] numOfGroups;
 	private static String front = ""; // the prefix of the main chain
 	private static ArrayList<String> chainNames; // all the side chains
 	private static ArrayList<String> chainLocations; // locations of the side chains
@@ -35,6 +35,23 @@ public class Interpreter {
 	 * as text return compound - compound object from Compound
 	 */
 	public static Compound compoundFromName(String name) {
+		//reset all variables
+		compoundName = null;
+		compound = null;
+		suffix = "";
+		delimit= "";
+		mainBond = 0;
+		endingPosition = new ArrayList<Integer>();
+		numOfGroups = new int[2];
+		front = "";
+		chainNames = null;
+		chainLocations = null;
+		originalName = "";
+		additionalGroups = 0;
+		ester = false;
+		benzene = false;
+		
+		
 		originalName = name;
 
 		splitChains(); // remove all the hyphens in the String

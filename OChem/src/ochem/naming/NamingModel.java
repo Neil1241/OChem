@@ -10,8 +10,6 @@ import ochem.organic.*;
 public class NamingModel extends Object {
 	private NamingGUI g;
 	private Compound c;
-	private Chain mainChain;
-	private Chain[] sideChains;
 	private boolean valid = true;
 	
 	public NamingModel() {
@@ -24,8 +22,6 @@ public class NamingModel extends Object {
 	
 	public void giveCompound(Compound c) {
 		this.c=c;
-		this.mainChain=c.getMainChain();
-		this.sideChains=c.getSideChains();
 		this.g.update();
 	}
 	
