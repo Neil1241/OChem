@@ -2,6 +2,9 @@ package ochem.drawing;
 
 import java.awt.Color;
 
+import ochem.OChem;
+import ochem.drawing.CanvasUtil.DrawDirection;
+
 /*
  * CanvasUtil
  * Created by: Neil Balaskandarajah
@@ -39,6 +42,9 @@ public class CanvasUtil {
 	public static final double UP_BOND_ODD = Math.toRadians(225);
 	public static final double UP_BOND_EVEN = Math.toRadians(315);
 	
+	//font size
+	public static final float fontSize = (float) (96.0F * OChem.width/3840.0);
+	
 	//lengths
 	public static final int CHAIN_ARM = 120;
 	public static final int CYCLO_RAD = 140;
@@ -73,7 +79,11 @@ public class CanvasUtil {
 		FLUORINE,
 		CHLORINE,
 		BROMINE,
-		IODINE
+		IODINE, 
+		ALDEHYDE,
+		KETONE,
+		ALCOHOL,
+		CARBOXYLIC_ACID
 	} //end enum
 	
 	/*
@@ -121,6 +131,15 @@ public class CanvasUtil {
 	 */
 	public static double cycloAngle(DrawDirection dir) {
 		return dir.ordinal() * 30 - 30; //ordinal is the enum's position in its parent set
+	} //end angleFromDirection
+	
+	/*
+	 * Calculate an angle to rotate a functional group based on a direction
+	 * DrawDirection dir - direction to draw in
+	 * return - angle based on the direction
+	 */
+	public static double funcAngle(DrawDirection dir) {
+		return Math.toRadians(dir.ordinal() * 60 - 90); //ordinal is the enum's position in its parent set
 	} //end angleFromDirection
 	
 	/*
@@ -190,4 +209,24 @@ public class CanvasUtil {
 		
 		return angle;
 	} //end angleBetweenNodes
+	
+	/*
+	 * Get the position in the direction enum 'n' steps ahead (rolls back to zero if near end)
+	 * DrawDirection dir - direction to increase
+	 * int n - number of steps forward
+	 */
+	public static DrawDirection incDirection(DrawDirection dir, int n) {
+		int pos = dir.ordinal();
+		
+		while (n > 0) {
+			if (pos + 1 >= DrawDirection.values().length) {
+				pos = -1;
+			} //if
+			pos++;
+			
+			n--;
+		} //loop
+		
+		return DrawDirection.values()[pos];
+	} //end incDirection
 } //end class

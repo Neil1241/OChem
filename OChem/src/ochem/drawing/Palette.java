@@ -33,11 +33,15 @@ public class Palette extends JPanel {
 	private OBox bromo;
 	private OBox chloro;
 	private OBox iodo;
+	private OBox aldehyde;
+	private OBox ketone;
+	private OBox alcohol;
+	private OBox carbox;
 	
 	//list of buttons so adding controllers is easier
 	private ArrayList<OBox> buttons;
 	
-	private final int NUM_ROWS = 7; //number of buttons on the screen
+	private final int NUM_ROWS = 9; //number of buttons on the screen
 	
 	private Canvas canvas; //instance of the Canvas
 	
@@ -93,10 +97,10 @@ public class Palette extends JPanel {
 		buttons.add(fluoro);
 		row1.add(fluoro);
 		
-		//bromine
-		bromo = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Br", true, false);
-		buttons.add(bromo);
-		row1.add(bromo);
+		//iodine
+		iodo = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "I", true, false);
+		buttons.add(iodo);
+		row1.add(iodo);
 		
 		//add first row to panel
 		this.add(row1);
@@ -109,14 +113,44 @@ public class Palette extends JPanel {
 		buttons.add(chloro);
 		row2.add(chloro);
 		
-		//iodine
-		iodo = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "I", true, false);
-		buttons.add(iodo);
-		row2.add(iodo);
+		//bromine
+		bromo = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Br", true, false);
+		buttons.add(bromo);
+		row2.add(bromo);
 		
-		//add second row to panel
 		this.add(row2);
 		row2.setBackground(DrawingGUI.BG_COLOR);
+		
+		JPanel row3 = new JPanel(); //third row
+		
+		//aldehyde
+		aldehyde = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Al", true, false);
+		buttons.add(aldehyde);
+		row3.add(aldehyde);
+		
+		//ketone
+		ketone = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Ke", true, false);
+		buttons.add(ketone);
+		row3.add(ketone);	
+		
+		//add second row to panel
+		this.add(row3);
+		row3.setBackground(DrawingGUI.BG_COLOR);
+		
+		JPanel row4 = new JPanel(); //fourth row
+		
+		//alcohol
+		alcohol = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "OH", true, false);
+		buttons.add(alcohol);
+		row4.add(alcohol);	
+		
+		//carboxylic acid
+		carbox = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "CA", true, false);
+		buttons.add(carbox);
+		row4.add(carbox);
+		
+		this.add(row4);
+		row4.setBackground(DrawingGUI.BG_COLOR);
 	
 		//clear button
 		clear = new OBox(width, height/NUM_ROWS - 2*View.PAD, "Clear", true, false);

@@ -64,10 +64,9 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					bondLeft();
 					break;
 					
-				case FUNC_GROUP:
+				case FUNC_GROUP: //functional group
 					funcLeft();
 					break;
-
 			} // switch
 
 		// if right clicked
@@ -119,7 +118,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	private void right() {
 		// if on side location deciding step
 		if (canvas.getSideStep() == 3 || canvas.getFuncStep() == 1) {
-			incDirection(); // increment the direction
+			dir = CanvasUtil.incDirection(dir, 1); // increment the direction
 			canvas.setGhostDirection(dir); // set the ghost direction for the canvas
 		} // if
 	} // end sideRight
@@ -159,33 +158,64 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		// temporary list with all the nodes
 		ArrayList<Node> mainNodes = canvas.getMainNodes();
 		
-		// loop through main nodes (not last one, cannot have bond on last node)
-		for (int i = 0; i < mainNodes.size(); i++) {
-			Node n = mainNodes.get(i); // current node
-
-			// if the click was on a valid node
-			if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
-					n.getDia())) {
-				canvas.addFuncNode(n); // add that node to the bonded nodes
-				canvas.addGroupDirection(dir); //save that direction into the list
-				canvas.setFuncStep(2); // increment the bond step
-				break; // exit loop
-			} // if
-		} // loop
-	}
-
-	/*
-	 * Increment the draw direction one step forward
-	 */
-	private void incDirection() {
-		int pos = dir.ordinal();
-		if (pos == DrawDirection.values().length - 1) { // if last value in enum
-			dir = DrawDirection.values()[0]; // set to zero
-
-		} else { // any other
-			dir = DrawDirection.values()[pos + 1]; // set to one further ahead
-		} // if
-	} // end incDirection
+		//different nodes can be clicked depending on group
+		switch (canvas.getGhostGroup()) {
+			case FLUORINE:
+			case CHLORINE:
+			case IODINE:
+			case BROMINE:
+			case ALCOHOL:
+				//show all nodes
+				for (int i = 0; i < mainNodes.size(); i++) {
+					Node n = mainNodes.get(i);
+					
+					// if the click was on a valid node
+					if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
+							n.getDia())) {
+						canvas.addFuncNode(n); // add that node to the functional group nodes
+						canvas.addGroupDirection(dir); //save that direction into the list
+						canvas.setFuncStep(2); // increment the bond step
+						break; // exit loop
+					} // if
+				} // loop
+				break;
+				
+			case ALDEHYDE:
+			case CARBOXYLIC_ACID:
+				//first node
+				if (isWithinBounds(current.getCenterX(), current.getCenterY(), 
+						mainNodes.get(0).getCenterX(), mainNodes.get(0).getCenterY(), mainNodes.get(0).getDia())) {
+					canvas.addFuncNode(mainNodes.get(0)); //add the first node
+					canvas.addGroupDirection(dir); //save that direction into the list
+					canvas.setFuncStep(2); // increment the bond step
+				} else if (isWithinBounds(current.getCenterX(), current.getCenterY(), 
+						mainNodes.get(mainNodes.size()-1).getCenterX(), mainNodes.get(mainNodes.size()-1).getCenterY(), 
+						mainNodes.get(mainNodes.size()-1).getDia())) {
+					canvas.addFuncNode(mainNodes.get(mainNodes.size()-1)); //add the first node
+					canvas.addGroupDirection(dir); //save that direction into the list
+					canvas.setFuncStep(2); // increment the bond step
+				} //if
+					
+				break;
+				
+			case KETONE: 
+				//show all inner nodes (not first or last)
+				for (int i = 1; i < mainNodes.size()-1; i++) {
+					Node n = mainNodes.get(i);
+					
+					// if the click was on a valid node
+					if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
+							n.getDia())) {
+						canvas.addFuncNode(n); // add that node to the functional group nodes
+						canvas.addGroupDirection(dir); //save that direction into the list
+						canvas.setFuncStep(2); // increment the bond step
+						break; // exit loop
+					} // if
+				} //loop
+				break;
+				
+		} //switch
+	} //end funcLeft
 
 	/*
 	 * Check whether one point is within a radius around a target point
@@ -213,6 +243,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	public void mouseMoved(MouseEvent m) {
 		// send the mouse (x,y) to the canvas
 		canvas.setMouseXY(m.getX(), m.getY());
+		current = new Node(m.getX(), m.getY(), 20);
 
 		// if on the side drawing step
 		if (canvas.getSideStep() == 3) {
@@ -334,33 +365,90 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		ArrayList<Node> nodes = canvas.getMainNodes(); //list of main nodes
 		Node ms = new Node(m.getX(), m.getY(), nodes.get(0).getRad()); //node for mouse
 		
-		int end = nodes.size();
-		
-		//loop through selectable nodes	 to see if mouse is over
-		for (int i = 0; i < end; i++) {
-			// if mouse is over the node
-			if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), nodes.get(i).getCenterY(),
-					nodes.get(i).getRad())) {
-				// make its color darker
-				nodes.get(i).setColor(CanvasUtil.DARK_RED); // dark green
+		//different nodes can be clicked depending on group
+		switch (canvas.getGhostGroup()) {
+			case FLUORINE:
+			case CHLORINE:
+			case IODINE:
+			case BROMINE:
+			case ALCOHOL:
+				//show all nodes
+				for (int i = 0; i < nodes.size(); i++) {
+					// if mouse is over the node
+					if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), nodes.get(i).getCenterY(),
+							nodes.get(i).getRad())) {
+						// make its color darker
+						nodes.get(i).setColor(CanvasUtil.DARK_RED); // dark green
 
-				// if not a cycloidal chain
-				if (!canvas.getMainCyclo() && !canvas.getMainBenzene()) {
-					// change direction of the ghost chain depending on node position on chain
-					if (i % 2 == 0) {
-						dir = DrawDirection.DOWN_RIGHT; // even, down
-					} else {
-						dir = DrawDirection.UP_RIGHT; // odd, up
+						// if not a cycloidal chain
+						if (!canvas.getMainCyclo() && !canvas.getMainBenzene()) {
+							// change direction of the ghost chain depending on node position on chain
+							if (i % 2 == 0) {
+								dir = DrawDirection.DOWN_RIGHT; // even, down
+							} else {
+								dir = DrawDirection.UP_RIGHT; // odd, up
+							} // if
+
+							canvas.setGhostDirection(dir); // set the ghost direction for the canvas
+						} // if
+						
+					} else { //mouse is not over the node
+						// return to the default lighter color
+						nodes.get(i).setColor(CanvasUtil.LIGHT_RED); // light green
 					} // if
-
-					canvas.setGhostDirection(dir); // set the ghost direction for the canvas
-				} // if
+				} // loop
+				break;
 				
-			} else { //mouse is not over the node
-				// return to the default lighter color
-				nodes.get(i).setColor(CanvasUtil.LIGHT_RED); // light green
-			} // if
-		} //loop
+			case ALDEHYDE:
+			case CARBOXYLIC_ACID:
+				//first node
+				if (isWithinBounds(current.getCenterX(), current.getCenterY(), 
+						nodes.get(0).getCenterX(), nodes.get(0).getCenterY(), nodes.get(0).getDia())) {
+					nodes.get(0).setColor(CanvasUtil.DARK_RED);
+				} else {
+					nodes.get(0).setColor(CanvasUtil.LIGHT_RED);
+				}
+				
+				//last node
+				if (isWithinBounds(current.getCenterX(), current.getCenterY(), 
+						nodes.get(nodes.size()-1).getCenterX(), nodes.get(nodes.size()-1).getCenterY(), 
+						nodes.get(nodes.size()-1).getDia())) {
+					nodes.get(nodes.size()-1).setColor(CanvasUtil.DARK_RED);
+				} else {
+					nodes.get(nodes.size()-1).setColor(CanvasUtil.LIGHT_RED);
+				}
+					
+				break;
+				
+			case KETONE:
+				//show all inner nodes (not first or last)
+				for (int i = 1; i < nodes.size()-1; i++) {
+					// if mouse is over the node
+					if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), nodes.get(i).getCenterY(),
+							nodes.get(i).getRad())) {
+						// make its color darker
+						nodes.get(i).setColor(CanvasUtil.DARK_RED); // dark green
+
+						// if not a cycloidal chain
+						if (!canvas.getMainCyclo() && !canvas.getMainBenzene()) {
+							// change direction of the ghost chain depending on node position on chain
+							if (i % 2 == 0) {
+								dir = DrawDirection.DOWN_RIGHT; // even, down
+							} else {
+								dir = DrawDirection.UP_RIGHT; // odd, up
+							} // if
+
+							canvas.setGhostDirection(dir); // set the ghost direction for the canvas
+						} // if
+						
+					} else { //mouse is not over the node
+						// return to the default lighter color
+						nodes.get(i).setColor(CanvasUtil.LIGHT_RED); // light green
+					} // if
+				} //loop
+				break;
+				
+		} //switch
 	} //end showFuncNodes
 	
 	/*

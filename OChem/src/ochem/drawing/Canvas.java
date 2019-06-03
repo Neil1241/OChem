@@ -147,6 +147,9 @@ public class Canvas extends JComponent {
 
 		// update the type to the palette's type
 		this.type = palette.getSelectedType();
+		
+		//set the font type
+		g2.setFont(g2.getFont().deriveFont(CanvasUtil.fontSize));
 
 		// handle the actions for each type
 		clearAction(g2);
@@ -154,11 +157,6 @@ public class Canvas extends JComponent {
 		sideAction(g2);
 		bondAction(g2);
 		funcAction(g2);
-		
-		//test
-		g2.setColor(Color.BLACK);
-		Node n = new Node(300,300, 10);
-//		drawDoubleOxygen(g2, n, DrawDirection.UP_RIGHT);
 	} // end paintComponent
 
 	// ACTIONS//
@@ -460,21 +458,52 @@ public class Canvas extends JComponent {
 			case 1:
 				DrawingGUI.showMessage("Select location for " + ghostGroup.toString());
 				
-				// show nodes that can be clicked
-				for (int i = 0; i < mainNodes.size(); i++) {
-					g2.setColor(mainNodes.get(i).getColor());
-					drawNode(g2, mainNodes.get(i));
-				} // loop
+				//draw the functional groups
+				g2.setColor(CanvasUtil.CHAIN_COLOR);
+				drawGroups(g2);
 				
+				//draw the ghost group
 				g2.setColor(CanvasUtil.TRANS_GREY);
 				drawFunc(g2, mouse, ghostGroup, ghostDir);
 				
-				g2.setColor(CanvasUtil.CHAIN_COLOR);
-				drawGroups(g2);
+				//different nodes can be clicked depending on group
+				switch (ghostGroup) {
+					case FLUORINE:
+					case CHLORINE:
+					case IODINE:
+					case BROMINE:
+					case ALCOHOL:
+						//show all nodes
+						for (int i = 0; i < mainNodes.size(); i++) {
+							g2.setColor(mainNodes.get(i).getColor());
+							drawNode(g2, mainNodes.get(i));
+						} // loop
+						break;
+						
+					case ALDEHYDE:
+					case CARBOXYLIC_ACID:
+						//show first and last nodes
+						g2.setColor(mainNodes.get(0).getColor());
+						drawNode(g2, mainNodes.get(0));
+						
+						g2.setColor(mainNodes.get(mainNodes.size()-1).getColor());
+						drawNode(g2, mainNodes.get(mainNodes.size()-1));
+						break;
+						
+					case KETONE:
+						//show all inner nodes (not first or last)
+						for (int i = 1; i < mainNodes.size()-1; i++) {
+							 g2.setColor(mainNodes.get(i).getColor());
+							 drawNode(g2, mainNodes.get(i));
+						} //loop
+						break;
+						
+				} //switch
 				break;
 				
 			//draw out step
 			case 2:
+				//draw the groups
 				g2.setColor(CanvasUtil.CHAIN_COLOR);
 				drawGroups(g2);
 				break;
@@ -794,38 +823,47 @@ public class Canvas extends JComponent {
 	 * DrawDirectiond dir - what direction to draw group in
 	 */
 	private void drawFunc(Graphics2D g2, Node start, FuncGroup group, DrawDirection dir) {
-		int r, x2, y2, fontR, textX, textY;
-		int xFlip, yFlip;
-		double angle;
-		FontMetrics fm;
-		
 		switch (group) {
 			case FLUORINE:
-				drawHaloAlkane(g2, "F", start, dir);
+				drawLetterFunc(g2, "F", start, dir);
 				break;
 				
 			case CHLORINE:
-				drawHaloAlkane(g2, "Cl", start, dir);
+				drawLetterFunc(g2, "Cl", start, dir);
 				break;
 				
 			case BROMINE:
-				drawHaloAlkane(g2, "Br", start, dir);
+				drawLetterFunc(g2, "Br", start, dir);
 				break;
 				
 			case IODINE:
-				drawHaloAlkane(g2, "I", start, dir);
+				drawLetterFunc(g2, "I", start, dir);
+				break;
+				
+			case ALDEHYDE:
+			case KETONE:
+				drawDoubleOxygen(g2, start, dir);
+				break;
+				
+			case ALCOHOL:
+				drawLetterFunc(g2, "OH", start, dir);
+				break;
+				
+			case CARBOXYLIC_ACID:
+				drawDoubleOxygen(g2, start, dir);
+				drawLetterFunc(g2, "OH", start, CanvasUtil.incDirection(dir, 2));
 				break;
 		} //switch
 	} //end drawFunc
 	
 	/*
-	 * Draw a haloalkane
+	 * Draw a functional group that's a single letter
 	 * Graphics2D g2 - object reponsible for drawing
 	 * String symbol - chemical symbol of element
 	 * Node start - start position of the haloalkane
 	 * DrawDirection dir - direction to draw in
 	 */
-	private void drawHaloAlkane(Graphics2D g2, String symbol, Node start, DrawDirection dir) {
+	private void drawLetterFunc(Graphics2D g2, String symbol, Node start, DrawDirection dir) {
 		int r = (int) (CanvasUtil.CHAIN_ARM * 0.8);
 		double angle = 2 * Math.toRadians(CanvasUtil.cycloAngle(dir));
 		
@@ -839,7 +877,7 @@ public class Canvas extends JComponent {
 		int fontR = 60;
 		
 		int textX = x2 + (int) (fontR * Math.cos(angle)) - fm.stringWidth(symbol)/2;
-		int textY = y2 + (int) (fontR * Math.sin(angle)) + fm.getAscent()/2;
+		int textY = y2 + (int) (fontR * Math.sin(angle)) + (int) (fm.getAscent() * 0.375);
 		
 		g2.drawString(symbol, textX, textY);
 	} //end drawHaloAlkane
@@ -851,34 +889,68 @@ public class Canvas extends JComponent {
 	 * DrawDirection dir - direction to draw in
 	 */
 	private void drawDoubleOxygen(Graphics2D g2, Node start, DrawDirection dir) {
-		int arm = (int) (CanvasUtil.CHAIN_ARM * 0.8);
-		int offset = (int) (CanvasUtil.CHAIN_ARM * 0.1);
+		int arm = (int) (CanvasUtil.CHAIN_ARM * 0.8); //length of bond
+		int offset = (int) (CanvasUtil.CHAIN_ARM * 0.2); //length to move back from start
+		int perpOut = (int) (CanvasUtil.CHAIN_ARM * 0.15); //distance to stick out
+		int oExtend = (int) (CanvasUtil.CHAIN_ARM * 0.5); //how much letter sticks out from endpoints
 		
-		//angle for chains
-		double angle = 2 * Math.toRadians(CanvasUtil.cycloAngle(dir));
+		double angle = CanvasUtil.funcAngle(dir); //angle to draw with
 		
 		//perpendicular offsets for each line
 		double aPerp = angle + Math.PI/2;
 		double bPerp = angle - Math.PI/2;
 		
 		//first line
-		int ax1 = start.getX() - (int) (arm * Math.cos(angle) + offset * Math.cos(aPerp));
-		int ay1 = start.getY() - (int) (arm * Math.sin(angle) + offset * Math.sin(bPerp));
+		//start points are offset back behind start node and out perpendicular to angle of travel
+		int ax1 = start.getX() - rCos(offset, angle) + rCos(perpOut, aPerp);
+		int ay1 = start.getY() - rSin(offset, angle) + rSin(perpOut, aPerp);
 		
-		int ax2 = ax1 + (int) (arm * Math.cos(angle) - offset * Math.cos(aPerp));
-		int ay2 = ay1 + (int) (arm * Math.sin(angle) - offset * Math.sin(bPerp));
+		//end points are start points translated out at the angle
+		int ax2 = ax1 + rCos(arm + offset, angle);
+		int ay2 = ay1 + rSin(arm + offset, angle);
 		
-		g2.drawLine(ax1, ay1, ax2, ay2);
+		g2.drawLine(ax1, ay1, ax2, ay2); // draw the first line
 		
 		//second line
-		int bx1 = start.getX() - (int) (arm * Math.cos(angle) + offset * Math.cos(bPerp));
-		int by1 = start.getY() - (int) (arm * Math.sin(angle) + offset * Math.sin(bPerp));
+		//start points are offset back behind start node and out perpendicular to angle of travel
+		int bx1 = start.getX() - rCos(offset, angle) + rCos(perpOut, bPerp);
+		int by1 = start.getY() - rSin(offset, angle) + rSin(perpOut, bPerp);
+
+		//end points are start points translated out at the angle
+		int bx2 = bx1 + rCos(arm + offset, angle);
+		int by2 = by1 + rSin(arm + offset, angle);
 		
-		int bx2 = ax1 + (int) ((arm + offset) * Math.cos(angle) - offset * Math.cos(bPerp));
-		int by2 = ay1 + (int) ((arm + offset) * Math.sin(angle) - offset * Math.sin(bPerp));
+		g2.drawLine(bx1, by1, bx2, by2); //draw the second line
 		
-		g2.drawLine(bx1, by1, bx2, by2);
+		//draw the oxygen
+		String o = "O"; //symbol for oxygen
+		FontMetrics fm = g2.getFontMetrics(); //object containing details about font
+		
+		//coordinates to draw String to
+		int oX = start.getX() + rCos(arm + oExtend, angle) - fm.stringWidth(o)/2; //string width is width of the letter
+		int oY = start.getY() + rSin(arm + oExtend, angle) + (int) (fm.getAscent() * 0.375); //ascent is how high typeface can draw
+		
+		g2.drawString(o, oX, oY); //draw the symbol
 	} //end drawDoubleOxygen
+	
+	//MATH//
+	/*
+	 * Calculate the x offset from rotating a line 'arm' long by 'angRad' CCW
+	 * int arm - length of line in pixels
+	 * angRad - angle to rotate line CCW in radians
+	 */
+	private int rCos(int arm, double angRad) {
+		return (int) (arm * Math.cos(angRad));
+	} //end rCos
+	
+	/*
+	 * Calculate the y offset from rotating a line 'arm' long by 'angRad' CCW
+	 * int arm - length of line in pixels
+	 * angRad - angle to rotate line CCW in radians
+	 */
+	private int rSin(int arm, double angRad) {
+		return (int) (arm * Math.sin(angRad));
+	} //end rSin
 	
 	// COMPONENT//
 
@@ -1127,6 +1199,14 @@ public class Canvas extends JComponent {
 		groups.add(group);
 		ghostGroup = group;
 	} //end addFuncGroup
+	
+	/*
+	 * Get the ghost group
+	 * return ghostGroup - group currently being attempted to be drawn
+	 */
+	public FuncGroup getGhostGroup() {
+		return ghostGroup;
+	} //end getGhostGroup
 	
 	/*
 	 * Add a node to the functional groups list

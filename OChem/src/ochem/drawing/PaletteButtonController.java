@@ -88,7 +88,18 @@ public class PaletteButtonController implements MouseListener {
 		} else if (text.equals("I")) { //iodine
 			iodoAction();
 			
-		} //big if
+		} else if (text.equals("Al")) { //aldehyde
+			aldehydeAction();
+			
+		} else if (text.equals("Ke")) { //ketone
+			ketoneAction();
+			
+		} else if (text.equals("OH")) { //alcohol
+			alcoholAction();
+			
+		} else if (text.equals("CA")) { //carboxylic acid
+			acidAction();
+		}
 		
 		//update the button and canvas
 		button.update();
@@ -203,6 +214,70 @@ public class PaletteButtonController implements MouseListener {
 			} //loop
 		} //if 
 	} //end iodoAction
+	
+	/*
+	 * Action for when the "aldehyde" button is pressed
+	 */
+	private void aldehydeAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.ALDEHYDE);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end aldehydeAction
+	
+	/*
+	 * Action for when the "ketone" button is pressed
+	 */
+	private void ketoneAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.KETONE);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end aldehydeAction
+	
+	/*
+	 * Action for when the "ketone" button is pressed
+	 */
+	private void alcoholAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.ALCOHOL);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end ketoneAction
+	
+	/*
+	 * Action for when the "carboxylic acid" button is pressed
+	 */
+	private void acidAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.CARBOXYLIC_ACID);
+			canvas.setFuncStep(1);
+			
+			//set the colors for all the main nodes to red
+			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
+			} //loop
+		} //if 
+	} //end ketoneAction
 	
 	/*
 	 * Action for when the "clear" button is pressed
