@@ -210,7 +210,7 @@ public class Palette extends JPanel {
 	 */
 	private void registerControllers() {
 		for (int i = 0; i < buttons.size(); i++) {
-			buttons.get(i).setFontSize(80.0F);
+			buttons.get(i).setFontSize((float) (DrawingUtil.FONT_SIZE * 0.8));
 			buttons.get(i).addMouseListener(new PaletteButtonController(this, buttons.get(i), canvas));
 		} //loop
 	} //end registerControllers

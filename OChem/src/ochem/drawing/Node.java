@@ -166,6 +166,6 @@ public class Node {
 	 * Coordinates of the node as a String for debugging
 	 */
 	public String toString() {
-		return "" + x + " " + y;
+		return tag +": "+ x +" "+ y;
 	} //end toString
 } //end class

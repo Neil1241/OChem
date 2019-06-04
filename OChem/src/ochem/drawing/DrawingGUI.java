@@ -92,7 +92,7 @@ public class DrawingGUI extends JPanel {
 		//create and configure the dialog box
 		dialog = new OBox((int) (DIALOG_SCALE * width), (int) (height * ERROR_SCALE), "Start with a main chain");
 		dialog.setCornerRadius(20);
-		dialog.setFontSize(80.0F);
+		dialog.setFontSize((float) (DrawingUtil.FONT_SIZE * 0.95));
 		dialogPanel.add(dialog);
 		
 		//create and configure the text field

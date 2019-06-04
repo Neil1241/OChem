@@ -89,7 +89,7 @@ public class Canvas extends JComponent {
 		this.setPreferredSize(new Dimension(this.width, this.height));
 
 		// instantiate the nodes list, create the mouse node
-		mouse = new Node(20);
+		mouse = new Node(DrawingUtil.NODE_RAD);
 
 		// set the type
 		type = ActionType.CLEAR;
@@ -163,7 +163,7 @@ public class Canvas extends JComponent {
 			this.type = palette.getSelectedType();
 			
 			//set the font type
-			g2.setFont(g2.getFont().deriveFont(DrawingUtil.fontSize));
+			g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE));
 	
 			// handle the actions for each type
 			clearAction(g2);
@@ -171,6 +171,11 @@ public class Canvas extends JComponent {
 			funcAction(g2);
 			sideAction(g2);
 			bondAction(g2);
+			
+			//debug by printing mouse node to screen
+			g2.setColor(Color.GREEN);
+			g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE));
+			g2.drawString("M:" + mouse.toString(), 0, 100);
 		} // for drawing GUI
 	} // end paintComponent
 
@@ -363,22 +368,23 @@ public class Canvas extends JComponent {
 				} //if
 				
 				//draw all selectable nodes
-				for (Node n : mainNodes) {
+				for (int i = 0; i < mainNodes.size(); i++) {
+					Node n = mainNodes.get(i); //current node
 					
 					if (!noUpdate.contains(n.getTag())) { //if the tag passes the no update test
-						g2.setColor(n.getColor());
 						
 						//draw node or symbol depending on tag
 						if (DrawingUtil.isNumber(n.getTag())) { //numeric tag
+							g2.setColor(n.getColor()); //change color to node color
 							drawNode(g2, n);
 							
 						} else { //letter tag for nitrogen and oxygen
+							g2.setColor(n.getColor()); //change color to node color
 							drawSymbol(g2, n.getTag(), n); 
 						} //if
+						
 					} //big if
 				} //loop
-				
-				System.out.println();
 				break;
 
 			// fixed on screen step
@@ -512,7 +518,7 @@ public class Canvas extends JComponent {
 					case ALDEHYDE:
 					case CARBOXYLIC_ACID:
 						//only first or last node
-						for (int i = 1; i < mainNodes.size(); i++) {
+						for (int i = 2; i < mainNodes.size(); i++) {
 							 if (DrawingUtil.isNumber(mainNodes.get(i).getTag()) && i != compound.getMainSize()) { //if number
 								 noUpdate.add(Integer.toString(i));
 							 } //if
@@ -679,7 +685,7 @@ public class Canvas extends JComponent {
 	 * Node n - node to draw at
 	 */
 	private void drawSymbol(Graphics2D g2, String symbol, Node n) {
-		g2.setFont(g2.getFont().deriveFont(96.0F));
+		g2.setFont(g2.getFont().deriveFont((DrawingUtil.FONT_SIZE)));
 		FontMetrics fm = g2.getFontMetrics();
 		
 		int textX = n.getX() - fm.stringWidth(symbol)/2;
@@ -759,7 +765,7 @@ public class Canvas extends JComponent {
 		} // if
 
 		// draw the #s for debugging
-		 g2.setFont(g2.getFont().deriveFont(50.0F));
+		 g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE / 2));
 		 Color oldClr = g2.getColor();
 		 g2.setColor(Color.RED);
 		 for (Node n : nodes) {
@@ -835,7 +841,7 @@ public class Canvas extends JComponent {
 		} // if
 
 		// draw the #s for debugging
-		 g2.setFont(g2.getFont().deriveFont(50.0F));
+		 g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE / 2));
 		 g2.setColor(Color.RED);
 		 for (Node n : nodes) {
 			 g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
@@ -980,7 +986,7 @@ public class Canvas extends JComponent {
 		
 		g2.drawLine(start.getX(), start.getY(), x2, y2);
 		
-		g2.setFont(g2.getFont().deriveFont(96.0F));
+		g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE));
 		FontMetrics fm = g2.getFontMetrics();
 		int fontR = 60;
 		
@@ -1038,6 +1044,7 @@ public class Canvas extends JComponent {
 		//draw the oxygen
 		String o = "O"; //symbol for oxygen
 		FontMetrics fm = g2.getFontMetrics(); //object containing details about font
+		g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE));
 		
 		//coordinates to draw String to
 		int oX = start.getX() + rCos(arm + oExtend, angle) - fm.stringWidth(o)/2; //string width is width of the letter
@@ -1118,9 +1125,9 @@ public class Canvas extends JComponent {
 	 */
 	public void setMainStart(int x, int y) {
 		if (mainNodes.isEmpty()) {
-			mainNodes.add(new Node(mouse.getX(), mouse.getY(), 20));
+			mainNodes.add(new Node(mouse.getX(), mouse.getY(), DrawingUtil.NODE_RAD));
 		} else {
-			mainNodes.set(0, new Node(mouse.getX(), mouse.getY(), 20));
+			mainNodes.set(0, new Node(mouse.getX(), mouse.getY(), DrawingUtil.NODE_RAD));
 		} // inner if
 	} // end setMainStart
 	
