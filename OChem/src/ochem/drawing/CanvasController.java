@@ -74,7 +74,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 			// if right clicked
 		} else if (m.getButton() == RIGHT_CLICK) {
-			right();
+			sideRight();
 		}
 
 		canvas.update(); // update the canvas
@@ -98,18 +98,17 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 * Action for when screen is left clicked with the "side" type
 	 */
 	private void sideLeft() {
-
 		// create a temporary list with all the side nodes
-		ArrayList<Node> sideNodes = canvas.getMainNodes();
+		ArrayList<Node> mainNodes = canvas.getMainNodes();
 
 		// loop through all nodes to see if click was on a main node
-		for (int i = 0; i < sideNodes.size(); i++) {
-			Node n = sideNodes.get(i); // current side node
+		for (int i = 0; i < mainNodes.size(); i++) {
+			Node n = mainNodes.get(i); // current side node
 
 			// if click was on a main node
 			if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 					n.getDia())) {
-				n.setTag("" + (i + 1)); // set the location for that chain
+				n.setTag(n.getTag()); // set the location for that chain
 				canvas.addSideNode(n); // add that node to the side nodes list
 				canvas.addSideDirection(dir); // save that direction into the chain
 				canvas.setSideStep(4); // step forward
@@ -121,7 +120,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	/*
 	 * Action for when screen is right clicked with the "side" type
 	 */
-	private void right() {
+	private void sideRight() {
 
 		// if on side location deciding step
 		if (canvas.getSideStep() == 3 || canvas.getFuncStep() == 1) {
@@ -286,7 +285,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				// if mouse is over the node
 				if (DrawingUtil.isWithinBounds(ms.getCenterX(), ms.getCenterY(), mainNodes.get(i).getCenterX(),
 						mainNodes.get(i).getCenterY(), mainNodes.get(i).getRad())) {
-					System.out.println(mainNodes.get(i).getTag() +" is darker");
 					
 					// make its color darker
 					mainNodes.get(i).setColor(DrawingUtil.DARK_YELLOW); 

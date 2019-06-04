@@ -152,7 +152,7 @@ public class UserInputController implements KeyListener {
 		if (num < 1) { //too small to be a chain
 			DrawingGUI.reportError("Size enter too small!");
 			
-		} else if (num < 3 || num > 7) { //valid size, can't be cyclo
+		} else if (num < 3 || (num > 7 && num <= 10)) { //valid size, can't be cyclo
 			canvas.addSideSize(num); //add number to the list
 			canvas.addSideCyclo(false); //set it to false
 			canvas.setSideStep(3); //skip over cyclo step
