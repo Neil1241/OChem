@@ -1,6 +1,7 @@
 package ochem;
 
 import java.awt.Toolkit;
+import ochem.welcome.*;
 
 public class OChem {
 	public static int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();;
@@ -10,7 +11,7 @@ public class OChem {
 	 * Instantiate the View, Model and show the frame
 	 */
 	public static void main(String[] args) {
-		new View();
+		new WelcomeGUI();
 	} //end main
 
 } //end OChem
