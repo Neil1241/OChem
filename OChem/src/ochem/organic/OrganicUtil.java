@@ -22,7 +22,7 @@ public class OrganicUtil {
 
 	public static final String[] SIDE_CHAIN_PRIORITY = { "bromo", "iodo", "fluro", "chloro", "phenyl", "yl", "oxy",
 			"hydroxy", "oxo", "amino" };
-
+	
 	// name of functional groups
 	public static final String[] FUNCTIONAL_NAMES = { "Alkane", "Alkene", "Alkyne", "Alcohol", "Aldehyde", "Ketone",
 			"Amine", "Amide", "Ester", "Carboxylic Acid", "Benzene", "Ether" };

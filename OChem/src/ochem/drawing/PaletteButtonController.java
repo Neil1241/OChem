@@ -13,6 +13,7 @@ import java.awt.event.MouseListener;
 
 import ochem.drawing.DrawingUtil.ActionType;
 import ochem.drawing.DrawingUtil.FuncGroup;
+import ochem.organic.OrganicUtil;
 
 public class PaletteButtonController implements MouseListener {
 	//Attributes
@@ -176,7 +177,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.FLUORINE);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-4);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end fluoroAction
@@ -189,6 +190,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.CHLORINE);
 			canvas.setFuncStep(1);
+			canvas.addSideSize(-5);
 
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
@@ -202,6 +204,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.BROMINE);
 			canvas.setFuncStep(1);
+			canvas.addSideSize(-2);
 
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
@@ -215,7 +218,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.IODINE);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-3);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end iodoAction
@@ -228,7 +231,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ALDEHYDE);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-6);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end aldehydeAction
@@ -241,7 +244,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.KETONE);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-6);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end aldehydeAction
@@ -254,7 +257,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ALCOHOL);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-7);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end ketoneAction
@@ -267,7 +270,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.CARBOXYLIC_ACID);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-12);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end ketoneAction
@@ -280,7 +283,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.AMINE);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-9);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end amineAction
@@ -293,7 +296,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.AMIDE);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-10);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end amineAction
@@ -306,7 +309,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ETHER);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-8);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end ketoneAction
@@ -319,7 +322,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ESTER);
 			canvas.setFuncStep(1);
-
+			canvas.addSideSize(-11);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end amineAction
@@ -343,7 +346,7 @@ public class PaletteButtonController implements MouseListener {
 			for (String s : canvas.getEndings()) {
 				System.out.println(s);
 			}
-			System.out.println();
+			System.out.println(OrganicUtil.nameFromCompound(canvas.getCompound()));
 		} //if
 	} //end nameAction
 	
