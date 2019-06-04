@@ -77,7 +77,6 @@ public class Canvas extends JComponent {
 	 * Palette palette - instance of the palette
 	 */
 	public Canvas(int width, int height, Palette palette) {
-
 		super();
 
 		// set attributes
@@ -142,21 +141,16 @@ public class Canvas extends JComponent {
 	} // end constructor
 
 	public Canvas(int width, int height) {
-<<<<<<< HEAD
-
-		super();
+		this(width,height,null);
 		this.width = width;
 		this.height = height;
 		this.setPreferredSize(new Dimension(this.width, this.height));
 		this.draw = false;
-=======
-		this(width,height,null);
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 	}
 
 	/*
 	 * Draw all nodes, bonds and functional groups to the screen
-	 * Graphics g - AWT object responsible for drawing
+	 * Graphics g - AWT object responsible for drawing 
 	 */
 	public void paintComponent(Graphics g) {
 
@@ -164,7 +158,7 @@ public class Canvas extends JComponent {
 		Graphics2D g2 = (Graphics2D) g;
 
 		// stroke object for drawing
-		BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		BasicStroke bs = new BasicStroke(DrawingUtil.CHAIN_STROKE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
 
 		// background
@@ -262,7 +256,7 @@ public class Canvas extends JComponent {
 			case 1:
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Enter size of main chain: (ENTER)");
-				g2.setColor(DrawingUtil.TRANS_BLUE);
+				g2.setColor(DrawingUtil.TRANS_BLUE); 
 				drawNode(g2, mouse);
 				break;
 
@@ -294,15 +288,11 @@ public class Canvas extends JComponent {
 				break;
 
 			// fixed on screen step
-<<<<<<< HEAD
 			case 4:
 				DrawingGUI.clear();
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
 				if (this.palette != null)
-=======
-			case 4:
 				if (this.palette!=null)
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 					DrawingGUI.clear();
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
 
@@ -486,7 +476,7 @@ public class Canvas extends JComponent {
 	private void funcAction(Graphics2D g2) {
 
 		// stroke object for drawing
-		BasicStroke bs = new BasicStroke(15.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		BasicStroke bs = new BasicStroke(DrawingUtil.CHAIN_STROKE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
 
 		switch (funcStep) {
@@ -610,7 +600,7 @@ public class Canvas extends JComponent {
 	private void drawBond(Graphics2D g2, Node n1, Node n2, int bondSize) {
 
 		// thinner lines
-		BasicStroke bs = new BasicStroke(8.0F, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+		BasicStroke bs = new BasicStroke(DrawingUtil.BOND_STROKE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
 
 		// determine up or down based on whether the tag is even or odd
@@ -1534,16 +1524,12 @@ public class Canvas extends JComponent {
 
 		return "Canvas:";
 	} // end toString
-<<<<<<< HEAD
-
-=======
 	
 	/*
 	 * Sets the Compound Object to the given compound object.
 	 * Changes all the stepValues to be within the nodes
 	 * create nodes for drawing
 	 */
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 	public void setCompound(Compound c) {
 
 		this.compound = c;

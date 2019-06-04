@@ -14,7 +14,7 @@ import ochem.drawing.DrawingUtil.DrawDirection;
 
 public class DrawingUtil {
 	//Static values
-	//transparent colors
+	//transparent colors 
 	public static final Color TRANS_RED = new Color(238,50,50,100);
 	public static final Color TRANS_GREEN = new Color(50,238,50,100);
 	public static final Color TRANS_BLUE = new Color(50,50,238,100);
@@ -47,12 +47,20 @@ public class DrawingUtil {
 	public static final double UP_BOND_EVEN = Math.toRadians(315);
 	
 	//scalable constants
-	public static final float FONT_SIZE = (float) (96.0F * OChem.width/3840.0);
-	public static final int NODE_RAD = (int) (20 * OChem.width/3840.0);
+	//scale ratio
+	private static final double SCALE_RATIO = OChem.width/3840.0;
+	
+	//canvas
+	public static final float FONT_SIZE = (float) (80.0F * SCALE_RATIO);
+	public static final int NODE_RAD = (int) (20 * SCALE_RATIO);
 	
 	//lengths
-	public static final int CHAIN_ARM = (int) (120 * OChem.width/3840.0);
-	public static final int CYCLO_RAD = (int) (140 * OChem.width/3840.0);
+	public static final int CHAIN_ARM = (int) (120 * SCALE_RATIO);
+	public static final int CYCLO_RAD = (int) (140 * SCALE_RATIO);
+	
+	//thicknesses
+	public static final float CHAIN_STROKE = (float) (15.0F * SCALE_RATIO);
+	public static final float BOND_STROKE = (float) (8.0F * SCALE_RATIO);
 	
 	/*
 	 * Types of action to determine different drawing features

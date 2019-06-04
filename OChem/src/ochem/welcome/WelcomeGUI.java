@@ -94,12 +94,7 @@ public class WelcomeGUI extends JPanel {
 		this.add(gif, BorderLayout.EAST);
 		this.add(quote, BorderLayout.SOUTH);
 		this.add(title, BorderLayout.NORTH);
-		this.setPreferredSize(new Dimension (OChem.width/2,OChem.height/2));
+		this.setPreferredSize(new Dimension (OChem.width/3,OChem.height/3));
 		this.setBackground(Color.white);
-	}
-
-	// main for testing purposes
-	public static void main(String args[]) {
-		new WelcomeGUI();
 	}
 }

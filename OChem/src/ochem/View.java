@@ -42,7 +42,7 @@ public class View extends JFrame {
 //		this.setSize(new Dimension(width, height));
 		this.pack();
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setLocation(OChem.width/2 - width/2 - 300, OChem.height/2 - 3*height/4); //get rid of x offset
+		this.setLocation(OChem.width/2 - width/2, OChem.height/2 - 3*height/4); //get rid of x offset
 		this.setResizable(false);
 		this.dispose();
 		this.setUndecorated(false);

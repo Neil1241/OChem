@@ -31,7 +31,7 @@ public class DrawingGUI extends JPanel {
 	private JPanel dialogPanel; //panel for holding the bottom row of items
 	
 	private final double CANVAS_SCALE = 0.85; //how big the canvas is in terms of the whole container
-	private final double ERROR_SCALE = 0.1; //how big the bottom is in terms of the whole container
+	private final double ERROR_SCALE = 0.15; //how big the bottom is in terms of the whole container
 	public static final Color BG_COLOR = new Color(128,0,0); //background color for the drawing GUI
 	//86 101 115
 	public static final Color TEXT_COLOR = new Color(255,215,0); //text color for the drawing GUI
@@ -90,15 +90,15 @@ public class DrawingGUI extends JPanel {
 		double DIALOG_SCALE = 1.0 - ERROR_SCALE;
 		
 		//create and configure the dialog box
-		dialog = new OBox((int) (DIALOG_SCALE * width), (int) (height * ERROR_SCALE), "Start with a main chain");
+		dialog = new OBox((int) (0.80 * width), (int) (height * ERROR_SCALE), "Start with a main chain");
 		dialog.setCornerRadius(20);
 		dialog.setFontSize((float) (DrawingUtil.FONT_SIZE * 0.95));
 		dialogPanel.add(dialog);
 		
 		//create and configure the text field
 		userInput = new JTextField("", SwingConstants.CENTER);
-		userInput.setPreferredSize(new Dimension((int) ((1 - DIALOG_SCALE) * width), (int) (height * ERROR_SCALE))); 
-		userInput.setFont(userInput.getFont().deriveFont(80.0F));
+		userInput.setPreferredSize(new Dimension((int) ((1 - DIALOG_SCALE) * width), (int) (height * 0.6 * ERROR_SCALE))); 
+		userInput.setFont(userInput.getFont().deriveFont(DrawingUtil.FONT_SIZE * 0.95F));
 		
 		//add a controller to the text field
 		UserInputController uic = new UserInputController(canvas, palette);
@@ -127,7 +127,15 @@ public class DrawingGUI extends JPanel {
 		dialog.setTextColor(TEXT_COLOR);
 		dialog.setText(message);
 		dialog.update();
+		userInput.requestFocus();
 	} //end showMessage
+	
+	/*
+	 * Request focus of the text field
+	 */
+	public static void requestFieldFocus() {
+		userInput.requestFocus();
+	} //end requestFieldFocus
 	
 	/*
 	 * Get the user input from the textbox
