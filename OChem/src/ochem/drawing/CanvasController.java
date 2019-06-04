@@ -1,7 +1,5 @@
 package ochem.drawing;
 
-import java.awt.Color;
-
 /*
  * CanvasController
  * Created by: Neil Balaskandarajah
@@ -95,6 +93,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		} // if
 	} // end mainLeft
 
+	
 	/*
 	 * Action for when screen is left clicked with the "side" type
 	 */
@@ -108,7 +107,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			Node n = sideNodes.get(i); // current side node
 
 			// if click was on a main node
-			if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
+			if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 					n.getDia())) {
 				n.setTag("" + (i + 1)); // set the location for that chain
 				canvas.addSideNode(n); // add that node to the side nodes list
@@ -151,7 +150,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			Node n = mainNodes.get(i); // current node
 
 			// if the click was on a valid node
-			if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
+			if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 					n.getDia())) {
 				canvas.addBondNode(i); // add that node to the bonded nodes
 				canvas.setBondStep(3); // increment the bond step
@@ -182,7 +181,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					Node n = mainNodes.get(i);
 
 					// if the click was on a valid node
-					if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
+					if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 							n.getDia())) {
 						canvas.addFuncNode(n); // add that node to the functional group nodes
 						canvas.addGroupDirection(dir); // save that direction into the list
@@ -197,14 +196,14 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			case AMIDE:
 			case ESTER:
 				// first node
-				if (isWithinBounds(current.getCenterX(), current.getCenterY(), mainNodes.get(0).getCenterX(),
+				if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), mainNodes.get(0).getCenterX(),
 						mainNodes.get(0).getCenterY(), mainNodes.get(0).getDia())) {
 					canvas.addFuncNode(mainNodes.get(0)); // add the first node
 					canvas.addGroupDirection(dir); // save that direction into the list
 					canvas.setFuncStep(2); // increment the bond step
 
 				//last node
-				} else if (isWithinBounds(current.getCenterX(), current.getCenterY(),
+				} else if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(),
 						mainNodes.get(mainNodes.size() - 1).getCenterX(),
 						mainNodes.get(mainNodes.size() - 1).getCenterY(),
 						mainNodes.get(mainNodes.size() - 1).getDia())) {
@@ -221,7 +220,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					Node n = mainNodes.get(i);
 
 					// if the click was on a valid node
-					if (isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
+					if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 							n.getDia())) {
 						canvas.addFuncNode(n); // add that node to the functional group nodes
 						canvas.addGroupDirection(dir); // save that direction into the list
@@ -234,26 +233,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		} // switch
 	} // end funcLeft
 
-	/*
-	 * Check whether one point is within a radius around a target point
-	 * int x1 - current point x
-	 * int y1 - current point y
-	 * int x2 - goal point x
-	 * int y2 - goal point y
-	 * int range - distance to check within
-	 */
-	private boolean isWithinBounds(int x1, int y1, int x2, int y2, int range) {
-
-		// calculate the differences in x and y
-		double xDiff = Math.abs(x2 - x1);
-		double yDiff = Math.abs(y2 - y1);
-
-		if (xDiff < range && yDiff < range) {
-			return true;
-		} else {
-			return false;
-		} // if
-	} // end isWithinBounds
 
 	/*
 	 * Send the mouse position to the canvas
@@ -295,16 +274,19 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 		//set of all node tags that can't be updated
 		HashSet<String> noUpdate = canvas.getNoUpdate();
-
+		/*for (String s : noUpdate) {
+			System.out.println(s);
+		}*/
+		
 		// loop through all main nodes
 		for (int i = 0; i < mainNodes.size(); i++) {
 			
 			if (!noUpdate.contains(mainNodes.get(i).getTag())) { //if the tag isn't in the no update set, valid
 				
 				// if mouse is over the node
-				if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), mainNodes.get(i).getCenterX(),
+				if (DrawingUtil.isWithinBounds(ms.getCenterX(), ms.getCenterY(), mainNodes.get(i).getCenterX(),
 						mainNodes.get(i).getCenterY(), mainNodes.get(i).getRad())) {
-					System.out.println(mainNodes.get(i).toString());
+					System.out.println(mainNodes.get(i).getTag() +" is darker");
 					
 					// make its color darker
 					mainNodes.get(i).setColor(DrawingUtil.DARK_YELLOW); 
@@ -352,7 +334,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		// loop through selectable nodes to see if mouse is over
 		for (int i = 0; i < end; i++) {
 			// if mouse is over the node
-			if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), nodes.get(i).getCenterY(),
+			if (DrawingUtil.isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(), nodes.get(i).getCenterY(),
 					nodes.get(i).getRad())) {
 				// make its color darker
 				nodes.get(i).setColor(DrawingUtil.DARK_RED); // dark yellow
@@ -396,7 +378,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				// show all nodes
 				for (int i = 0; i < nodes.size(); i++) {
 					// if mouse is over the node
-					if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(),
+					if (DrawingUtil.isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(),
 							nodes.get(i).getCenterY(), nodes.get(i).getRad())) {
 						// make its color darker
 						nodes.get(i).setColor(DrawingUtil.DARK_BLUE); // dark green
@@ -423,7 +405,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			case ALDEHYDE:
 			case CARBOXYLIC_ACID:
 				// first node
-				if (isWithinBounds(current.getCenterX(), current.getCenterY(), nodes.get(0).getCenterX(),
+				if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), nodes.get(0).getCenterX(),
 						nodes.get(0).getCenterY(), nodes.get(0).getDia())) {
 					nodes.get(0).setColor(DrawingUtil.DARK_BLUE);
 				} else {
@@ -431,7 +413,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				}
 
 				// last node
-				if (isWithinBounds(current.getCenterX(), current.getCenterY(), nodes.get(nodes.size() - 1).getCenterX(),
+				if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), nodes.get(nodes.size() - 1).getCenterX(),
 						nodes.get(nodes.size() - 1).getCenterY(), nodes.get(nodes.size() - 1).getDia())) {
 					nodes.get(nodes.size() - 1).setColor(DrawingUtil.DARK_BLUE);
 				} else {
@@ -444,7 +426,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				// show all inner nodes (not first or last)
 				for (int i = 1; i < nodes.size() - 1; i++) {
 					// if mouse is over the node
-					if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(),
+					if (DrawingUtil.isWithinBounds(ms.getCenterX(), ms.getCenterY(), nodes.get(i).getCenterX(),
 							nodes.get(i).getCenterY(), nodes.get(i).getRad())) {
 						// make its color darker
 						nodes.get(i).setColor(DrawingUtil.DARK_BLUE); // dark green

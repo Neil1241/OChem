@@ -374,23 +374,7 @@ public class Canvas extends JComponent {
 				} //if
 				
 				//draw all selectable nodes
-				for (int i = 0; i < mainNodes.size(); i++) {
-					Node n = mainNodes.get(i); //current node
-					
-					if (!noUpdate.contains(n.getTag())) { //if the tag passes the no update test
-						
-						//draw node or symbol depending on tag
-						if (DrawingUtil.isNumber(n.getTag())) { //numeric tag
-							g2.setColor(n.getColor()); //change color to node color
-							drawNode(g2, n);
-							
-						} else { //letter tag for nitrogen and oxygen
-							g2.setColor(n.getColor()); //change color to node color
-							drawSymbol(g2, n.getTag(), n); 
-						} //if
-						
-					} //big if
-				} //loop
+				drawSelectableNodes(g2);
 				break;
 
 			// fixed on screen step
@@ -661,18 +645,24 @@ public class Canvas extends JComponent {
 	private void drawSelectableNodes(Graphics2D g2) {
 		//draw all selectable nodes
 		for (Node n : mainNodes) {
+			System.out.println(n.getTag());
 			if (!noUpdate.contains(n.getTag())) { //if the tag passes the no update test
-				g2.setColor(n.getColor());
 				
 				//draw node or symbol depending on tag
 				if (DrawingUtil.isNumber(n.getTag())) { //numeric tag
+					System.out.println(n.getTag() +" "+ n.getColor().toString());
+					g2.setColor(n.getColor());
 					drawNode(g2, n);
 					
 				} else { //letter tag for nitrogen and oxygen
+					System.out.println(n.getTag() +" "+ n.getColor().toString());
+					g2.setColor(n.getColor());
 					drawSymbol(g2, n.getTag(), n); 
 				} //if
 			} //big if
 		} //loop
+		
+		System.out.println();
 	} //end drawSelectableNodes
 	
 	/*
@@ -827,10 +817,10 @@ public class Canvas extends JComponent {
 			if (i >= tagStart) {
 				if (side) {
 					// set the location, radius, tag and save the node to the list
-					nodes.add(new Node(x1, y1, 20, "" + (i)));
+					nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (i)));
 				} else {
 					// set the location, radius, tag, color and save the node to the list
-					nodes.add(new Node(x1, y1, 20, "" + (i + 1), DrawingUtil.LIGHT_YELLOW));
+					nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (i + 1), DrawingUtil.LIGHT_YELLOW));
 				} // small if
 			} // big if
 
@@ -841,9 +831,9 @@ public class Canvas extends JComponent {
 
 		// add the last node
 		if (side) {
-			nodes.add(new Node(x1, y1, 20, "" + (chainSize - 1)));
+			nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (chainSize - 1)));
 		} else {
-			nodes.add(new Node(x1, y1, 20, "" + (chainSize), DrawingUtil.LIGHT_YELLOW));
+			nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (chainSize), DrawingUtil.LIGHT_YELLOW));
 		} // if
 
 		// draw the #s for debugging
@@ -1003,6 +993,7 @@ public class Canvas extends JComponent {
 		
 		Node text = new Node(textX + fm.stringWidth(symbol)/2, textY - (int) (fm.getAscent() * 0.375), fm.stringWidth(symbol)/2);
 		text.setTag(symbol);
+		text.setColor(mainNodes.get(0).getColor());
 		
 		return text;
 	} //end drawHaloAlkane
@@ -1479,7 +1470,7 @@ public class Canvas extends JComponent {
 	 * String representation of the String used for debugging
 	 */
 	public String toString() {
-		return "Canvas";
+		return "Canvas:";
 	} // end toString
 	
 	public void setCompound(Compound c) {

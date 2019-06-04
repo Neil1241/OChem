@@ -51,8 +51,8 @@ public class DrawingUtil {
 	public static final int NODE_RAD = (int) (20 * OChem.width/3840.0);
 	
 	//lengths
-	public static final int CHAIN_ARM = 120;
-	public static final int CYCLO_RAD = 140;
+	public static final int CHAIN_ARM = (int) (120 * OChem.width/3840.0);
+	public static final int CYCLO_RAD = (int) (140 * OChem.width/3840.0);
 	
 	/*
 	 * Types of action to determine different drawing features
@@ -252,4 +252,25 @@ public class DrawingUtil {
 			return false;
 		} //try-catch
 	} //end isNumber
+	
+	/*
+	 * Check whether one point is within a radius around a target point
+	 * int x1 - current point x
+	 * int y1 - current point y
+	 * int x2 - goal point x
+	 * int y2 - goal point y
+	 * int range - distance to check within
+	 */
+	public static boolean isWithinBounds(int x1, int y1, int x2, int y2, int range) {
+
+		// calculate the differences in x and y
+		double xDiff = Math.abs(x2 - x1);
+		double yDiff = Math.abs(y2 - y1);
+
+		if (xDiff < range && yDiff < range) {
+			return true;
+		} else {
+			return false;
+		} // if
+	} // end isWithinBounds
 } //end class
