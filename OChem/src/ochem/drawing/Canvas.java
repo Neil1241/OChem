@@ -1425,6 +1425,11 @@ public class Canvas extends JComponent {
 		return "Canvas";
 	} // end toString
 	
+	/*
+	 * Sets the Compound Object to the given compound object.
+	 * Changes all the stepValues to be within the nodes
+	 * create nodes for drawing
+	 */
 	public void setCompound(Compound c) {
 		this.compound = c;
 		this.mainStep = 4;
@@ -1434,5 +1439,5 @@ public class Canvas extends JComponent {
 		this.draw = true;
 		this.type = ActionType.MAIN;
 		repaint();
-	}
+	}//end setCompound
 } // end class
