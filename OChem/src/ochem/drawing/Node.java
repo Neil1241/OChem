@@ -9,7 +9,7 @@ package ochem.drawing;
 
 import java.awt.Color;
 
-import ochem.drawing.CanvasUtil.FuncGroup;
+import ochem.drawing.DrawingUtil.FuncGroup;
 
 public class Node {
 	//Attributes

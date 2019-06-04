@@ -38,7 +38,7 @@ public class UserInputController implements KeyListener {
 		if ((int) k.getKeyChar() == ENTER_KEY ) {
 			
 			//if the text in the text field is a number
-			if (isNumber(DrawingGUI.getUserInput())) {
+			if (DrawingUtil.isNumber(DrawingGUI.getUserInput())) {
 				int num = Integer.parseInt(DrawingGUI.getUserInput()); //store the number
 				
 				//actions depend on the palette type
@@ -81,19 +81,7 @@ public class UserInputController implements KeyListener {
 		} //outer if
 	} //end keyTyped
 
-	/*
-	 * Checks if a String is a valid number
-	 * String text - String to check for number
-	 */
-	private boolean isNumber(String text) {
-		//if parse succeeds, string is a number and true is returned
-		try {
-			Integer.parseInt(text); //no need to save; if error isn't caught, text is number
-			return true;
-		} catch (NumberFormatException n) {
-			return false;
-		} //try-catch
-	} //end isNumber
+	
 	
 	//MAIN TYPE//
 	

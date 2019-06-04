@@ -11,8 +11,8 @@ import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import ochem.drawing.CanvasUtil.ActionType;
-import ochem.drawing.CanvasUtil.FuncGroup;
+import ochem.drawing.DrawingUtil.ActionType;
+import ochem.drawing.DrawingUtil.FuncGroup;
 
 public class PaletteButtonController implements MouseListener {
 	//Attributes
@@ -102,7 +102,17 @@ public class PaletteButtonController implements MouseListener {
 			
 		} else if (text.equals("N")) { //amine
 			amineAction();
-		}
+			
+		} else if (text.equals("ON")) { //amide
+			amideAction();
+			
+		} else if (text.equals("O")) { //ether
+			etherAction();
+			
+		} else if (text.equals("OO")) { //ester
+			esterAction();
+			
+		} //if
 		
 		//update the button and canvas
 		button.update();
@@ -110,6 +120,17 @@ public class PaletteButtonController implements MouseListener {
 	} //end mouseClicked
 
 	//BUTTON ACTIONS//
+	
+	/*
+	 * Set the main nodes to a specific color
+	 * Color color - color to set the nodes to
+	 */
+	private void setMainNodeColor(Color color) {
+		//set the colors for all the main nodes 
+		for (int i = 0; i < canvas.getMainNodes().size(); i++) {
+			canvas.getMainNodes().get(i).setColor(color);
+		} //loop
+	} //end setMainNodeColor
 	
 	/*
 	 * Action for when the "main" button is pressed
@@ -130,11 +151,7 @@ public class PaletteButtonController implements MouseListener {
 		if (canvas.getMainOnScreen()) {
 			palette.setSelectedType(ActionType.SIDE); //set type to side
 			canvas.setSideStep(1); //step forward
-			
-			//set the colors for all the main nodes to yellow
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_YELLOW);
-			} //loop
+			setMainNodeColor(DrawingUtil.LIGHT_YELLOW); //set the node colors			
 		} //if
 	} //end sideAction
 	
@@ -147,10 +164,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.BOND); //set type to bond
 			canvas.setBondStep(1); //step forward
 			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED);
-			} //loop
+			setMainNodeColor(DrawingUtil.LIGHT_RED); //set the node colors
 		} //if
 	} //end bondAction
 	
@@ -162,11 +176,8 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.FLUORINE);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end fluoroAction
 	
@@ -178,11 +189,8 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.CHLORINE);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end chloroAction
 	
@@ -194,11 +202,8 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.BROMINE);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end bromoAction
 	
@@ -210,11 +215,8 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.IODINE);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end iodoAction
 	
@@ -226,11 +228,8 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ALDEHYDE);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end aldehydeAction
 	
@@ -242,11 +241,8 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.KETONE);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end aldehydeAction
 	
@@ -258,11 +254,8 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ALCOHOL);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end ketoneAction
 	
@@ -274,11 +267,8 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.CARBOXYLIC_ACID);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end ketoneAction
 	
@@ -290,11 +280,47 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.AMINE);
 			canvas.setFuncStep(1);
-			
-			//set the colors for all the main nodes to red
-			for (int i = 0; i < canvas.getMainNodes().size(); i++) {
-				canvas.getMainNodes().get(i).setColor(CanvasUtil.LIGHT_RED); //make green
-			} //loop
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
+		} //if 
+	} //end amineAction
+	
+	/*
+	 * Action for when the "amide" button is pressed
+	 */
+	private void amideAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.AMIDE);
+			canvas.setFuncStep(1);
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
+		} //if 
+	} //end amineAction
+	
+	/*
+	 * Action for when the "carboxylic acid" button is pressed
+	 */
+	private void etherAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.ETHER);
+			canvas.setFuncStep(1);
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
+		} //if 
+	} //end ketoneAction
+	
+	/*
+	 * Action for when the "amine" button is pressed
+	 */
+	private void esterAction() {
+		if (canvas.getMainOnScreen()) {
+			palette.setSelectedType(ActionType.FUNC_GROUP);
+			canvas.addFuncGroup(FuncGroup.ESTER);
+			canvas.setFuncStep(1);
+
+			setMainNodeColor(DrawingUtil.LIGHT_BLUE); //set the node colors
 		} //if 
 	} //end amineAction
 	

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import ochem.View;
-import ochem.drawing.CanvasUtil.ActionType;
+import ochem.drawing.DrawingUtil.ActionType;
 
 /*
  * Palette
@@ -170,6 +170,21 @@ public class Palette extends JPanel {
 		
 		this.add(row5);
 		row5.setBackground(DrawingGUI.BG_COLOR);
+		
+		JPanel row6 = new JPanel(); //row 6
+		
+		//ether
+		ether = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "O", true, false);
+		buttons.add(ether);
+		row6.add(ether);
+		
+		//ester
+		ester = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "OO", true, false);
+		buttons.add(ester);
+		row6.add(ester);
+		
+		this.add(row6);
+		row6.setBackground(DrawingGUI.BG_COLOR);
 		
 		//clear button
 		clear = new OBox(width, height/NUM_ROWS - 2*View.PAD, "Clear", true, false);
