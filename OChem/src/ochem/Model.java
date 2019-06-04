@@ -19,6 +19,5 @@ public class Model extends Object
 		frame.pack();
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		SwingUtilities.updateComponentTreeUI(frame);
 	}
 }

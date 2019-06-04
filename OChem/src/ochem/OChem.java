@@ -1,6 +1,7 @@
 package ochem;
 
 import java.awt.Toolkit;
+import ochem.welcome.*;
 
 import ochem.welcome.WelcomeGUI;
 
