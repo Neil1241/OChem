@@ -482,8 +482,8 @@ public class OrganicUtil {
 					beforeMain += prefixFromNumber(prefix);
 				}
 
-				// if the key has an oxy in the end and is not a hydroxy add a space; else if
-				// the
+				// if the key has an oxy in the end and is not a 
+				//hydroxy add a space; else if the
 				// boolean space is true, add a space or else add a hyphen
 				if (key.substring(key.length() - 3, key.length()).equals("oxy") && !key.equals("hydroxy")) {
 					beforeMain += key + " ";
