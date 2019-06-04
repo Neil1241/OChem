@@ -3,16 +3,16 @@ package ochem.drawing;
 import java.awt.Color;
 
 import ochem.OChem;
-import ochem.drawing.CanvasUtil.DrawDirection;
+import ochem.drawing.DrawingUtil.DrawDirection;
 
 /*
  * CanvasUtil
  * Created by: Neil Balaskandarajah
  * Last modified: 05/23/2019
- * Utility methods and values for the Canvas object
+ * Utility methods and values for all drawing operations
  */
 
-public class CanvasUtil {
+public class DrawingUtil {
 	//Static values
 	//transparent colors
 	public static final Color TRANS_RED = new Color(238,50,50,100);
@@ -29,6 +29,10 @@ public class CanvasUtil {
 	//red
 	public static final Color DARK_RED = new Color(183, 33, 33);
 	public static final Color LIGHT_RED = new Color(255, 45, 45);
+	
+	//blue
+	public static final Color DARK_BLUE = new Color(0, 0, 255);
+	public static final Color LIGHT_BLUE = new Color(51, 102, 255);
 	
 	//chain colors
 	public static final Color CHAIN_COLOR = new Color(44, 62, 80);
@@ -233,4 +237,18 @@ public class CanvasUtil {
 		
 		return DrawDirection.values()[pos];
 	} //end incDirection
+	
+	/*
+	 * Checks if a String is a valid number
+	 * String text - String to check for number
+	 */
+	public static boolean isNumber(String text) {
+		//if parse succeeds, string is a number and true is returned
+		try {
+			Integer.parseInt(text); //no need to save; if error isn't caught, text is number
+			return true;
+		} catch (NumberFormatException n) {
+			return false;
+		} //try-catch
+	} //end isNumber
 } //end class
