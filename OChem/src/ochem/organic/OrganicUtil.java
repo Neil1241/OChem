@@ -93,7 +93,7 @@ public class OrganicUtil {
 			prefixBond = random(1, 2);
 			bondLocation = new int[prefixBond];
 			if (prefixBond == 1)
-				bondLocation[0] = random(1,mainSize);
+				bondLocation[0] = random(1, mainSize);
 			else {
 				bondLocation[0] = 1;
 				bondLocation[1] = 2;
@@ -109,11 +109,11 @@ public class OrganicUtil {
 			int idx = 0;
 			bondLocation = new int[prefixBond];
 			HashSet<Integer> toBond = new HashSet<Integer>();
-			for (int i=0;i<prefixBond;i++) {
-				if (!toBond.add(random(1,mainSize-1)))
+			for (int i = 0; i < prefixBond; i++) {
+				if (!toBond.add(random(1, mainSize - 1)))
 					i--;
-			}//end for
-			for(Integer n: toBond)
+			} // end for
+			for (Integer n : toBond)
 				bondLocation[idx++] = n;
 		} // end if
 
@@ -173,6 +173,8 @@ public class OrganicUtil {
 
 		} // end if
 
+		pass();
+
 		// add sidechain if needed for esters and ethers
 		if (ending == 8 || ending == 11) {
 			int length = random(1, 4);
@@ -182,11 +184,13 @@ public class OrganicUtil {
 			c.addSideChain(length, "O", cycloEster, false);
 		} // end if
 
+		pass();
 		// determine amount of side chains
 		numOfSideChains = random(0, 4);
 		sideLocation = new String[numOfSideChains];
 		sideChainType = new String[numOfSideChains];
 
+		pass();
 		// add the sidechains to the compound
 		for (int i = 0; i < numOfSideChains; i++) {
 			// temp variables for the loop
@@ -195,21 +199,22 @@ public class OrganicUtil {
 			boolean sideCyclo = false;
 
 			switch (ending) {
+			case 0:
 			case 1:
 			case 2:
 			case 3:
-			case 4:
 				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 4)];
 				break;
+			case 4:
 			case 5:
-			case 6:
 				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 3)];
 				break;
 			default:
 				sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
-			}//end switch case
+			}// end switch case
 			sideLocation[i] = location(ending, mainSize);
 
+			pass();
 			if (sideChainType[i].equals("yl")) {
 				while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
 					sideLocation[i] = location(ending, mainSize);
@@ -225,7 +230,11 @@ public class OrganicUtil {
 				phenyl = true;
 			} else {
 				for (int j = 2; j < SIDE_CHAIN_SUFFIX.length; j++) {
-					if (sideChainType[i].equals(SIDE_CHAIN_SUFFIX[j])) {
+					if (sideChainType[i].equals("oxy")) {
+						pre = -j;
+						c.addSideChain(random(1, 3), "O", false, false);
+						break;
+					} else if (sideChainType[i].equals(SIDE_CHAIN_SUFFIX[j])) {
 						pre = -j;
 						break;
 					} // end if
@@ -260,13 +269,13 @@ public class OrganicUtil {
 	private static String location(int ending, int mainSize) {
 		String sideLocation = "";
 		if (ending == 6 || ending == 7) {
-			int r = random(0,mainSize);
+			int r = random(0, mainSize);
 			if (r == mainSize)
 				sideLocation = LOCATIONS[LOCATIONS.length - 1];
 			else
 				sideLocation = LOCATIONS[r];
-				
-		}else {
+
+		} else {
 			sideLocation = LOCATIONS[random(0, mainSize - 1)];
 		}
 		return sideLocation;
@@ -473,8 +482,8 @@ public class OrganicUtil {
 					beforeMain += prefixFromNumber(prefix);
 				}
 
-				// if the key has an oxy in the end and is not a hydroxy add a space; else if
-				// the
+				// if the key has an oxy in the end and is not a 
+				//hydroxy add a space; else if the
 				// boolean space is true, add a space or else add a hyphen
 				if (key.substring(key.length() - 3, key.length()).equals("oxy") && !key.equals("hydroxy")) {
 					beforeMain += key + " ";
@@ -536,6 +545,33 @@ public class OrganicUtil {
 		} // end if
 		return toReturn;
 	}// end sizeToWord
+
+	// compares 2 given compounds to see if they are the same
+	public static boolean compareCompound(Compound a, Compound b) {
+		boolean sides = true;
+		boolean main = false;
+		if (a.getMainSize() == b.getMainSize())
+			main = true;
+		if (a.getSideChains().length == b.getSideChains().length) {
+			Chain[] sideA = a.getSideChains();
+			Chain[] sideB = b.getSideChains();
+			for (int i = 0; i < sideA.length; i++) {
+				if (sideA[i].equals(sideB[i]))
+					sideB[i] = null;
+			} // end for
+			for (int i = 0; i < sideB.length; i++) {
+				if (sideB[i] != null) {
+					sides = false;
+					break;
+				}
+			}
+		} // end if
+
+		if (main && sides)
+			return true;
+		else
+			return false;
+	}
 
 	// main for testing purposes
 	public static void main(String[] args) {

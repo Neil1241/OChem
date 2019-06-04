@@ -142,12 +142,16 @@ public class Canvas extends JComponent {
 	} // end constructor
 
 	public Canvas(int width, int height) {
+<<<<<<< HEAD
 
 		super();
 		this.width = width;
 		this.height = height;
 		this.setPreferredSize(new Dimension(this.width, this.height));
 		this.draw = false;
+=======
+		this(width,height,null);
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 	}
 
 	/*
@@ -290,10 +294,15 @@ public class Canvas extends JComponent {
 				break;
 
 			// fixed on screen step
+<<<<<<< HEAD
 			case 4:
 				DrawingGUI.clear();
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
 				if (this.palette != null)
+=======
+			case 4:
+				if (this.palette!=null)
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 					DrawingGUI.clear();
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
 
@@ -1159,6 +1168,14 @@ public class Canvas extends JComponent {
 			mainNodes.set(0, new Node(x, y, DrawingUtil.NODE_RAD));
 		} // inner if
 	} // end setMainStart
+	
+	public void setMainStart() {
+		if (mainNodes.isEmpty()) {
+			mainNodes.add(new Node(this.width/6,this.height/2,20));
+		} else {
+			mainNodes.set(0, new Node(this.width/6,this.height/2,20));
+		} // inner if
+	} // end setMainStart
 
 	/*
 	 * Get whether there is a main chain on the screen
@@ -1517,7 +1534,16 @@ public class Canvas extends JComponent {
 
 		return "Canvas:";
 	} // end toString
+<<<<<<< HEAD
 
+=======
+	
+	/*
+	 * Sets the Compound Object to the given compound object.
+	 * Changes all the stepValues to be within the nodes
+	 * create nodes for drawing
+	 */
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 	public void setCompound(Compound c) {
 
 		this.compound = c;
@@ -1527,6 +1553,7 @@ public class Canvas extends JComponent {
 		this.funcStep = 3;
 		this.draw = true;
 		this.type = ActionType.MAIN;
+		this.setMainStart();
 		repaint();
-	}
+	}//end setCompound
 } // end class

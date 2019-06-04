@@ -162,4 +162,25 @@ public class Chain {
 	public void setBenzene(Boolean b) {
 		this.benzene = b;
 	}
+	
+	public boolean equals(Chain s) {
+		boolean sameSize = false;
+		boolean sameLocation = false;
+		boolean sameCyclo = false;
+		boolean sameBenzene = false;
+		if (this.size == s.size)
+			sameSize = true;
+		if (this.location.equals(s.location))
+			sameLocation = true;
+		if (this.cyclo == s.isCyclo())
+			sameCyclo = true;
+		if (this.benzene == s.isBenzene())
+			sameBenzene = true;
+		
+		//final return statment
+		if (sameSize && sameLocation && sameCyclo && sameBenzene)
+			return true;
+		else
+			return false;
+	}
 } // end Chain
