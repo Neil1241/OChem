@@ -162,6 +162,7 @@ public class Canvas extends JComponent {
 		g2.clearRect(0, 0, width, height);
 
 		if (draw) {
+			if (this.palette!=null)
 			// update the type to the palette's type
 			this.type = palette.getSelectedType();
 			
@@ -277,6 +278,9 @@ public class Canvas extends JComponent {
 			// fixed on screen step
 			case 4:
 				DrawingGUI.clear();
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+				if (this.palette!=null)
+					DrawingGUI.clear();
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
 
 				if (!mainOnScreen) { // first time called
@@ -1470,4 +1474,15 @@ public class Canvas extends JComponent {
 	public String toString() {
 		return "Canvas";
 	} // end toString
+	
+	public void setCompound(Compound c) {
+		this.compound = c;
+		this.mainStep = 4;
+		this.sideStep = 4;
+		this.bondStep = 3;
+		this.funcStep = 3;
+		this.draw = true;
+		this.type = ActionType.MAIN;
+		repaint();
+	}
 } // end class

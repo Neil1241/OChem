@@ -9,7 +9,6 @@ package ochem.welcome;
 //import packages
 import ochem.*;
 import java.awt.*;
-import java.net.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -45,10 +44,9 @@ public class WelcomeGUI extends JPanel {
 		JLabel gif = new JLabel("");
 
 		try {
-			URL url = new URL("https://mir-s3-cdn-cf.behance.net/project_modules/disp/d2edcf29458309.55f3e6e7cc760.gif");
-			ImageIcon icon = new ImageIcon(url);
+			ImageIcon icon = new ImageIcon("src/resources/Spin.gif");
 			gif = new JLabel(icon);
-		} catch (MalformedURLException e) {
+		} catch (Exception e) {
 			System.out.println("HAHAHAHAHA");
 		}
 		
@@ -102,6 +100,6 @@ public class WelcomeGUI extends JPanel {
 
 	// main for testing purposes
 	public static void main(String args[]) {
-		WelcomeGUI view = new WelcomeGUI();
+		new WelcomeGUI();
 	}
 }

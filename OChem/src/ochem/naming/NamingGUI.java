@@ -63,6 +63,7 @@ public class NamingGUI extends JPanel {
 		else {
 			this.test.setText(OrganicUtil.nameFromCompound(this.model.getCompound()));
 			this.input.setText(null);
+			this.c.setCompound(this.model.getCompound());
 		}
 	}
 	
