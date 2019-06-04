@@ -172,6 +172,8 @@ public class OrganicUtil {
 			} // end if
 
 		} // end if
+		
+		pass();
 
 		// add sidechain if needed for esters and ethers
 		if (ending == 8 || ending == 11) {
@@ -182,11 +184,13 @@ public class OrganicUtil {
 			c.addSideChain(length, "O", cycloEster, false);
 		} // end if
 
+		pass();
 		// determine amount of side chains
 		numOfSideChains = random(0, 4);
 		sideLocation = new String[numOfSideChains];
 		sideChainType = new String[numOfSideChains];
 
+		pass();
 		// add the sidechains to the compound
 		for (int i = 0; i < numOfSideChains; i++) {
 			// temp variables for the loop
@@ -195,14 +199,14 @@ public class OrganicUtil {
 			boolean sideCyclo = false;
 
 			switch (ending) {
+			case 0:
 			case 1:
 			case 2:
 			case 3:
-			case 4:
 				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 4)];
 				break;
+			case 4:
 			case 5:
-			case 6:
 				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 3)];
 				break;
 			default:
@@ -210,6 +214,7 @@ public class OrganicUtil {
 			}//end switch case
 			sideLocation[i] = location(ending, mainSize);
 
+			pass();
 			if (sideChainType[i].equals("yl")) {
 				while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
 					sideLocation[i] = location(ending, mainSize);
@@ -233,6 +238,7 @@ public class OrganicUtil {
 			} // end if
 			c.addSideChain(pre, sideLocation[i], sideCyclo, phenyl);
 		} // end for
+		
 
 		// output for debugging
 		System.out.println(

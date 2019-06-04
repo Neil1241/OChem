@@ -138,11 +138,7 @@ public class Canvas extends JComponent {
 	} // end constructor
 	
 	public Canvas(int width, int height) {
-		super();
-		this.width = width;
-		this.height = height;
-		this.setPreferredSize(new Dimension(this.width, this.height));
-		this.draw = false;
+		this(width,height,null);
 	}
 
 	/*
@@ -277,8 +273,6 @@ public class Canvas extends JComponent {
 
 			// fixed on screen step
 			case 4:
-				DrawingGUI.clear();
-				g2.setColor(DrawingUtil.CHAIN_COLOR);
 				if (this.palette!=null)
 					DrawingGUI.clear();
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
@@ -1129,6 +1123,14 @@ public class Canvas extends JComponent {
 			mainNodes.set(0, new Node(mouse.getX(), mouse.getY(), 20));
 		} // inner if
 	} // end setMainStart
+	
+	public void setMainStart() {
+		if (mainNodes.isEmpty()) {
+			mainNodes.add(new Node(this.width/6,this.height/2,20));
+		} else {
+			mainNodes.set(0, new Node(this.width/6,this.height/2,20));
+		} // inner if
+	} // end setMainStart
 
 	/*
 	 * Get whether there is a main chain on the screen
@@ -1488,6 +1490,7 @@ public class Canvas extends JComponent {
 		this.funcStep = 3;
 		this.draw = true;
 		this.type = ActionType.MAIN;
+		this.setMainStart();
 		repaint();
 	}//end setCompound
 } // end class
