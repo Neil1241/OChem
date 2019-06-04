@@ -114,7 +114,7 @@ public class OBox extends JComponent {
 		
 		//draw the text centered on the button
 		g.drawString(text, (this.getWidth() / 2) - (fm.stringWidth(text) / 2), 
-							(this.getHeight() / 2) + (fm.getAscent() / 2) - 10);
+							(this.getHeight() / 2) + (fm.getAscent() / 2) - (int) (DrawingUtil.FONT_SIZE * 0.12));
 	} //end paintComponent
 	
 	/*

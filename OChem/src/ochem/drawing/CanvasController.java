@@ -298,15 +298,16 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 		// loop through all main nodes
 		for (int i = 0; i < mainNodes.size(); i++) {
-
+			
 			if (!noUpdate.contains(mainNodes.get(i).getTag())) { //if the tag isn't in the no update set, valid
 				
 				// if mouse is over the node
 				if (isWithinBounds(ms.getCenterX(), ms.getCenterY(), mainNodes.get(i).getCenterX(),
 						mainNodes.get(i).getCenterY(), mainNodes.get(i).getRad())) {
+					System.out.println(mainNodes.get(i).toString());
 					
 					// make its color darker
-					mainNodes.get(i).setColor(Color.GREEN); 
+					mainNodes.get(i).setColor(DrawingUtil.DARK_YELLOW); 
 					
 					// if not a cycloidal chain
 					if (!canvas.getMainCyclo() && !canvas.getMainBenzene() && DrawingUtil.isNumber(mainNodes.get(i).getTag())) {

@@ -46,8 +46,9 @@ public class DrawingUtil {
 	public static final double UP_BOND_ODD = Math.toRadians(225);
 	public static final double UP_BOND_EVEN = Math.toRadians(315);
 	
-	//font size
-	public static final float fontSize = (float) (96.0F * OChem.width/3840.0);
+	//scalable constants
+	public static final float FONT_SIZE = (float) (96.0F * OChem.width/3840.0);
+	public static final int NODE_RAD = (int) (20 * OChem.width/3840.0);
 	
 	//lengths
 	public static final int CHAIN_ARM = 120;
