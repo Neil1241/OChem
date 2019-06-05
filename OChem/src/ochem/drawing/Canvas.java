@@ -220,8 +220,6 @@ public class Canvas extends JComponent {
 
 			// clear the lists of nodes
 			mainNodes.clear();
-			System.out.println("cleared");
-
 			sideNodes.clear();
 			bondNodes.clear();
 			groupNodes.clear();
@@ -332,7 +330,45 @@ public class Canvas extends JComponent {
 
 			} // big if
 
+<<<<<<< HEAD
+			// fixed on screen step
+			case 4:
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+
+				if (this.palette != null)
+					DrawingGUI.clear();
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+
+				if (!mainOnScreen) { // first time called
+					if (compound.getMainChain().isCyclo()) { // cycloidal chain
+						mainNodes = drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
+
+					} else if (compound.getMainChain().isBenzene()) { // benzene ring
+						mainNodes = drawBenzene(g2, mainNodes.get(0), false, null);
+
+					} else { // regular chain
+						this.mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(),
+								false);
+					} // if
+					mainOnScreen = true; // tell other components and actions there is a main chain on the screen
+
+				} else { // all other times
+					if (compound.getMainChain().isCyclo()) { // cycloidal chain
+						drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
+
+					} else if (compound.getMainChain().isBenzene()) { // benzene ring
+						drawBenzene(g2, mainNodes.get(0), false, null);
+
+					} else { // regular chain
+						drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
+					} // if
+
+				} // big if
+
+				break;
+=======
 			break;
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 
 		} // switch
 	} // end mainAction
@@ -867,8 +903,7 @@ public class Canvas extends JComponent {
 			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
 		}
 		g2.setColor(DrawingUtil.CHAIN_COLOR);
-
-		System.out.println("drawChain: " + nodes.size());
+		
 		return nodes;
 	} // end drawChain
 

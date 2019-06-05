@@ -78,9 +78,10 @@ public class NamingGUI extends JPanel {
 			
 			this.c.setCompound(this.model.getCompound()); //set the compound
 			
-			this.setMainNodes(this.calcMainStart());
-			
-			this.setSideNodes(); 
+			//set up the drawing
+			this.setUpMain(this.calcMainStart()); //set up main drawing
+			this.setUpSides(); //set up side drawing
+			this.setUpBonds(); //set up bond drawing
 			
 			this.c.updateDisplay();
 		}
@@ -144,7 +145,7 @@ public class NamingGUI extends JPanel {
 	 * Set all the main nodes to the canvas
 	 * Node start - starting node for the chain
 	 */
-	private void setMainNodes(Node start) {
+	private void setUpMain(Node start) {
 		ArrayList<Node> nodes = new ArrayList<Node>(); //list of nodes
 		
 		if (!model.getCompound().getMainChain().isBenzene() && !model.getCompound().getMainChain().isCyclo()) {
@@ -207,7 +208,7 @@ public class NamingGUI extends JPanel {
 	/*
 	 * Set the start positions for all the side chains
 	 */
-	private void setSideNodes() {	
+	private void setUpSides() {	
 		System.out.println("setSideNodes: " + c.getMainNodes().size());
 		//all the chains from the compound
 		Chain[] chains = model.getCompound().getSideChains();
@@ -248,8 +249,30 @@ public class NamingGUI extends JPanel {
 	/*
 	 * Set the bond nodes to the canvas
 	 */
-	private void setBondNodes() {
+	private void setUpBonds() {
+		ArrayList<String> endings = model.getCompound().getMainChain().getEndings();
 		
+		System.out.println("setUpBonds:");
+		for (String s : endings) {
+			System.out.println(s +" | "+ s.substring(0,6));
+			//if substring 0 -> n is alkene, bond nodes ...
+			//if "" alkyne, bond nodes ...
+			//location after colon
+			if (s.substring(0,6).equalsIgnoreCase("alkene")) {
+				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
+				int index = Integer.parseInt(loc) - 1; //size minus one
+				
+				c.addBondNode(index);
+				c.setBondSize(2);
+						
+			} else if (s.substring(0,6).equalsIgnoreCase("alkyne")) {
+				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
+				int index = Integer.parseInt(loc) - 1; //size minus one
+				
+				c.addBondNode(index);
+				c.setBondSize(3);
+			} //if
+		} //loop
 	} //end setBondNoddes
 	
 	/*
