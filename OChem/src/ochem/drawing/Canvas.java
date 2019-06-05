@@ -296,7 +296,7 @@ public class Canvas extends JComponent {
 			break;
 
 		// fixed on screen step
-		case 4:
+	/*	case 4:
 			g2.setColor(DrawingUtil.CHAIN_COLOR);
 
 			if (this.palette != null)
@@ -330,7 +330,7 @@ public class Canvas extends JComponent {
 
 			} // big if
 
-<<<<<<< HEAD
+<<<<<<< HEAD*/
 			// fixed on screen step
 			case 4:
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
@@ -365,10 +365,10 @@ public class Canvas extends JComponent {
 
 				} // big if
 
-				break;
+				break;/*
 =======
 			break;
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git*/
 
 		} // switch
 	} // end mainAction
@@ -1315,13 +1315,7 @@ public class Canvas extends JComponent {
 		if (compound.getMainChain().getBond() < bond) {
 			compound.getMainChain().setBond(bond);
 		}
-
 		bondSizes.add(bond);
-		if (bond == 2)
-			chain = new Chain(-14,"");
-		else if (bond ==3) {
-			chain = new Chain(-15, "");
-		}
 	} // end setBondSize
 
 	/*
@@ -1352,9 +1346,7 @@ public class Canvas extends JComponent {
 		bondNodes.add(end);
 
 		// add the location to the main chain
-		System.out.println("BOND " + bondNum);
-		compound.addSideChain(chain.getSize(), start.getTag(), false, false);
-		// compound.getMainChain().addFunctionalLocation("" + idx);
+		compound.getMainChain().addFunctionalLocation(idx+1+"");
 
 	} // end addBondedNode
 

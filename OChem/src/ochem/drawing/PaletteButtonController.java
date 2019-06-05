@@ -363,26 +363,13 @@ public class PaletteButtonController implements MouseListener {
 		Chain sides[] = c.getSideChains();
 		int num = 0;
 		ArrayList<Integer> spots = new ArrayList<Integer>();
-	/*	for (int i=0;i<sides[i].getSize();i++) {	
-		 if (sides[i].getSize() <= -13 && sides[i].getSize()>=-15) {
-				num = sides[i].getSize();
-				spots.add(i);
-			}//end if
-		}//end for
 		
-		for (int i: spots)
-			c.getMainChain().addFunctionalLocation(sides[i].getLocation());
-		
-		c.getMainChain().addNumOfGroups(spots.size(), 0);
-		if (num == -14)
-			c.getMainChain().setEnding(1, 0);
-		else if (num == -15)
-			c.getMainChain().setEnding(2,0);
-		sides = c.removeSideChain(num);*/
-		
-		//reset variables for second pass through
-		spots = new ArrayList<Integer>();
-		num = 0;
+		c.getMainChain().addNumOfGroups(c.getMainChain().getFunctionalLocation().size(), 0);
+		if (c.getMainChain().getBond() == 2) {
+			c.getMainChain().setEnding(1);
+		}else if (c.getMainChain().getBond() == 3) {
+			c.getMainChain().setEnding(2);
+		}
 		
 		// saves the indexes of the positions with the highest priority
 		for (int i = 0; i < sides.length; i++) {
