@@ -69,6 +69,8 @@ public class Canvas extends JComponent {
 	private boolean draw; // whether the canvas is in the DrawingGUI or not
 
 	private HashSet<String> noUpdate; // the list of Strings to not update with
+	private String name;
+	private int nameStep;
 
 	/*
 	 * Create a canvas with its parent's width and height
@@ -179,6 +181,7 @@ public class Canvas extends JComponent {
 			funcAction(g2);
 			sideAction(g2);
 			bondAction(g2);
+			nameAction(g2);
 
 			// debug by printing mouse node to screen
 			g2.setColor(Color.GREEN);
@@ -206,6 +209,7 @@ public class Canvas extends JComponent {
 			sideStep = 0;
 			bondStep = 0;
 			funcStep = 0;
+			nameStep = 0;
 
 			// set mainOnScreen to false
 			mainOnScreen = false;
@@ -546,6 +550,15 @@ public class Canvas extends JComponent {
 				break;
 		} // switch
 	} // end funcAction
+	
+	private void nameAction(Graphics2D g2) {
+		switch (nameStep) {
+		case 0:
+			break;
+		default:
+			DrawingGUI.showMessage(this.getName());
+		}
+	}
 
 	// DRAWING//
 
@@ -1294,6 +1307,8 @@ public class Canvas extends JComponent {
 		compound.addSideChain(lastSide.getSize(), lastSide.getLocation(), lastSide.isCyclo(), lastSide.isBenzene());
 		if (lastSide.getSize()<-5)
 			compound.addFunctionalLocation(lastSide.getLocation());
+		else
+			System.out.println("MUHAHAHAHAHAHAHA");
 	}
 	/*
 	 * Set the direction for the ghost to be drawn
@@ -1488,6 +1503,18 @@ public class Canvas extends JComponent {
 
 		return funcStep;
 	} // end getFuncStep
+	
+	public void nameStep(String name) {
+		this.name =name;
+		this.nameStep++;
+	}
+	
+	public String getName() {
+		if (this.name == null)
+			return "";
+		else
+		return this.name;
+	}
 
 	/*
 	 * Get the no updates set
