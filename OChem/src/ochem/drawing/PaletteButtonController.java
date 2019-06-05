@@ -120,8 +120,8 @@ public class PaletteButtonController implements MouseListener {
 
 		// update the button and canvas
 		button.update();
-		canvas.update();
-	} // end mouseClicked
+		canvas.updateDisplay();
+	} //end mouseClicked
 
 	// BUTTON ACTIONS//
 
@@ -351,6 +351,7 @@ public class PaletteButtonController implements MouseListener {
 			 */
 			Compound c = this.adjustEnding();
 			System.out.println(c.toString());
+			System.out.println(c.getMainChain().getBond());
 			System.out.println(OrganicUtil.nameFromCompound(c));
 			canvas.nameStep(OrganicUtil.nameFromCompound(c));
 		} // if
@@ -361,16 +362,37 @@ public class PaletteButtonController implements MouseListener {
 		Chain sides[] = c.getSideChains();
 		int num = 0;
 		ArrayList<Integer> spots = new ArrayList<Integer>();
-
+		/*
+		for (int i=0;i<sides[i].getSize();i++) {	
+		 if (sides[i].getSize() <= -13 && sides[i].getSize()>=-15) {
+				num = sides[i].getSize();
+				spots.add(i);
+			}//end if
+		}//end for
+		
+		for (int i: spots)
+			c.getMainChain().addFunctionalLocation(sides[i].getLocation());
+		
+		c.getMainChain().addNumOfGroups(spots.size(), 0);
+		if (num == -14)
+			c.getMainChain().setEnding(1, 0);
+		else if (num == -15)
+			c.getMainChain().setEnding(2,0);
+		sides = c.removeSideChain(num);
+		
+		//reset variables for second pass through
+		spots = new ArrayList<Integer>();
+		num = 0;*/
+		
 		// saves the indexes of the positions with the highest priority
 		for (int i = 0; i < sides.length; i++) {
-			if (sides[i].getSize() < num) {
+			if (sides[i].getSize() < num && sides[i].getSize()>-12) {
 				num = sides[i].getSize();
 				spots = new ArrayList<Integer>();
 				spots.add(i);
-			} else if (sides[i].getSize() == num) {
+			} else if (sides[i].getSize() == num && sides[i].getSize()>-12) {
 				spots.add(i);
-			} // end if
+			}//end if
 		} // end for
 
 		// add functional locations

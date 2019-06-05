@@ -8,6 +8,8 @@ package ochem.welcome;
 
 //import packages
 import ochem.*;
+import ochem.drawing.DrawingUtil;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -55,11 +57,9 @@ public class WelcomeGUI extends JPanel {
 		drawing.setBorder(emptyBorder);
 		quizing.setBorder(emptyBorder);
 		
-		naming.setFont(new Font("Arial", Font.PLAIN, 25));
-		drawing.setFont(new Font("Arial", Font.PLAIN, 25));
-		quizing.setFont(new Font("Arial", Font.PLAIN, 25));
-		
-		
+		naming.setFont(DrawingUtil.getFileFont(DrawingUtil.OXYGEN_LOCATION));
+		drawing.setFont(DrawingUtil.getFileFont(DrawingUtil.OXYGEN_LOCATION));
+		quizing.setFont(DrawingUtil.getFileFont(DrawingUtil.OXYGEN_LOCATION));
 
 		// create layout managers and JPanels
 		JPanel buttons = new JPanel();

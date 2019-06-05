@@ -183,11 +183,12 @@ public class Canvas extends JComponent {
 			bondAction(g2);
 			nameAction(g2);
 
-			// debug by printing mouse node to screen
+		/*	// debug by printing mouse node to screen
 			g2.setColor(Color.GREEN);
 			g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE));
-			mouse.setTag("M");
-			g2.drawString(mouse.toString(), 0, 100);
+			mouse.setTag("M");*/
+			
+			//System.out.println(Thread.currentThread().toString());
 		} // for drawing GUI
 	} // end paintComponent
 
@@ -201,8 +202,10 @@ public class Canvas extends JComponent {
 
 		// only draw the node if the type is CLEAR
 		if (type == ActionType.CLEAR) {
-			g2.setColor(DrawingUtil.TRANS_GREY); // transparent green
-			drawNode(g2, mouse);
+			if (g2 != null) {
+				g2.setColor(DrawingUtil.TRANS_GREY); // transparent green
+				drawNode(g2, mouse);
+			} //if
 
 			// set the steps to zero
 			mainStep = 0;
@@ -216,6 +219,8 @@ public class Canvas extends JComponent {
 
 			// clear the lists of nodes
 			mainNodes.clear();
+			System.out.println("cleared");
+			
 			sideNodes.clear();
 			bondNodes.clear();
 			groupNodes.clear();
@@ -293,9 +298,8 @@ public class Canvas extends JComponent {
 
 			// fixed on screen step
 			case 4:
-				DrawingGUI.clear();
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
-				if (this.palette != null)
+				
 				if (this.palette!=null)
 					DrawingGUI.clear();
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
@@ -308,7 +312,8 @@ public class Canvas extends JComponent {
 						mainNodes = drawBenzene(g2, mainNodes.get(0), false, null);
 
 					} else { // regular chain
-						mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
+						this.mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
+						System.out.println("set main nodes to " + mainNodes.size());
 					} // if
 					mainOnScreen = true; // tell other components and actions there is a main chain on the screen
 
@@ -816,8 +821,8 @@ public class Canvas extends JComponent {
 				
 		if (start.getTag().equals("N") || start.getTag().equals("O")) { // if starting on a symbol
 			// move up further
-			x1 += rCos(DrawingUtil.CHAIN_ARM / 2, Math.toRadians(angles[0]));
-			y1 += rSin(DrawingUtil.CHAIN_ARM / 2, Math.toRadians(angles[0]));
+			x1 += DrawingUtil.rCos(DrawingUtil.CHAIN_ARM / 2, Math.toRadians(angles[0]));
+			y1 += DrawingUtil.rSin(DrawingUtil.CHAIN_ARM / 2, Math.toRadians(angles[0]));
 		} // if
 		
 		ArrayList<Node> nodes = new ArrayList<Node>(); // list of nodes
@@ -871,6 +876,7 @@ public class Canvas extends JComponent {
 		}
 		g2.setColor(DrawingUtil.CHAIN_COLOR);
 
+		System.out.println("drawChain: " + nodes.size());
 		return nodes;
 	} // end drawChain
 
@@ -1008,8 +1014,8 @@ public class Canvas extends JComponent {
 		
 		if (start.getTag().equals("N") || start.getTag().equals("O")) { // if starting on a symbol
 			// move up further
-			x1 += rCos(DrawingUtil.CHAIN_ARM / 2, angle/2.0);
-			y1 += rSin(DrawingUtil.CHAIN_ARM / 2, angle/2.0);
+			x1 += DrawingUtil.rCos(DrawingUtil.CHAIN_ARM / 2, angle/2.0);
+			y1 += DrawingUtil.rSin(DrawingUtil.CHAIN_ARM / 2, angle/2.0);
 		} // if
 		
 		int x2 = x1 + (int) (r * Math.cos(angle));
@@ -1029,7 +1035,6 @@ public class Canvas extends JComponent {
 		Node text = new Node(textX + fm.stringWidth(symbol) / 2, textY - (int) (fm.getAscent() * 0.375),
 				fm.stringWidth(symbol) / 2);
 		text.setTag(symbol);
-		System.out.println("drawLetterFunc " + text.getTag());
 		text.setColor(mainNodes.get(0).getColor());
 
 		return text;
@@ -1056,23 +1061,23 @@ public class Canvas extends JComponent {
 
 		// first line
 		// start points are offset back behind start node and out perpendicular to angle of travel
-		int ax1 = start.getX() - rCos(offset, angle) + rCos(perpOut, aPerp);
-		int ay1 = start.getY() - rSin(offset, angle) + rSin(perpOut, aPerp);
+		int ax1 = start.getX() - DrawingUtil.rCos(offset, angle) + DrawingUtil.rCos(perpOut, aPerp);
+		int ay1 = start.getY() - DrawingUtil.rSin(offset, angle) + DrawingUtil.rSin(perpOut, aPerp);
 
 		// end points are start points translated out at the angle
-		int ax2 = ax1 + rCos(arm + offset, angle);
-		int ay2 = ay1 + rSin(arm + offset, angle);
+		int ax2 = ax1 + DrawingUtil.rCos(arm + offset, angle);
+		int ay2 = ay1 + DrawingUtil.rSin(arm + offset, angle);
 
 		g2.drawLine(ax1, ay1, ax2, ay2); // draw the first line
 
 		// second line
 		// start points are offset back behind start node and out perpendicular to angle of travel
-		int bx1 = start.getX() - rCos(offset, angle) + rCos(perpOut, bPerp);
-		int by1 = start.getY() - rSin(offset, angle) + rSin(perpOut, bPerp);
+		int bx1 = start.getX() - DrawingUtil.rCos(offset, angle) + DrawingUtil.rCos(perpOut, bPerp);
+		int by1 = start.getY() - DrawingUtil.rSin(offset, angle) + DrawingUtil.rSin(perpOut, bPerp);
 
 		// end points are start points translated out at the angle
-		int bx2 = bx1 + rCos(arm + offset, angle);
-		int by2 = by1 + rSin(arm + offset, angle);
+		int bx2 = bx1 + DrawingUtil.rCos(arm + offset, angle);
+		int by2 = by1 + DrawingUtil.rSin(arm + offset, angle);
 
 		g2.drawLine(bx1, by1, bx2, by2); // draw the second line
 
@@ -1082,39 +1087,19 @@ public class Canvas extends JComponent {
 		g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE)); // set the font size
 
 		// coordinates to draw String to
-		int oX = start.getX() + rCos(arm + oExtend, angle) - fm.stringWidth(o) / 2; // string width is width of the letter
-		int oY = start.getY() + rSin(arm + oExtend, angle) + (int) (fm.getAscent() * 0.375); // ascent is how high typeface can draw
+		int oX = start.getX() + DrawingUtil.rCos(arm + oExtend, angle) - fm.stringWidth(o) / 2; // string width is width of the letter
+		int oY = start.getY() + DrawingUtil.rSin(arm + oExtend, angle) + (int) (fm.getAscent() * 0.375); // ascent is how high typeface can draw
 
 		g2.drawString(o, oX, oY); // draw the symbol
 	} // end drawDoubleOxygen
 
-	/*
-	 * Calculate the x offset from rotating a line 'arm' long by 'angRad' CCW
-	 * int arm - length of line in pixels
-	 * angRad - angle to rotate line CCW in radians
-	 */
-	private int rCos(int arm, double angRad) {
-
-		return (int) (arm * Math.cos(angRad));
-	} // end rCos
-
-	/*
-	 * Calculate the y offset from rotating a line 'arm' long by 'angRad' CCW
-	 * int arm - length of line in pixels
-	 * angRad - angle to rotate line CCW in radians
-	 */
-	private int rSin(int arm, double angRad) {
-
-		return (int) (arm * Math.sin(angRad));
-	} // end rSin
 
 	// COMPONENT//
 
 	/*
 	 * Update the screen
 	 */
-	public void update() {
-
+	public void updateDisplay() {
 		repaint();
 	} // end update
 
@@ -1164,19 +1149,10 @@ public class Canvas extends JComponent {
 	 * int y - starting y
 	 */
 	public void setMainStart(int x, int y) {
-
 		if (mainNodes.isEmpty()) {
 			mainNodes.add(new Node(x, y, DrawingUtil.NODE_RAD));
 		} else {
 			mainNodes.set(0, new Node(x, y, DrawingUtil.NODE_RAD));
-		} // inner if
-	} // end setMainStart
-	
-	public void setMainStart() {
-		if (mainNodes.isEmpty()) {
-			mainNodes.add(new Node(this.width/6,this.height/2,20));
-		} else {
-			mainNodes.set(0, new Node(this.width/6,this.height/2,20));
 		} // inner if
 	} // end setMainStart
 
@@ -1194,19 +1170,16 @@ public class Canvas extends JComponent {
 	 * return nodes - list of all the nodes of the main chain
 	 */
 	public ArrayList<Node> getMainNodes() {
-
 		return mainNodes;
 	} // end getMainNodes
 
 	/*
-	 * Set the nodes on the main chain to the list passed
-	 * ArrayList<Node> mainNodes - list to change nodes to
+	 * Set the main nodes to the screen
 	 */
-	public void setMainNodes(ArrayList<Node> mainNodes) {
-
-		this.mainNodes = mainNodes;
-	} // end setMainNodes
-
+	public void setMainNodes(ArrayList<Node> nodes) {
+		mainNodes = nodes;
+	} //end setMainNodes
+	
 	/*
 	 * Update the type of the canvas from the palette type
 	 */
@@ -1362,7 +1335,9 @@ public class Canvas extends JComponent {
 		bondNodes.add(end);
 
 		// add the location to the main chain
-		compound.getMainChain().addFunctionalLocation("" + idx);
+		compound.addSideChain(-12-this.bondNum, bondNodes.get(bondNodes.size()-2).getTag(), false, false);
+		//compound.getMainChain().addFunctionalLocation("" + idx);
+		
 	} // end addBondedNode
 
 	/*
@@ -1422,7 +1397,7 @@ public class Canvas extends JComponent {
 			mainStep = step;
 		} // if
 
-		this.update();
+		this.updateDisplay();
 	} // end setMainStep
 
 	/*
@@ -1446,7 +1421,7 @@ public class Canvas extends JComponent {
 			sideStep = step;
 		} // if
 
-		this.update();
+		this.updateDisplay();
 	} // end sideStep
 
 	/*
@@ -1468,7 +1443,7 @@ public class Canvas extends JComponent {
 			bondStep = step;
 		} // if
 
-		this.update();
+		this.updateDisplay();
 	} // end sideStep
 
 	/*
@@ -1485,14 +1460,13 @@ public class Canvas extends JComponent {
 	 * int step - step for group drawing
 	 */
 	public void setFuncStep(int step) {
-
 		if (step < 0 || step > 3) {
 			throw new IllegalArgumentException("Too much for me :(");
 		} else {
 			funcStep = step;
 		} // if
 
-		this.update();
+		this.updateDisplay();
 	} // end setFuncStep
 
 	/*
@@ -1524,7 +1498,7 @@ public class Canvas extends JComponent {
 		return noUpdate;
 	} // end getNoUpdate
 
-	// COMPOUND//
+	//NAMING GUI//
 
 	/*
 	 * Get the compound
@@ -1563,15 +1537,29 @@ public class Canvas extends JComponent {
 	 * create nodes for drawing
 	 */
 	public void setCompound(Compound c) {
-
+		///set the compound
 		this.compound = c;
+		
+		//set all the steps to the final drawing steps
 		this.mainStep = 4;
 		this.sideStep = 4;
 		this.bondStep = 3;
 		this.funcStep = 3;
+		
+		//set it to draw
 		this.draw = true;
+		
+		//give it a type
 		this.type = ActionType.MAIN;
-		this.setMainStart();
-		repaint();
 	}//end setCompound
+	
+	/*
+	 * Reset the compounds and all associated lists and sets
+	 */
+	public void reset() {
+		type = ActionType.CLEAR;
+		clearAction(null);
+		type = ActionType.MAIN;
+	} //end reset
+	
 } // end class

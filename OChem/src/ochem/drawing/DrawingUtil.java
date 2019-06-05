@@ -1,9 +1,10 @@
 package ochem.drawing;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.io.File;
 
 import ochem.OChem;
-import ochem.drawing.DrawingUtil.DrawDirection;
 
 /*
  * CanvasUtil
@@ -61,6 +62,9 @@ public class DrawingUtil {
 	//thicknesses
 	public static final float CHAIN_STROKE = (float) (15.0F * SCALE_RATIO);
 	public static final float BOND_STROKE = (float) (8.0F * SCALE_RATIO);
+	
+	//file locations
+	public static final String OXYGEN_LOCATION = "src/resources/Oxygen-Regular.ttf";
 	
 	/*
 	 * Types of action to determine different drawing features
@@ -262,6 +266,23 @@ public class DrawingUtil {
 	} //end isNumber
 	
 	/*
+	 * Convert a String to an integer
+	 * String str - string to convert
+	 * return num - numerical form of the String OR default value
+	 */
+	public static int stringToNum(String str) {
+		int num;
+		
+		try { //set parsed number
+			num = Integer.parseInt(str);
+		} catch (NumberFormatException n) { //set default
+			num = 0;
+		}
+		
+		return num;
+	} //end stringToNum
+	
+	/*
 	 * Check whether one point is within a radius around a target point
 	 * int x1 - current point x
 	 * int y1 - current point y
@@ -281,4 +302,42 @@ public class DrawingUtil {
 			return false;
 		} // if
 	} // end isWithinBounds
+	
+	/*
+	 * Get a font from a file
+	 * String location - location of the file
+	 * return font - font retrieved from file OR default font
+	 */
+	public static Font getFileFont(String location) {
+		Font f;
+		
+		//try to create and set the font if the file is present
+		try {
+			f = Font.createFont(Font.TRUETYPE_FONT, new File(location));
+			f = f.deriveFont(DrawingUtil.FONT_SIZE);
+		} catch (Exception e) {
+			e.printStackTrace();
+			f = new Font(Font.SANS_SERIF, Font.PLAIN, (int) DrawingUtil.FONT_SIZE);
+		} //try-catch
+		
+		return f;
+	} //end getFileFont
+	
+	/*
+	 * Calculate the x offset from rotating a line 'arm' long by 'angRad' CCW
+	 * int arm - length of line in pixels
+	 * angRad - angle to rotate line CCW in radians
+	 */
+	public static int rCos(int arm, double angRad) {
+		return (int) (arm * Math.cos(angRad));
+	} // end rCos
+
+	/*
+	 * Calculate the y offset from rotating a line 'arm' long by 'angRad' CCW
+	 * int arm - length of line in pixels
+	 * angRad - angle to rotate line CCW in radians
+	 */
+	public static int rSin(int arm, double angRad) {
+		return (int) (arm * Math.sin(angRad));
+	} // end rSin
 } //end class
