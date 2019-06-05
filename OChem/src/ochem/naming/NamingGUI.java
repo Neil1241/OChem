@@ -174,11 +174,35 @@ public class NamingGUI extends JPanel {
 			nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (model.getCompound().getMainSize())));
 			
 		} else {
-			//put drawCyclo methods here
-		}
+			// offset length in pixels
+			int r = DrawingUtil.CYCLO_RAD;
+
+			// start point
+			int x1 = start.getX();
+			int y1 = start.getY();
+
+			// end point
+			int x2 = 0;
+			int y2 = 0;
+
+			// value to increment angle by each step
+			double theta = Math.toRadians(-360.0 / model.getCompound().getMainSize());
+
+			// draw the cyclo
+			for (int i = 0; i < model.getCompound().getMainSize(); i++) {
+				x2 = x1 + (int) (r * Math.cos(theta * i));
+				y2 = y1 + (int) (r * Math.sin(theta * i));
+
+				// add the node to the list
+				nodes.add(new Node(x1, y1, 20, "" + (i + 1)));
+
+				x1 = x2;
+				y1 = y2;
+			} // loop
+		} //if
 		
 		c.setMainNodes(nodes);
-	}
+	} //end setMainNodes
 	
 	/*
 	 * Set the start positions for all the side chains
@@ -201,11 +225,18 @@ public class NamingGUI extends JPanel {
 				
 				c.addSideSize(chains[i].getSize());
 				
-				if (location % 2 == 0) {
-					c.addSideDirection(DrawDirection.UP_RIGHT);
+				if (!model.getCompound().getMainChain().isBenzene() || !model.getCompound().getMainChain().isCyclo()) {
+					if (location % 2 == 0) {
+						c.addSideDirection(DrawDirection.UP_RIGHT);
+					} else {
+						c.addSideDirection(DrawDirection.DOWN_RIGHT);
+					} //if
+					
 				} else {
-					c.addSideDirection(DrawDirection.DOWN_RIGHT);
-				}
+					c.addSideDirection(nameDir(location));
+					
+				} //big if
+				
 				c.addSideNode(side);
 				
 			} else { //(-) size for functional group
@@ -213,5 +244,34 @@ public class NamingGUI extends JPanel {
 			}
 		} //loop
 	} //end setSideNodes
+	
+	/*
+	 * Set the bond nodes to the canvas
+	 */
+	private void setBondNodes() {
+		
+	} //end setBondNoddes
+	
+	/*
+	 * Name direction from location
+	 * int location - location on main chain
+	 */
+	private DrawDirection nameDir(int location) {
+		if (location == 1 || location == 2) { //lower
+			return DrawDirection.DOWN_LEFT;
+			
+		} else if (location == 3) { //right
+			return DrawDirection.RIGHT;
+			
+		} else if (location == 4 || location == 5) { //top
+			return DrawDirection.UP_LEFT;
+			
+		} else if (location == 6) { //left
+			return DrawDirection.LEFT;
+			
+		} else { //other cases 
+			return DrawDirection.LEFT;
+		} //if
+	} //end nameDir
 	
 }//end class

@@ -120,13 +120,9 @@ public class PaletteButtonController implements MouseListener {
 
 		// update the button and canvas
 		button.update();
-<<<<<<< HEAD
 		canvas.updateDisplay();
-	} //end mouseClicked
-=======
-		canvas.update();
-	} // end mouseClicked
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
+	} //end mouseClicke
+
 
 	// BUTTON ACTIONS//
 
