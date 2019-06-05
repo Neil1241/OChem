@@ -123,6 +123,7 @@ public class PaletteButtonController implements MouseListener {
 		canvas.updateDisplay();
 	} //end mouseClicked
 
+
 	// BUTTON ACTIONS//
 
 	/*
