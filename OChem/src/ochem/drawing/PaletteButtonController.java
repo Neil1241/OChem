@@ -168,7 +168,7 @@ public class PaletteButtonController implements MouseListener {
 																	// ring
 			palette.setSelectedType(ActionType.BOND); // set type to bond
 			canvas.setBondStep(1); // step forward
-
+			
 			setMainNodeColor(DrawingUtil.LIGHT_RED); // set the node colors
 		} // if
 	} // end bondAction
