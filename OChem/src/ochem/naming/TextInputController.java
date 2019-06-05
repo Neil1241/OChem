@@ -23,12 +23,12 @@ public class TextInputController implements ActionListener {
 		if (in.length() < 6)
 			this.model.giveInvalid();
 		else {
-			try {
+			//try {
 				this.c = Interpreter.compoundFromName(in);
 				this.model.giveCompound(c);
-			} catch (Exception error) {
-				this.model.giveInvalid();
-			}
+			//} catch (Exception error) {
+//				this.model.giveInvalid();
+			//}
 		}
 
 	}

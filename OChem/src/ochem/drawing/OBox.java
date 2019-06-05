@@ -46,15 +46,10 @@ public class OBox extends JComponent {
 		this.setPreferredSize(new Dimension(width, height));
 		
 		//set the font size
-		fontSize = 96.0F;	
+		fontSize = DrawingUtil.FONT_SIZE;	
 		
-		//try to create and set the font if the file is present
-		try {
-			f = Font.createFont(Font.TRUETYPE_FONT, new File("src/resources/Oxygen-Regular.ttf"));
-		} catch (Exception e) {
-			e.printStackTrace();
-			f = new Font(Font.SANS_SERIF, Font.PLAIN, (int) fontSize);
-		} //try-catch
+		//regular Oxygen font
+		f = DrawingUtil.getFileFont(DrawingUtil.OXYGEN_LOCATION);
 		
 		//set the corner radius and colors
 		cornerRad = 60;		

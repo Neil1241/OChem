@@ -23,11 +23,13 @@ public class WelcomeController implements ActionListener
 	
 	public void actionPerformed(ActionEvent e)
 	{
-		if (e.getActionCommand().equals("Naming"))
+		if (e.getActionCommand().equals("Naming")) {
 			this.model.setGUI(new NamingGUI());
-		else if (e.getActionCommand().equals("Drawing"))
-			this.model.setGUI(new DrawingGUI(this.width,this.height));
-		else
+			NamingGUI.requestFieldFocus();
+		} else if (e.getActionCommand().equals("Drawing")) {
+			this.model.setGUI(new DrawingGUI(this.width, this.height));
+		} else {
 			this.model.setGUI(null);
+		}
 	}
 }

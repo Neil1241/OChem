@@ -77,7 +77,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			sideRight();
 		}
 
-		canvas.update(); // update the canvas
+		canvas.updateDisplay(); // update the canvas
 	} // end mousePressed
 
 	// ACTION METHODS//
@@ -257,7 +257,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 		} // if
 
 		// update the display
-		canvas.update();
+		canvas.updateDisplay();
 	} // end mouseMoved
 
 	// MOTION//
