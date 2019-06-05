@@ -1292,7 +1292,8 @@ public class Canvas extends JComponent {
 		Chain lastSide = sideChains.get(sideChains.size() - 1);
 		lastSide.setLocation(n.getTag());
 		compound.addSideChain(lastSide.getSize(), lastSide.getLocation(), lastSide.isCyclo(), lastSide.isBenzene());
-		compound.addFunctionalLocation(lastSide.getLocation());
+		if (lastSide.getSize()<-5)
+			compound.addFunctionalLocation(lastSide.getLocation());
 	}
 	/*
 	 * Set the direction for the ghost to be drawn

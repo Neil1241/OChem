@@ -24,10 +24,10 @@ public class OChem {
 		//for (int i=0;i<3;i++) {
 		out.println("Enter name of compound: ");
 		String cmpnd = in.nextLine();
-		String cmpnd2 = in.nextLine();
+		//String cmpnd2 = in.nextLine();
 
 		Compound compound = Interpreter.compoundFromName(cmpnd);
-		Compound c = Interpreter.compoundFromName(cmpnd2);
+		//Compound c = Interpreter.compoundFromName(cmpnd2);
 
 		out.println("------------------------------------------");
 		out.println("OCHEM RUNNING THIS");
@@ -37,7 +37,7 @@ public class OChem {
 		out.println(compound.getMainChain().getBond());
 		
 		out.println(OrganicUtil.nameFromCompound(compound));
-		out.println(OrganicUtil.compareCompound(c, compound));
+		//out.println(OrganicUtil.compareCompound(c, compound));
 		//}
 
 		in.close();

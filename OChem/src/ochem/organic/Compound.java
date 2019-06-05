@@ -57,6 +57,16 @@ public class Compound {
 			}
 		}
 	} // end addSideChain
+	
+	public Chain[] removeSideChain(int size) {
+		for (int i=0; i<sideChains.size();i++) {
+			if (this.sideChains.get(i).getSize() == size) {
+				this.sideChains.remove(i);
+				i--;
+			}//end if
+		}//end for
+		return this.getSideChains();
+	}
 
 	/*
 	 * Get an array of all the side chains return side - array containing all the
