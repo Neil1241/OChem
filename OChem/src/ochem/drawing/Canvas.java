@@ -219,8 +219,6 @@ public class Canvas extends JComponent {
 
 			// clear the lists of nodes
 			mainNodes.clear();
-			System.out.println("cleared");
-
 			sideNodes.clear();
 			bondNodes.clear();
 			groupNodes.clear();
@@ -314,7 +312,6 @@ public class Canvas extends JComponent {
 					} else { // regular chain
 						this.mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(),
 								false);
-						System.out.println("set main nodes to " + mainNodes.size());
 					} // if
 					mainOnScreen = true; // tell other components and actions there is a main chain on the screen
 
@@ -876,8 +873,7 @@ public class Canvas extends JComponent {
 			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
 		}
 		g2.setColor(DrawingUtil.CHAIN_COLOR);
-
-		System.out.println("drawChain: " + nodes.size());
+		
 		return nodes;
 	} // end drawChain
 
