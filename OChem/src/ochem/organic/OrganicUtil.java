@@ -17,10 +17,10 @@ public class OrganicUtil {
 	// Suffixes
 	public static final String[] MAIN_CHAIN_SUFFIX = { "ane", "ene", "yne", "ol", "al", "one", "amine", "amide", "oate",
 			"oic acid" };
-	public static final String[] SIDE_CHAIN_SUFFIX = { "phenyl", "yl", "bromo", "iodo", "fluro", "chloro", "oxo",
+	public static final String[] SIDE_CHAIN_SUFFIX = { "phenyl", "yl", "bromo", "iodo", "fluoro", "chloro", "oxo",
 			"hydroxy", "oxy", "amino" };
 
-	public static final String[] SIDE_CHAIN_PRIORITY = { "bromo", "iodo", "fluro", "chloro", "phenyl", "yl", "oxy",
+	public static final String[] SIDE_CHAIN_PRIORITY = { "bromo", "iodo", "fluoro", "chloro", "phenyl", "yl", "oxy",
 			"hydroxy", "oxo", "amino" };
 	
 	// name of functional groups

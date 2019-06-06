@@ -209,7 +209,7 @@ public class UserInputController implements KeyListener {
 			DrawingGUI.reportError("Number entered too big!");
 			
 		} else { //valid
-			canvas.setBondSize(num); //set the size of the bond
+			canvas.addBondSize(num); //set the size of the bond
 			canvas.setBondStep(2); //step forward
 		} //if
 	} //end bondAction

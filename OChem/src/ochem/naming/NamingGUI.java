@@ -19,8 +19,10 @@ import ochem.View;
 import ochem.drawing.Canvas;
 import ochem.drawing.DrawingUtil;
 import ochem.drawing.DrawingUtil.DrawDirection;
+import ochem.drawing.DrawingUtil.FuncGroup;
 import ochem.drawing.Node;
 import ochem.organic.Chain;
+import ochem.organic.Compound;
 import ochem.organic.OrganicUtil;
 
 public class NamingGUI extends JPanel {
@@ -31,6 +33,8 @@ public class NamingGUI extends JPanel {
 	private Canvas c;
 	private int width = (int) (0.5 * OChem.width + 2 * View.PAD);
 	private int height = (int) (0.5 * OChem.height + 2 * View.PAD);
+	
+	private Compound compound; //local copy of the compound to be drawn
 
 	public NamingGUI() {
 		super();
@@ -70,21 +74,15 @@ public class NamingGUI extends JPanel {
 			this.model.setValid(true);
 		}
 		else {
-			this.test.setText(OrganicUtil.nameFromCompound(this.model.getCompound()));
-			this.input.setText(null);
+			compound = model.getCompound();
 			
-			//clear the canvas of all data so it can be given data only for the new compound
-			c.reset();
+			this.test.setText(OrganicUtil.nameFromCompound(this.compound));
+			input.setText(null);
 			
-			this.c.setCompound(this.model.getCompound()); //set the compound
+			this.setUpCanvas(); //set the canvas up
 			
-			//set up the drawing
-			this.setUpMain(this.calcMainStart()); //set up main drawing
-			this.setUpSides(); //set up side drawing
-			this.setUpBonds(); //set up bond drawing
-			
-			this.c.updateDisplay();
-		}
+			this.c.updateDisplay(); //update the display to show the canvas
+		} 
 	}
 	
 	/*
@@ -108,6 +106,21 @@ public class NamingGUI extends JPanel {
 	}
 	
 	//SET UP CANVAS//
+	/**
+	 * Set up the canvas for drawing the compound
+	 */
+	private void setUpCanvas() {
+		this.c.reset(); //reset the canvas
+		
+		this.c.setCompound(compound); //set the compound to the canvas
+		
+		//set up the drawing
+		this.setUpMain(this.calcMainStart()); //set up main drawing
+		this.setUpSides(); //set up side drawing
+		this.setUpBonds(); //set up bond drawing
+		this.setUpFuncGroups(); //set up functional groups
+	} //end setUpCanvas
+	
 	/*
 	 * Set the canvas main start position based on the compound size
 	 * return - starting node for the main chain
@@ -120,9 +133,9 @@ public class NamingGUI extends JPanel {
 		int yOffset;
 		
 		//if a regular chain
-		if (!model.getCompound().getMainChain().isBenzene() && !model.getCompound().getMainChain().isCyclo()) {
+		if (!compound.getMainChain().isBenzene() && !compound.getMainChain().isCyclo()) {
 			//width of chain
-			xOffset = (model.getCompound().getMainSize() - 1) * 
+			xOffset = (compound.getMainSize() - 1) * 
 					DrawingUtil.rCos(DrawingUtil.CHAIN_ARM, angle);
 			
 			//height of chain
@@ -148,14 +161,14 @@ public class NamingGUI extends JPanel {
 	private void setUpMain(Node start) {
 		ArrayList<Node> nodes = new ArrayList<Node>(); //list of nodes
 		
-		if (!model.getCompound().getMainChain().isBenzene() && !model.getCompound().getMainChain().isCyclo()) {
+		if (!compound.getMainChain().isBenzene() && !compound.getMainChain().isCyclo()) {
 			double[] angles = DrawingUtil.angleFromDirection(DrawDirection.RIGHT); // get the angles based on the direction
 			int arm = DrawingUtil.CHAIN_ARM;
 			
 			int x1 = start.getX();
 			int y1 = start.getY();
 			
-			for (int i = 0; i < model.getCompound().getMainSize() - 1; i++) {
+			for (int i = 0; i < compound.getMainSize() - 1; i++) {
 				// current angle to draw (alternate between the 2 angles)
 				double ang = angles[i % 2];
 
@@ -172,7 +185,7 @@ public class NamingGUI extends JPanel {
 			} // loop
 			
 			//add the last node
-			nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (model.getCompound().getMainSize())));
+			nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (compound.getMainSize())));
 			
 		} else {
 			// offset length in pixels
@@ -187,10 +200,10 @@ public class NamingGUI extends JPanel {
 			int y2 = 0;
 
 			// value to increment angle by each step
-			double theta = Math.toRadians(-360.0 / model.getCompound().getMainSize());
+			double theta = Math.toRadians(-360.0 / compound.getMainSize());
 
 			// draw the cyclo
-			for (int i = 0; i < model.getCompound().getMainSize(); i++) {
+			for (int i = 0; i < compound.getMainSize(); i++) {
 				x2 = x1 + (int) (r * Math.cos(theta * i));
 				y2 = y1 + (int) (r * Math.sin(theta * i));
 
@@ -209,13 +222,8 @@ public class NamingGUI extends JPanel {
 	 * Set the start positions for all the side chains
 	 */
 	private void setUpSides() {	
-		System.out.println("setSideNodes: " + c.getMainNodes().size());
 		//all the chains from the compound
-		Chain[] chains = model.getCompound().getSideChains();
-		
-		for (Node n : c.getMainNodes()) {
-			System.out.println(n.toString());
-		}
+		Chain[] chains = compound.getSideChains();
 		
 		//loop through all the chains adding them to the list
 		for (int i = 0; i < chains.length; i++) {
@@ -226,7 +234,7 @@ public class NamingGUI extends JPanel {
 				
 				c.addSideSize(chains[i].getSize());
 				
-				if (!model.getCompound().getMainChain().isBenzene() || !model.getCompound().getMainChain().isCyclo()) {
+				if (!compound.getMainChain().isBenzene() || !compound.getMainChain().isCyclo()) {
 					if (location % 2 == 0) {
 						c.addSideDirection(DrawDirection.UP_RIGHT);
 					} else {
@@ -240,8 +248,6 @@ public class NamingGUI extends JPanel {
 				
 				c.addSideNode(side);
 				
-			} else { //(-) size for functional group
-				
 			}
 		} //loop
 	} //end setSideNodes
@@ -250,7 +256,7 @@ public class NamingGUI extends JPanel {
 	 * Set the bond nodes to the canvas
 	 */
 	private void setUpBonds() {
-		ArrayList<String> endings = model.getCompound().getMainChain().getEndings();
+		ArrayList<String> endings = compound.getMainChain().getEndings();
 		
 		System.out.println("setUpBonds:");
 		for (String s : endings) {
@@ -262,18 +268,113 @@ public class NamingGUI extends JPanel {
 				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				
+				System.out.println("alkene " + loc +" "+ index);
+				
 				c.addBondNode(index);
-				c.setBondSize(2);
+				c.addBondSize(2);
+				System.out.println("2 bond added at " + (index+1));
 						
 			} else if (s.substring(0,6).equalsIgnoreCase("alkyne")) {
 				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				
 				c.addBondNode(index);
-				c.setBondSize(3);
+				c.addBondSize(3);
+				
+				System.out.println("3 bond added at " + (index+1));
 			} //if
 		} //loop
+		System.out.println("----------");
 	} //end setBondNoddes
+	
+	/*
+	 * Set up the functional groups on the compound
+	 */
+	private void setUpFuncGroups() {
+		this.setUpHaloAlkanes();
+		this.setUpMiscFuncGroups();
+	} //end setUpFuncGroups
+	
+	
+	/*
+	 * Add the haloalkanes to the canvas
+	 */
+	private void setUpHaloAlkanes() {
+		Chain[] sideChains = compound.getSideChains();
+		
+		System.out.println("setUpHaloAlkanes:");
+		for (int i = 0; i < sideChains.length; i++) {
+			int size = sideChains[i].getSize();
+			
+			c.addSideSize(size);
+			
+			System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[-size]);
+			
+			//add the group based on the index
+			switch (size) {
+				case -2:
+					c.addFuncGroup(FuncGroup.BROMINE);
+					break;
+				case -3:
+					c.addFuncGroup(FuncGroup.IODINE);
+					break;
+				case -4:
+					c.addFuncGroup(FuncGroup.FLUORINE);
+					break;
+				case -5:
+					c.addFuncGroup(FuncGroup.CHLORINE);
+					break;
+			} //switch
+			
+			//get the location of the haloalkane on the main chain
+			int location = Integer.parseInt(sideChains[i].getLocation());
+			
+			c.addFuncNode(c.getMainNodes().get(location - 1));
+			
+			//add a direction for the chain
+			if (location == 1) {
+				c.addGroupDirection(DrawDirection.UP_LEFT);
+			} else if (location % 2 == 0) {
+				c.addGroupDirection(DrawDirection.UP_RIGHT);
+			} else {
+				c.addGroupDirection(DrawDirection.DOWN_RIGHT);
+			} //if
+		} //loop
+		System.out.println("----------");
+	} //end setUpHaloAlkanes
+	
+	/*
+	 * Add miscellaneous functional groups
+	 */
+	private void setUpMiscFuncGroups() {
+		ArrayList<String> endings = compound.getMainChain().getEndings();
+		
+		System.out.println("setUpMiscFuncGroups:");
+		for (String s : endings) {
+			System.out.println(s +" | "+ s.substring(0,7));
+			if (s.substring(0,7).equalsIgnoreCase("alcohol")) {
+				//add the group
+				c.addFuncGroup(FuncGroup.ALCOHOL);
+				c.addSideSize(0);
+				
+				//add the node
+				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
+				int index = Integer.parseInt(loc) - 1; //size minus one
+				c.addFuncNode(c.getMainNodes().get(index));
+				
+				//add a direction for the chain
+				if (index+1 == 1) {
+					c.addGroupDirection(DrawDirection.UP_LEFT);
+				} else if ((index+1) % 2 == 0) {
+					c.addGroupDirection(DrawDirection.UP_RIGHT);
+				} else {
+					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
+				} //if
+			}
+			
+		} //loop
+		System.out.println("----------");
+	} //end setUpMiscFuncGroups
 	
 	/*
 	 * Name direction from location

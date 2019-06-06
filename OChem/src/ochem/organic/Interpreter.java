@@ -256,7 +256,7 @@ public class Interpreter {
 		// used to add any missing locations on the first suffix
 		while (additionalGroups > hold.length()) {
 			hold = "1" + hold;
-			chainLocations.add(0, "1");
+			chainLocations.add("1");
 		}
 
 		System.out.println("---" + test + "---" + hold);

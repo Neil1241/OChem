@@ -1,6 +1,6 @@
 package ochem.organic;
 
-import java.util.*;
+import java.util.ArrayList;
 
 /*
  * Chain

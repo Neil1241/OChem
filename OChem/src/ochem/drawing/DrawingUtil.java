@@ -78,7 +78,7 @@ public class DrawingUtil {
 	} //end enum
 	
 	/*
-	 * Different directions the chain can be drawn in
+	 * Different directions the chain can be drawn in (corresponds to pairs of angles)
 	 */
 	public static enum DrawDirection {
 		UP_RIGHT,
@@ -93,18 +93,33 @@ public class DrawingUtil {
 	 * Different functional groups
 	 */
 	public static enum FuncGroup {
+		//haloalkanes
 		FLUORINE,
 		CHLORINE,
 		BROMINE,
 		IODINE, 
+		
+		//double bonded oxygens
 		ALDEHYDE,
 		KETONE,
+		
+		//hydroxide
 		ALCOHOL,
+		
+		//double oxygen and hydroxide
 		CARBOXYLIC_ACID,
+		
+		//single oxygen
 		ETHER,
+		
+		//double oxygen and single oxygen
 		ESTER,
-		AMIDE,
-		AMINE
+		
+		//single nitrogen
+		AMINE,
+		
+		//double oxygen and single nitrogen
+		AMIDE
 	} //end enum
 	
 	/*

@@ -196,8 +196,8 @@ public class Canvas extends JComponent {
 	// ACTIONS//
 
 	/*
-	 * Handles the actions for the clear flow Graphics2D g2 - object responsible for
-	 * drawing
+	 * Handles the actions for the clear flow
+	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void clearAction(Graphics2D g2) {
 
@@ -249,88 +249,52 @@ public class Canvas extends JComponent {
 	} // end clearAction
 
 	/*
-	 * Handles the actions for the main flow Graphics2D g2 - object responsible for
-	 * drawing
+	 * Handles the actions for the main flow 
+	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void mainAction(Graphics2D g2) {
 
 		// change what to draw based on what the value of main step is
 		switch (mainStep) {
-		// do nothing step
-		case 0:
-			break;
+			// do nothing step
+			case 0:
+				break;
 
-		// size definition step
-		case 1:
-			mainOnScreen = false;
-			DrawingGUI.showMessage("Enter size of main chain: (ENTER)");
-			g2.setColor(DrawingUtil.TRANS_BLUE);
-			drawNode(g2, mouse);
-			break;
+			// size definition step
+			case 1:
+				mainOnScreen = false;
+				DrawingGUI.showMessage("Enter size of main chain: (ENTER)");
+				g2.setColor(DrawingUtil.TRANS_BLUE);
+				drawNode(g2, mouse);
+				break;
 
-		// determine cyclo step
-		case 2:
-			mainOnScreen = false;
-			DrawingGUI.showMessage("Cyclo? (Y/N)");
-			g2.setColor(DrawingUtil.TRANS_GREY);
-			drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
-			break;
-
-		// location selection step
-		case 3:
-			mainOnScreen = false;
-			DrawingGUI.showMessage("Select location for main chain: (CLICK)");
-			g2.setColor(DrawingUtil.TRANS_GREY);
-
-			if (compound.getMainChain().isCyclo()) { // cycloidal chain
-				drawCyclo(g2, mouse, compound.getMainSize(), false, null);
-
-			} else if (compound.getMainChain().isBenzene()) { // benzene ring
-				drawBenzene(g2, mouse, false, null);
-
-			} else { // regular chain
+			// determine cyclo step
+			case 2:
+				mainOnScreen = false;
+				DrawingGUI.showMessage("Cyclo? (Y/N)");
+				g2.setColor(DrawingUtil.TRANS_GREY);
 				drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
-			} // if
+				break;
 
-			drawSides(g2);
-			break;
+			// location selection step
+			case 3:
+				mainOnScreen = false;
+				DrawingGUI.showMessage("Select location for main chain: (CLICK)");
+				g2.setColor(DrawingUtil.TRANS_GREY);
 
-		// fixed on screen step
-		case 4:
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-
-			if (this.palette != null)
-				DrawingGUI.clear();
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-
-			if (!mainOnScreen) { // first time called
 				if (compound.getMainChain().isCyclo()) { // cycloidal chain
-					mainNodes = drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
+					drawCyclo(g2, mouse, compound.getMainSize(), false, null);
 
 				} else if (compound.getMainChain().isBenzene()) { // benzene ring
-					mainNodes = drawBenzene(g2, mainNodes.get(0), false, null);
+					drawBenzene(g2, mouse, false, null);
 
 				} else { // regular chain
-					this.mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(),
-							false);
-					System.out.println("set main nodes to " + mainNodes.size());
-				} // if
-				mainOnScreen = true; // tell other components and actions there is a main chain on the screen
-
-			} else { // all other times
-				if (compound.getMainChain().isCyclo()) { // cycloidal chain
-					drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
-
-				} else if (compound.getMainChain().isBenzene()) { // benzene ring
-					drawBenzene(g2, mainNodes.get(0), false, null);
-
-				} else { // regular chain
-					drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
+					drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
 				} // if
 
-			} // big if
+				drawSides(g2);
+				break;
 
-<<<<<<< HEAD
 			// fixed on screen step
 			case 4:
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
@@ -366,78 +330,76 @@ public class Canvas extends JComponent {
 				} // big if
 
 				break;
-=======
-			break;
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 
 		} // switch
 	} // end mainAction
 
 	/*
-	 * Handles the actions for the side flow Graphics2D g2 - object responsible for
+	 * Handles the actions for the side flow 
+	 * @param Graphics2D g2 - object responsible for
 	 * drawing
 	 */
 	private void sideAction(Graphics2D g2) {
 
 		// change what to draw based on what the value of main step is
 		switch (sideStep) {
-		// do nothing step
-		case 0:
-			break;
+			// do nothing step
+			case 0:
+				break;
 
-		// size definition step
-		case 1:
-			DrawingGUI.showMessage("Enter size of side chain: (ENTER)");
-			g2.setColor(DrawingUtil.TRANS_YELLOW);
-			drawNode(g2, mouse);
+			// size definition step
+			case 1:
+				DrawingGUI.showMessage("Enter size of side chain: (ENTER)");
+				g2.setColor(DrawingUtil.TRANS_YELLOW);
+				drawNode(g2, mouse);
 
-			drawSides(g2);
-			break;
+				drawSides(g2);
+				break;
 
-		// determine cyclo step
-		case 2:
-			DrawingGUI.showMessage("Cyclo? (Y/N)");
-			g2.setColor(DrawingUtil.TRANS_GREY);
-			drawChain(g2, mouse, ghostDir, sideChains.get(sideChains.size() - 1).getSize() + 1, true);
+			// determine cyclo step
+			case 2:
+				DrawingGUI.showMessage("Cyclo? (Y/N)");
+				g2.setColor(DrawingUtil.TRANS_GREY);
+				drawChain(g2, mouse, ghostDir, sideChains.get(sideChains.size() - 1).getSize() + 1, true);
 
-			drawSides(g2);
-			break;
+				drawSides(g2);
+				break;
 
-		// location selection step
-		case 3:
-			DrawingGUI.showMessage("Select location for side chain: (CLICK)");
-			g2.setColor(DrawingUtil.TRANS_GREY); // faint gray
+			// location selection step
+			case 3:
+				DrawingGUI.showMessage("Select location for side chain: (CLICK)");
+				g2.setColor(DrawingUtil.TRANS_GREY); // faint gray
 
-			// create and draw the would-be chain
-			Chain ghost = sideChains.get(sideChains.size() - 1);
-			if (ghost.isCyclo()) { // cycloidal chain
-				drawCyclo(g2, mouse, ghost.getSize(), true, ghostDir);
+				// create and draw the would-be chain
+				Chain ghost = sideChains.get(sideChains.size() - 1);
+				if (ghost.isCyclo()) { // cycloidal chain
+					drawCyclo(g2, mouse, ghost.getSize(), true, ghostDir);
 
-			} else if (ghost.isBenzene()) { // benzene ring
-				drawBenzene(g2, mouse, true, ghostDir);
+				} else if (ghost.isBenzene()) { // benzene ring
+					drawBenzene(g2, mouse, true, ghostDir);
 
-			} else { // regular chain
-				drawChain(g2, mouse, ghostDir, ghost.getSize() + 1, true);
-			} // if
+				} else { // regular chain
+					drawChain(g2, mouse, ghostDir, ghost.getSize() + 1, true);
+				} // if
 
-			// draw the side chains already on the compound
-			drawSides(g2);
+				// draw the side chains already on the compound
+				drawSides(g2);
 
-			noUpdate.clear();
-			if (!compound.getMainChain().isBenzene() && !compound.getMainChain().isCyclo()) {
-				noUpdate.add("1"); // can't add side chain to first node
-				noUpdate.add(Integer.toString(compound.getMainSize())); // or last node
-			} // if
+				noUpdate.clear();
+				if (!compound.getMainChain().isBenzene() && !compound.getMainChain().isCyclo()) {
+					noUpdate.add("1"); // can't add side chain to first node
+					noUpdate.add(Integer.toString(compound.getMainSize())); // or last node
+				} // if
 
-			// draw all selectable nodes
-			drawSelectableNodes(g2);
-			break;
+				// draw all selectable nodes
+				drawSelectableNodes(g2);
+				break;
 
-		// fixed on screen step
-		case 4:
-			// draw the side chains
-			drawSides(g2);
-			break;
+			// fixed on screen step
+			case 4:
+				// draw the side chains
+				drawSides(g2);
+				break;
 		} // switch
 	} // end sideAction
 
@@ -448,71 +410,71 @@ public class Canvas extends JComponent {
 	private void bondAction(Graphics2D g2) {
 
 		switch (bondStep) {
-		// do nothing step
-		case 0:
-			ghostBondIdx = -1; // reset the bond index
-			break;
+			// do nothing step
+			case 0:
+				ghostBondIdx = -1; // reset the bond index
+				break;
 
-		// enter size step
-		case 1:
-			DrawingGUI.showMessage("Enter size of the bond (2,3)");
-			g2.setColor(DrawingUtil.TRANS_RED);
-			drawNode(g2, mouse);
+			// enter size step
+			case 1:
+				DrawingGUI.showMessage("Enter size of the bond (2,3)");
+				g2.setColor(DrawingUtil.TRANS_RED);
+				drawNode(g2, mouse);
 
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-			drawBonds(g2);
-			break;
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+				drawBonds(g2);
+				break;
 
-		// select location step
-		case 2:
-			DrawingGUI.showMessage("Select node for the bond");
+			// select location step
+			case 2:
+				DrawingGUI.showMessage("Select node for the bond");
 
-			int end;
-			if (compound.getMainChain().isCyclo()) {
-				end = mainNodes.size();
-			} else {
-				end = mainNodes.size() - 1;
-			} // if
+				int end;
+				if (compound.getMainChain().isCyclo()) {
+					end = mainNodes.size();
+				} else {
+					end = mainNodes.size() - 1;
+				} // if
 
-			// show nodes that can be clicked
-			for (int i = 0; i < end; i++) {
-				g2.setColor(mainNodes.get(i).getColor());
-				drawNode(g2, mainNodes.get(i));
-			} // loop
+				// show nodes that can be clicked
+				for (int i = 0; i < end; i++) {
+					g2.setColor(mainNodes.get(i).getColor());
+					drawNode(g2, mainNodes.get(i));
+				} // loop
 
-			// show ghost bond
-			g2.setColor(DrawingUtil.TRANS_GREY); // set ghost color
+				// show ghost bond
+				g2.setColor(DrawingUtil.TRANS_GREY); // set ghost color
 
-			// if a node has been selected
-			if (ghostBondIdx != -1) {
-				if (!bondSizes.isEmpty()) {
-					int bondSize = bondSizes.get(bondSizes.size() - 1); // most recent size
+				// if a node has been selected
+				if (ghostBondIdx != -1) {
+					if (!bondSizes.isEmpty()) {
+						int bondSize = bondSizes.get(bondSizes.size() - 1); // most recent size
 
-					// temporary nodes for drawing ghost
-					Node n1 = mainNodes.get(ghostBondIdx);
-					Node n2;
+						// temporary nodes for drawing ghost
+						Node n1 = mainNodes.get(ghostBondIdx);
+						Node n2;
 
-					// index of second bond
-					if (ghostBondIdx + 1 == compound.getMainSize()) {
-						n2 = mainNodes.get(0);
-					} else {
-						n2 = mainNodes.get(ghostBondIdx + 1);
-					} // if
+						// index of second bond
+						if (ghostBondIdx + 1 == compound.getMainSize()) {
+							n2 = mainNodes.get(0);
+						} else {
+							n2 = mainNodes.get(ghostBondIdx + 1);
+						} // if
 
-					// draw the ghost bond
-					drawBond(g2, n1, n2, bondSize);
-				} // inner if
-			} // outer if
+						// draw the ghost bond
+						drawBond(g2, n1, n2, bondSize);
+					} // inner if
+				} // outer if
 
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-			drawBonds(g2);
-			break;
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+				drawBonds(g2);
+				break;
 
-		// fixed on screen step
-		case 3:
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-			drawBonds(g2);
-			break;
+			// fixed on screen step
+			case 3:
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+				drawBonds(g2);
+				break;
 		} // switch
 	} // end bondAction
 
@@ -527,79 +489,79 @@ public class Canvas extends JComponent {
 		g2.setStroke(bs);
 
 		switch (funcStep) {
-		// do nothing step
-		case 0:
-			break;
+			// do nothing step
+			case 0:
+				break;
 
-		// select location step
-		case 1:
-			DrawingGUI.showMessage("Select location for " + ghostGroup.toString());
+			// select location step
+			case 1:
+				DrawingGUI.showMessage("Select location for " + ghostGroup.toString());
 
-			// draw the functional groups
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-			drawGroups(g2);
+				// draw the functional groups
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+				drawGroups(g2);
 
-			// draw the ghost group
-			g2.setColor(DrawingUtil.TRANS_GREY);
-			drawFunc(g2, mouse, ghostGroup, ghostDir);
+				// draw the ghost group
+				g2.setColor(DrawingUtil.TRANS_GREY);
+				drawFunc(g2, mouse, ghostGroup, ghostDir);
 
-			// clear the set of tags to not update if detected
-			noUpdate.clear();
-
-			// different nodes can be clicked depending on group
-			switch (ghostGroup) {
-			case FLUORINE:
-			case CHLORINE:
-			case IODINE:
-			case BROMINE:
-			case ALCOHOL:
-				// all nodes allowed
+				// clear the set of tags to not update if detected
 				noUpdate.clear();
+
+				// different nodes can be clicked depending on group
+				switch (ghostGroup) {
+					case FLUORINE:
+					case CHLORINE:
+					case IODINE:
+					case BROMINE:
+					case ALCOHOL:
+						// all nodes allowed
+						noUpdate.clear();
+						break;
+
+					case AMINE:
+					case ETHER:
+						// show all non-lettered nodes
+						noUpdate.add("N");
+						noUpdate.add("O");
+						break;
+
+					case ALDEHYDE:
+					case CARBOXYLIC_ACID:
+						// only first or last node
+						for (int i = 2; i < mainNodes.size(); i++) {
+							if (DrawingUtil.isNumber(mainNodes.get(i).getTag()) && i != compound.getMainSize()) { // if number
+								noUpdate.add(Integer.toString(i));
+							} // if
+						} // loop
+						break;
+
+					case KETONE:
+						// show all inner nodes (not first or last)
+						noUpdate.add("1");
+						noUpdate.add("" + compound.getMainSize());
+						break;
+
+				} // switch
+
+				drawSelectableNodes(g2); // draw the nodes
 				break;
 
-			case AMINE:
-			case ETHER:
-				// show all non-lettered nodes
-				noUpdate.add("N");
-				noUpdate.add("O");
+			// draw out step
+			case 2:
+				// draw the groups
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+				drawGroups(g2);
 				break;
-
-			case ALDEHYDE:
-			case CARBOXYLIC_ACID:
-				// only first or last node
-				for (int i = 2; i < mainNodes.size(); i++) {
-					if (DrawingUtil.isNumber(mainNodes.get(i).getTag()) && i != compound.getMainSize()) { // if number
-						noUpdate.add(Integer.toString(i));
-					} // if
-				} // loop
-				break;
-
-			case KETONE:
-				// show all inner nodes (not first or last)
-				noUpdate.add("1");
-				noUpdate.add("" + compound.getMainSize());
-				break;
-
-			} // switch
-
-			drawSelectableNodes(g2); // draw the nodes
-			break;
-
-		// draw out step
-		case 2:
-			// draw the groups
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-			drawGroups(g2);
-			break;
 		} // switch
 	} // end funcAction
 
 	private void nameAction(Graphics2D g2) {
 		switch (nameStep) {
-		case 0:
-			break;
-		default:
-			DrawingGUI.showMessage(this.getName());
+			case 0:
+				break;
+			default:
+				DrawingGUI.showMessage(this.getName());
 		}
 	}
 
@@ -903,7 +865,7 @@ public class Canvas extends JComponent {
 			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
 		}
 		g2.setColor(DrawingUtil.CHAIN_COLOR);
-		
+
 		return nodes;
 	} // end drawChain
 
@@ -964,57 +926,57 @@ public class Canvas extends JComponent {
 	private void drawFunc(Graphics2D g2, Node start, FuncGroup group, DrawDirection dir) {
 
 		switch (group) {
-		case FLUORINE: // different symbol
-			drawLetterFunc(g2, "F", start, dir);
-			break;
+			case FLUORINE: // different symbol
+				drawLetterFunc(g2, "F", start, dir);
+				break;
 
-		case CHLORINE: // different symbol
-			drawLetterFunc(g2, "Cl", start, dir);
-			break;
+			case CHLORINE: // different symbol
+				drawLetterFunc(g2, "Cl", start, dir);
+				break;
 
-		case BROMINE: // different symbol
-			drawLetterFunc(g2, "Br", start, dir);
-			break;
+			case BROMINE: // different symbol
+				drawLetterFunc(g2, "Br", start, dir);
+				break;
 
-		case IODINE: // different symbol
-			drawLetterFunc(g2, "I", start, dir);
-			break;
+			case IODINE: // different symbol
+				drawLetterFunc(g2, "I", start, dir);
+				break;
 
-		case ALDEHYDE: // look identical
-		case KETONE:
-			drawDoubleOxygen(g2, start, dir);
-			break;
+			case ALDEHYDE: // look identical
+			case KETONE:
+				drawDoubleOxygen(g2, start, dir);
+				break;
 
-		case ALCOHOL: // different symbol
-			drawLetterFunc(g2, "OH", start, dir);
-			break;
+			case ALCOHOL: // different symbol
+				drawLetterFunc(g2, "OH", start, dir);
+				break;
 
-		case CARBOXYLIC_ACID: // combination
-			drawDoubleOxygen(g2, start, dir);
-			drawLetterFunc(g2, "OH", start, DrawingUtil.incDirection(dir, 2));
-			break;
+			case CARBOXYLIC_ACID: // combination
+				drawDoubleOxygen(g2, start, dir);
+				drawLetterFunc(g2, "OH", start, DrawingUtil.incDirection(dir, 2));
+				break;
 
-		case AMIDE:
-			drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4));
+			case AMIDE:
+				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4));
 
-		case AMINE: // save location to node
-			if ((compound.getMainSize() + groups.size()) > mainNodes.size()) {
-				mainNodes.add(drawLetterFunc(g2, "N", start, dir));
-			} else {
-				mainNodes.set(mainNodes.size() - 1, drawLetterFunc(g2, "N", start, dir));
-			}
-			break;
+			case AMINE: // save location to node
+				if ((compound.getMainSize() + groups.size()) > mainNodes.size()) {
+					mainNodes.add(drawLetterFunc(g2, "N", start, dir));
+				} else {
+					mainNodes.set(mainNodes.size() - 1, drawLetterFunc(g2, "N", start, dir));
+				}
+				break;
 
-		case ESTER:
-			drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4));
+			case ESTER:
+				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4));
 
-		case ETHER: // save location to node
-			if ((compound.getMainSize() + groups.size()) > mainNodes.size()) {
-				mainNodes.add(drawLetterFunc(g2, "O", start, dir));
-			} else {
-				mainNodes.set(mainNodes.size() - 1, drawLetterFunc(g2, "O", start, dir));
-			}
-			break;
+			case ETHER: // save location to node
+				if ((compound.getMainSize() + groups.size()) > mainNodes.size()) {
+					mainNodes.add(drawLetterFunc(g2, "O", start, dir));
+				} else {
+					mainNodes.set(mainNodes.size() - 1, drawLetterFunc(g2, "O", start, dir));
+				}
+				break;
 
 		} // switch
 	} // end drawFunc
@@ -1308,18 +1270,19 @@ public class Canvas extends JComponent {
 
 	// BONDS
 
-	/*
-	 * Set the bond size for main drawing int bond - size of bond
+	/**
+	 * Add a bond to the compound
+	 * @param bond - bond size to add
 	 */
-	public void setBondSize(int bond) {
+	public void addBondSize(int bond) {
 		if (compound.getMainChain().getBond() < bond) {
 			compound.getMainChain().setBond(bond);
 		}
 
 		bondSizes.add(bond);
 		if (bond == 2)
-			chain = new Chain(-14,"");
-		else if (bond ==3) {
+			chain = new Chain(-14, "");
+		else if (bond == 3) {
 			chain = new Chain(-15, "");
 		}
 	} // end setBondSize
@@ -1352,9 +1315,7 @@ public class Canvas extends JComponent {
 		bondNodes.add(end);
 
 		// add the location to the main chain
-		System.out.println("BOND " + bondNum);
-		compound.addSideChain(chain.getSize(), start.getTag(), false, false);
-		// compound.getMainChain().addFunctionalLocation("" + idx);
+		 compound.getMainChain().addFunctionalLocation("" + (idx+1));
 
 	} // end addBondedNode
 
@@ -1550,7 +1511,7 @@ public class Canvas extends JComponent {
 		this.mainStep = 4;
 		this.sideStep = 4;
 		this.bondStep = 3;
-		this.funcStep = 3;
+		this.funcStep = 2;
 
 		// set it to draw
 		this.draw = true;
