@@ -106,6 +106,10 @@ public class Chain {
 	public ArrayList<String> getFunctionalLocation() {
 		return functionalLocation;
 	}
+	
+	public void clearFunctionalLocations() {
+		this.functionalLocation = new ArrayList<String>();
+	}
 
 	/*
 	 * Set the size of the chain int size - size of the chain

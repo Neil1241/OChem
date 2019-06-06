@@ -282,6 +282,18 @@ public class Canvas extends JComponent {
 				DrawingGUI.showMessage("Select location for main chain: (CLICK)");
 				g2.setColor(DrawingUtil.TRANS_GREY);
 
+<<<<<<< HEAD
+=======
+		// fixed on screen step
+	/*	case 4:
+			g2.setColor(DrawingUtil.CHAIN_COLOR);
+
+			if (this.palette != null)
+				DrawingGUI.clear();
+			g2.setColor(DrawingUtil.CHAIN_COLOR);
+
+			if (!mainOnScreen) { // first time called
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 				if (compound.getMainChain().isCyclo()) { // cycloidal chain
 					drawCyclo(g2, mouse, compound.getMainSize(), false, null);
 
@@ -295,6 +307,10 @@ public class Canvas extends JComponent {
 				drawSides(g2);
 				break;
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD*/
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 			// fixed on screen step
 			case 4:
 				g2.setColor(DrawingUtil.CHAIN_COLOR);
@@ -329,7 +345,14 @@ public class Canvas extends JComponent {
 
 				} // big if
 
+<<<<<<< HEAD
 				break;
+=======
+				break;/*
+=======
+			break;
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git*/
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 
 		} // switch
 	} // end mainAction
@@ -1278,13 +1301,15 @@ public class Canvas extends JComponent {
 		if (compound.getMainChain().getBond() < bond) {
 			compound.getMainChain().setBond(bond);
 		}
-
 		bondSizes.add(bond);
+<<<<<<< HEAD
 		if (bond == 2)
 			chain = new Chain(-14, "");
 		else if (bond == 3) {
 			chain = new Chain(-15, "");
 		}
+=======
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 	} // end setBondSize
 
 	/*
@@ -1315,7 +1340,11 @@ public class Canvas extends JComponent {
 		bondNodes.add(end);
 
 		// add the location to the main chain
+<<<<<<< HEAD
 		 compound.getMainChain().addFunctionalLocation("" + (idx+1));
+=======
+		compound.getMainChain().addFunctionalLocation(idx+1+"");
+>>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 
 	} // end addBondedNode
 

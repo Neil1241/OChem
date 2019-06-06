@@ -445,7 +445,6 @@ public class OrganicUtil {
 		for (int i = 0; i < toCheck.size(); i++) {
 			try {
 				int temp = groups.get(toCheck.get(i)) + 1;
-				// if (!position.get(i).equalsIgnoreCase("o"))
 				groups.replace(toCheck.get(i), temp);
 
 			} catch (NullPointerException e) {
