@@ -363,30 +363,36 @@ public class PaletteButtonController implements MouseListener {
 		Chain sides[] = c.getSideChains();
 		int num = 0;
 		ArrayList<Integer> spots = new ArrayList<Integer>();
+		ArrayList<String> locations = new ArrayList<String>();
 		
-		c.getMainChain().addNumOfGroups(c.getMainChain().getFunctionalLocation().size(), 0);
-		if (c.getMainChain().getBond() == 2) {
-			c.getMainChain().setEnding(1);
-		}else if (c.getMainChain().getBond() == 3) {
-			c.getMainChain().setEnding(2);
-		}
+		if (c.getMainChain().getBond() == 1 && c.getMainChain().getFunctionalLocation().size() >= 1) {
+			c.getMainChain().clearFunctionalLocations();
+		} else {
+			c.getMainChain().addNumOfGroups(c.getMainChain().getFunctionalLocation().size(), 0);
+			if (c.getMainChain().getBond() == 2) {
+				c.getMainChain().setEnding(1);
+			} else if (c.getMainChain().getBond() == 3) {
+				c.getMainChain().setEnding(2);
+			}//end if
+		}//end if
 		
 		// saves the indexes of the positions with the highest priority
 		for (int i = 0; i < sides.length; i++) {
-			if (sides[i].getSize() < num && sides[i].getSize()>-12) {
+			if (sides[i].getSize() < num) {
 				num = sides[i].getSize();
 				spots = new ArrayList<Integer>();
 				spots.add(i);
-			} else if (sides[i].getSize() == num && sides[i].getSize()>-12) {
+			} else if (sides[i].getSize() == num) {
 				spots.add(i);
 			}//end if
 		} // end for
 
 		// add functional locations
-		if (num < -6) {
-		for (int i : spots)
+		if (num <= -6) {
+		for (int i : spots) {
 			c.getMainChain().addFunctionalLocation(sides[i].getLocation());
-		// end for
+			locations.add(sides[i].getLocation());
+		}// end for
 
 		c.getMainChain().addNumOfGroups(spots.size(), 1);
 		// remove side chains
@@ -409,7 +415,24 @@ public class PaletteButtonController implements MouseListener {
 			c.getMainChain().setEnding(3, 1);
 			break;
 		case -6:
-			c.getMainChain().setEnding(4, 1);
+			int al = 0;
+			for (String s: locations) {
+				if (s.equals("1")||s.equals(""+c.getMainChain().getSize()))
+					al++;
+			}
+			if (al>0) {
+				c.getMainChain().clearFunctionalLocations();
+				for (String s:locations) {
+					if (!s.equals("1")&&!s.equals(""+c.getMainChain().getSize()))
+						c.addSideChain(-6, s, false, false);
+					else
+						c.addFunctionalLocation(s);
+					//end if
+				}//end for
+				c.getMainChain().setEnding(4,1);
+			}else
+				c.getMainChain().setEnding(5, 1);
+			//end if
 			break;
 		default:
 		}//end switch case
