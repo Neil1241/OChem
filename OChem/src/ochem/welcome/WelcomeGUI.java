@@ -46,7 +46,7 @@ public class WelcomeGUI extends JPanel {
 		JLabel gif = new JLabel("");
 
 		try {
-			ImageIcon icon = new ImageIcon("src/resources/Spin.gif");
+			ImageIcon icon = new ImageIcon(getClass().getResource("/resources/Spin.gif"));
 			gif = new JLabel(icon);
 		} catch (Exception e) {
 			System.out.println("HAHAHAHAHA");
