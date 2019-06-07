@@ -281,11 +281,21 @@ public class Canvas extends JComponent {
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Select location for main chain: (CLICK)");
 				g2.setColor(DrawingUtil.TRANS_GREY);
+			if (compound.getMainChain().isCyclo()) { // cycloidal chain
+				drawCyclo(g2, mouse, compound.getMainSize(), false, null);
 
-<<<<<<< HEAD
-=======
+			} else if (compound.getMainChain().isBenzene()) { // benzene ring
+				drawBenzene(g2, mouse, false, null);
+
+			} else { // regular chain
+				drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
+			} // if
+
+			drawSides(g2);
+			break;
+
 		// fixed on screen step
-	/*	case 4:
+		case 4:
 			g2.setColor(DrawingUtil.CHAIN_COLOR);
 
 			if (this.palette != null)
@@ -293,67 +303,32 @@ public class Canvas extends JComponent {
 			g2.setColor(DrawingUtil.CHAIN_COLOR);
 
 			if (!mainOnScreen) { // first time called
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 				if (compound.getMainChain().isCyclo()) { // cycloidal chain
-					drawCyclo(g2, mouse, compound.getMainSize(), false, null);
+					mainNodes = drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
 
 				} else if (compound.getMainChain().isBenzene()) { // benzene ring
-					drawBenzene(g2, mouse, false, null);
+					mainNodes = drawBenzene(g2, mainNodes.get(0), false, null);
 
 				} else { // regular chain
-					drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
+					this.mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(),
+							false);
+				} // if
+				mainOnScreen = true; // tell other components and actions there is a main chain on the screen
+
+			} else { // all other times
+				if (compound.getMainChain().isCyclo()) { // cycloidal chain
+					drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
+
+				} else if (compound.getMainChain().isBenzene()) { // benzene ring
+					drawBenzene(g2, mainNodes.get(0), false, null);
+
+				} else { // regular chain
+					drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
 				} // if
 
-				drawSides(g2);
-				break;
+			} // big if
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD*/
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
-			// fixed on screen step
-			case 4:
-				g2.setColor(DrawingUtil.CHAIN_COLOR);
-
-				if (this.palette != null)
-					DrawingGUI.clear();
-				g2.setColor(DrawingUtil.CHAIN_COLOR);
-
-				if (!mainOnScreen) { // first time called
-					if (compound.getMainChain().isCyclo()) { // cycloidal chain
-						mainNodes = drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
-
-					} else if (compound.getMainChain().isBenzene()) { // benzene ring
-						mainNodes = drawBenzene(g2, mainNodes.get(0), false, null);
-
-					} else { // regular chain
-						this.mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(),
-								false);
-					} // if
-					mainOnScreen = true; // tell other components and actions there is a main chain on the screen
-
-				} else { // all other times
-					if (compound.getMainChain().isCyclo()) { // cycloidal chain
-						drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
-
-					} else if (compound.getMainChain().isBenzene()) { // benzene ring
-						drawBenzene(g2, mainNodes.get(0), false, null);
-
-					} else { // regular chain
-						drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
-					} // if
-
-				} // big if
-
-<<<<<<< HEAD
-				break;
-=======
-				break;/*
-=======
 			break;
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git*/
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
-
 		} // switch
 	} // end mainAction
 
@@ -1302,14 +1277,6 @@ public class Canvas extends JComponent {
 			compound.getMainChain().setBond(bond);
 		}
 		bondSizes.add(bond);
-<<<<<<< HEAD
-		if (bond == 2)
-			chain = new Chain(-14, "");
-		else if (bond == 3) {
-			chain = new Chain(-15, "");
-		}
-=======
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 	} // end setBondSize
 
 	/*
@@ -1340,11 +1307,7 @@ public class Canvas extends JComponent {
 		bondNodes.add(end);
 
 		// add the location to the main chain
-<<<<<<< HEAD
 		 compound.getMainChain().addFunctionalLocation("" + (idx+1));
-=======
-		compound.getMainChain().addFunctionalLocation(idx+1+"");
->>>>>>> branch 'master' of https://github.com/Neil1241/OChem.git
 
 	} // end addBondedNode
 
