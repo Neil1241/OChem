@@ -137,7 +137,6 @@ public class Interpreter {
 				chainNames.add(temp);
 			}
 		} // loop
-		delimit = delimit.substring(4);
 		splitLastChain(); // split the last chain and add it to the list
 	} // end splitChains()
 
@@ -241,10 +240,9 @@ public class Interpreter {
 
 		// gets digits if there are any
 		try {
+			System.out.println("Delimited "+delimit);
 			test = delimit.substring(0, delimit.length() - mainChain.length());
 			int idx = test.length() - 1;
-			/*while (!Character.isDigit(test.charAt(idx)))
-				idx--;*/
 
 			while (Character.isDigit(test.charAt(idx))) {
 				hold = test.charAt(idx) + hold;
