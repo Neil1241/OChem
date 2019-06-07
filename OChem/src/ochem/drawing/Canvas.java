@@ -249,7 +249,7 @@ public class Canvas extends JComponent {
 	} // end clearAction
 
 	/*
-	 * Handles the actions for the main flow 
+	 * Handles the actions for the main flow
 	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void mainAction(Graphics2D g2) {
@@ -281,59 +281,57 @@ public class Canvas extends JComponent {
 				mainOnScreen = false;
 				DrawingGUI.showMessage("Select location for main chain: (CLICK)");
 				g2.setColor(DrawingUtil.TRANS_GREY);
-			if (compound.getMainChain().isCyclo()) { // cycloidal chain
-				drawCyclo(g2, mouse, compound.getMainSize(), false, null);
-
-			} else if (compound.getMainChain().isBenzene()) { // benzene ring
-				drawBenzene(g2, mouse, false, null);
-
-			} else { // regular chain
-				drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
-			} // if
-
-			drawSides(g2);
-			break;
-
-		// fixed on screen step
-		case 4:
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-
-			if (this.palette != null)
-				DrawingGUI.clear();
-			g2.setColor(DrawingUtil.CHAIN_COLOR);
-
-			if (!mainOnScreen) { // first time called
 				if (compound.getMainChain().isCyclo()) { // cycloidal chain
-					mainNodes = drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
-
+					drawCyclo(g2, mouse, compound.getMainSize(), false, null);
 				} else if (compound.getMainChain().isBenzene()) { // benzene ring
-					mainNodes = drawBenzene(g2, mainNodes.get(0), false, null);
-
+					drawBenzene(g2, mouse, false, null);
 				} else { // regular chain
-					this.mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(),
-							false);
-				} // if
-				mainOnScreen = true; // tell other components and actions there is a main chain on the screen
-
-			} else { // all other times
-				if (compound.getMainChain().isCyclo()) { // cycloidal chain
-					drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
-
-				} else if (compound.getMainChain().isBenzene()) { // benzene ring
-					drawBenzene(g2, mainNodes.get(0), false, null);
-
-				} else { // regular chain
-					drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
+					drawChain(g2, mouse, DrawDirection.RIGHT, compound.getMainSize(), false);
 				} // if
 
-			} // big if
+				drawSides(g2);
+				break;
 
-			break;
+			// fixed on screen step
+			case 4:
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+
+				if (this.palette != null)
+					DrawingGUI.clear();
+				g2.setColor(DrawingUtil.CHAIN_COLOR);
+
+				if (!mainOnScreen) { // first time called
+					if (compound.getMainChain().isCyclo()) { // cycloidal chain
+						mainNodes = drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
+
+					} else if (compound.getMainChain().isBenzene()) { // benzene ring
+						mainNodes = drawBenzene(g2, mainNodes.get(0), false, null);
+
+					} else { // regular chain
+						this.mainNodes = drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(),
+								false);
+					} // if
+					mainOnScreen = true; // tell other components and actions there is a main chain on the screen
+
+				} else { // all other times
+					if (compound.getMainChain().isCyclo()) { // cycloidal chain
+						drawCyclo(g2, mainNodes.get(0), compound.getMainSize(), false, null);
+
+					} else if (compound.getMainChain().isBenzene()) { // benzene ring
+						drawBenzene(g2, mainNodes.get(0), false, null);
+
+					} else { // regular chain
+						drawChain(g2, mainNodes.get(0), DrawDirection.RIGHT, compound.getMainSize(), false);
+					} // if
+
+				} // big if
+
+				break;
 		} // switch
 	} // end mainAction
 
 	/*
-	 * Handles the actions for the side flow 
+	 * Handles the actions for the side flow
 	 * @param Graphics2D g2 - object responsible for
 	 * drawing
 	 */
@@ -1270,12 +1268,22 @@ public class Canvas extends JComponent {
 
 	/**
 	 * Add a bond to the compound
-	 * @param bond - bond size to add
+	 * 
+	 * @param bond
+	 *            - bond size to add
 	 */
 	public void addBondSize(int bond) {
 		if (compound.getMainChain().getBond() < bond) {
 			compound.getMainChain().setBond(bond);
 		}
+		bondSizes.add(bond);
+
+		if (bond == 2)
+			chain = new Chain(-14, "");
+		else if (bond == 3) {
+			chain = new Chain(-15, "");
+		}
+
 		bondSizes.add(bond);
 	} // end setBondSize
 
@@ -1307,7 +1315,9 @@ public class Canvas extends JComponent {
 		bondNodes.add(end);
 
 		// add the location to the main chain
-		 compound.getMainChain().addFunctionalLocation("" + (idx+1));
+		compound.getMainChain().addFunctionalLocation("" + (idx + 1));
+		compound.getMainChain().addFunctionalLocation(idx + 1 + "");
+		compound.getMainChain().addFunctionalLocation("" + (idx + 1));
 
 	} // end addBondedNode
 
