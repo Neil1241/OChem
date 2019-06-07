@@ -244,7 +244,7 @@ public class NamingGUI extends JPanel {
 				} else {
 					c.addSideDirection(nameDir(location));
 					
-				} //big if
+				} //big if 
 				
 				c.addSideNode(side);
 				
@@ -306,7 +306,7 @@ public class NamingGUI extends JPanel {
 		for (int i = 0; i < sideChains.length; i++) {
 			int size = sideChains[i].getSize();
 			
-			c.addSideSize(size);
+			c.addSideSize(size); //add chain to attach the func group too
 			
 			System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[-size]);
 			
@@ -351,11 +351,11 @@ public class NamingGUI extends JPanel {
 		
 		System.out.println("setUpMiscFuncGroups:");
 		for (String s : endings) {
-			System.out.println(s +" | "+ s.substring(0,7));
-			if (s.substring(0,7).equalsIgnoreCase("alcohol")) {
+			System.out.println("s: " + s.substring(0,15));
+			if (s.substring(0,7).equalsIgnoreCase("alcohol")) { //alcohol
 				//add the group
 				c.addFuncGroup(FuncGroup.ALCOHOL);
-				c.addSideSize(0);
+				c.addSideSize(0); //add side chain for drawing
 				
 				//add the node
 				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
@@ -370,7 +370,48 @@ public class NamingGUI extends JPanel {
 				} else {
 					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
 				} //if
-			}
+				
+			} else if (s.substring(0,6).equalsIgnoreCase("ketone")) { //ketone
+				//add the group
+				c.addFuncGroup(FuncGroup.KETONE);
+				c.addSideSize(0); //add side chain for drawing
+				
+				//add the node
+				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
+				int index = Integer.parseInt(loc) - 1; //size minus one
+				c.addFuncNode(c.getMainNodes().get(index));
+				
+				//add a direction for the chain
+				if ((index+1 == 1) || (index+1) % 2 == 0) {
+					c.addGroupDirection(DrawDirection.UP_RIGHT);
+				} else {
+					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
+				} //if
+				
+			} else if (s.substring(0,8).equalsIgnoreCase("aldehyde")) { //aldehyde
+				//add the group
+				c.addFuncGroup(FuncGroup.ALDEHYDE);
+				c.addSideSize(0); //add side chain for drawing
+				
+				//add the node
+				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
+				int index = Integer.parseInt(loc) - 1; //size minus one
+				c.addFuncNode(c.getMainNodes().get(index));
+				
+				c.addGroupDirection(DrawDirection.UP_RIGHT);
+			} else if (s.substring(0,15).equalsIgnoreCase("Carboxylic Acid")) { //carboxylic acid
+				//add the group
+				c.addFuncGroup(FuncGroup.CARBOXYLIC_ACID);
+				c.addSideSize(0); //add side chain for drawing
+				
+				//add the node
+				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
+				int index = Integer.parseInt(loc) - 1; //size minus one
+				c.addFuncNode(c.getMainNodes().get(index));
+				
+				c.addGroupDirection(DrawDirection.UP_RIGHT);
+				
+			} //else if
 			
 		} //loop
 		System.out.println("----------");
