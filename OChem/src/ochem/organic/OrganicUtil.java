@@ -22,7 +22,7 @@ public class OrganicUtil {
 
 	public static final String[] SIDE_CHAIN_PRIORITY = { "bromo", "iodo", "fluoro", "chloro", "phenyl", "yl", "oxy",
 			"hydroxy", "oxo", "amino" };
-	
+
 	// name of functional groups
 	public static final String[] FUNCTIONAL_NAMES = { "Alkane", "Alkene", "Alkyne", "Alcohol", "Aldehyde", "Ketone",
 			"Amine", "Amide", "Ester", "Carboxylic Acid", "Benzene", "Ether" };
@@ -176,7 +176,7 @@ public class OrganicUtil {
 		pass();
 
 		// add sidechain if needed for esters and ethers
-		if (ending == 8 || ending == 11) {
+		if (ending == 8) {
 			int length = random(1, 4);
 			boolean cycloEster = false;
 			if (length > 2)
@@ -191,57 +191,7 @@ public class OrganicUtil {
 		sideChainType = new String[numOfSideChains];
 
 		pass();
-		// add the sidechains to the compound
-		for (int i = 0; i < numOfSideChains; i++) {
-			// temp variables for the loop
-			int pre = 0;
-			boolean phenyl = false;
-			boolean sideCyclo = false;
-
-			switch (ending) {
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 4)];
-				break;
-			case 4:
-			case 5:
-				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 3)];
-				break;
-			default:
-				sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
-			}// end switch case
-			sideLocation[i] = location(ending, mainSize);
-
-			pass();
-			if (sideChainType[i].equals("yl")) {
-				while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
-					sideLocation[i] = location(ending, mainSize);
-				} // end while
-				sideCyclo = cyclo();
-				if (sideCyclo)
-					pre = random(3, mainSize);
-				else
-					pre = random(1, 4);
-				sideChainType[i] = CHAIN[pre] + sideChainType[i];
-			} else if (sideChainType[i].equals("phenyl")) {
-				pre = 6;
-				phenyl = true;
-			} else {
-				for (int j = 2; j < SIDE_CHAIN_SUFFIX.length; j++) {
-					if (sideChainType[i].equals("oxy")) {
-						pre = -j;
-						c.addSideChain(random(1, 3), "O", false, false);
-						break;
-					} else if (sideChainType[i].equals(SIDE_CHAIN_SUFFIX[j])) {
-						pre = -j;
-						break;
-					} // end if
-				} // end for
-			} // end if
-			c.addSideChain(pre, sideLocation[i], sideCyclo, phenyl);
-		} // end for
+		c = generateSideChains(c, ending, mainSize, sideChainType, sideLocation);
 
 		// output for debugging
 		System.out.println(
@@ -266,8 +216,77 @@ public class OrganicUtil {
 		return c;
 	}// end generateRandomCompound
 
+	private static Compound generateSideChains(Compound c, int ending, int mainSize, String[] sideChainType,
+			String[] sideLocation) {
+		// add the sidechains to the compound
+		for (int i = 0; i < sideLocation.length; i++) {
+			// temp variables for the loop
+			int pre = 0;
+			boolean phenyl = false;
+			boolean sideCyclo = false;
+
+			// switch case to determine which side chains can be used
+			switch (ending) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 4)];
+				break;
+			case 4:
+			case 5:
+				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 3)];
+				break;
+			default:
+				sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
+			}// end switch case
+
+			// get a location for the sideChain
+			sideLocation[i] = location(ending, mainSize);
+
+			pass();// dbg
+
+			// fix the endings if it is missing something, e.g alkyl only has yl and needs a
+			// chain to go with it
+			if (sideChainType[i].equals("yl")) {
+				while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
+					sideLocation[i] = location(ending, mainSize);
+				} // end while
+				sideCyclo = cyclo();
+				if (sideCyclo)
+					pre = random(3, mainSize);
+				else
+					pre = random(1, 4);
+				sideChainType[i] = CHAIN[pre] + sideChainType[i];
+			} else if (sideChainType[i].equals("phenyl")) {
+				pre = 6;
+				phenyl = true;
+			} else if (sideChainType[i].equals("oxy")) {
+				pre = -8;
+				c.addSideChain(random(1, 3), "O", false, false);
+			} else {
+				for (int j = 2; j < SIDE_CHAIN_SUFFIX.length; j++) {
+					if (sideChainType[i].equals(SIDE_CHAIN_SUFFIX[j])) {
+						pre = -j;
+						break;
+					} // end if
+				} // end for
+			} // end if
+
+			// add the sideChain
+			c.addSideChain(pre, sideLocation[i], sideCyclo, phenyl);
+		} // end for
+		return c;
+	}// end generate sideChains
+
+	// generates a random number within the main chain and based on the ending, if
+	// the compound is an amine or amide, allow for a nitrogen location
 	private static String location(int ending, int mainSize) {
+		// temporary variable to hold the location
 		String sideLocation = "";
+
+		// if ending is an amine or amide allow for a special case of nitrogen location,
+		// else create a random number within the mainSize
 		if (ending == 6 || ending == 7) {
 			int r = random(0, mainSize);
 			if (r == mainSize)
@@ -394,13 +413,18 @@ public class OrganicUtil {
 	}// end mainToName
 
 	private static String prefixFromNumber(int n) {
-		return PREFIX[n - 2];
+		if (n<2)
+			return "";
+		else
+			return PREFIX[n - 2];
 	}
 
 	private static String assignPrefix(Chain[] side) {
 		// declare temporary variables
 		boolean space = false;
-		String beforeMain = "";
+		boolean ether = false;
+		
+		StringBuffer beforeMain = new StringBuffer();
 		TreeMap<String, Integer> groups;
 		ArrayList<String> toCheck = new ArrayList<String>();
 		ArrayList<String> position = new ArrayList<String>();
@@ -456,6 +480,7 @@ public class OrganicUtil {
 			// place the value of the key into a variable for ease of use
 			int prefix = groups.get(key);
 			space = false;
+			ether = false;
 
 			// if the value is not equal to 0 see if there are any positions on an oxygen,
 			// if so ignore them. Else set the boolean space to true to indicate that the
@@ -463,44 +488,61 @@ public class OrganicUtil {
 			if (prefix != 0) {
 				for (int i = 0; i < toCheck.size(); i++) {
 					if (key.equals(toCheck.get(i))) {
-						if (!position.get(i).equalsIgnoreCase("o"))
-							beforeMain += position.get(i) + ",";
-						else
+						if (!position.get(i).equalsIgnoreCase("o")) {
+							if (key.substring(key.length() - 3, key.length()).equals("oxy") && !key.equals("hydroxy")) {
+								ether =true;
+								beforeMain.insert(0,position.get(i) + ",");
+							}else {
+								beforeMain.append(position.get(i) + ",");
+							}//end if
+						}else {
 							space = true;
-						// end if
+						}// end if
 					} // end if
 				} // end for
 
 				// add hyphens in between the the number and words
 				if (!space) {
-					beforeMain = beforeMain.substring(0, beforeMain.length() - 1) + "-";
+					if (ether) {
+						if (prefix>2) {
+							beforeMain.deleteCharAt(prefix+(int)(Math.round(prefix/2.0)));
+							beforeMain.insert(prefix+(int)(Math.round(prefix/2.0)), '-');
+						}else {
+						beforeMain.deleteCharAt(prefix);
+						beforeMain.insert(prefix, '-');
+						}
+					}else {
+						beforeMain.deleteCharAt(beforeMain.length()-1);
+						beforeMain.append("-");
+					}
 				}
 
 				// if the prefix is greater than or equal to 2 add the prefix infront of the key
 				if (prefix >= 2) {
-					beforeMain += prefixFromNumber(prefix);
+					beforeMain.append(prefixFromNumber(prefix));
 				}
 
-				// if the key has an oxy in the end and is not a 
-				//hydroxy add a space; else if the
+				// if the key has an oxy in the end and is not a
+				// hydroxy add a space; else if the
 				// boolean space is true, add a space or else add a hyphen
-				if (key.substring(key.length() - 3, key.length()).equals("oxy") && !key.equals("hydroxy")) {
-					beforeMain += key + " ";
+				if (ether) {
+					int word = prefixFromNumber(prefix).length();
+					beforeMain.insert(prefix+ word +(int)(Math.round(prefix/2.0)),key+ " ");
 				} else if (space) {
-					beforeMain += key + " ";
+					//beforeMain = key + " " + beforeMain;
+					beforeMain.insert(0,key+" ");
 				} else {
-					beforeMain += key + "-";
-				}
+					beforeMain.append(key + "-");
+				}//end if
 			} // end if
 		} // end for
 
-		// if the length of side is greater than 0 and space is not true se, remove the
-		// hyphen at the end
+		// if the length of side is greater than 0
 		if (side.length > 0) {
-			if (side.length != 1 && !space)
-				beforeMain = beforeMain.substring(0, beforeMain.length() - 1);
-		}
-		return beforeMain;
+			if (!(ether && side.length<3) || !space )
+			beforeMain.deleteCharAt(beforeMain.length()-1);
+		}//end if
+		return beforeMain.toString();
 	}// end assignPrefix
 
 	// creates a treemap and sets all the values to 0
