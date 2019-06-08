@@ -4,9 +4,8 @@ package ochem.organic;
  * Interpreter
  * Created by: Neil Balaskandarajah
  * Everything else: Jordan
- * Last modified: 05/07/2019
+ * Last modified: 06/08/19
  * Converts text names of compounds into compound objects
- * TODO: fix the way locations are added
  */
 
 import java.util.ArrayList;
@@ -137,7 +136,6 @@ public class Interpreter {
 				chainNames.add(temp);
 			}
 		} // loop
-		delimit = delimit.substring(4);
 		splitLastChain(); // split the last chain and add it to the list
 	} // end splitChains()
 
@@ -241,10 +239,9 @@ public class Interpreter {
 
 		// gets digits if there are any
 		try {
+			System.out.println("Delimited "+delimit);
 			test = delimit.substring(0, delimit.length() - mainChain.length());
 			int idx = test.length() - 1;
-			/*while (!Character.isDigit(test.charAt(idx)))
-				idx--;*/
 
 			while (Character.isDigit(test.charAt(idx))) {
 				hold = test.charAt(idx) + hold;
