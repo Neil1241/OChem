@@ -227,7 +227,7 @@ public class NamingGUI extends JPanel {
 		
 		//loop through all the chains adding them to the list
 		for (int i = 0; i < chains.length; i++) {
-			if (chains[i].getSize() > 0) { //(+) size for alkyl chain
+			if (chains[i].getSize() > 0 && DrawingUtil.stringToNum(chains[i].getLocation()) > 0) { //(+) size for alkyl chain
 				int location = DrawingUtil.stringToNum(chains[i].getLocation());
 				
 				Node side = c.getMainNodes().get(location - 1);
@@ -253,7 +253,7 @@ public class NamingGUI extends JPanel {
 	} //end setSideNodes
 	
 	/*
-	 * Set the bond nodes to the canvas
+	 * Set the bond nodes to the canvas by searching through the main chain's endings
 	 */
 	private void setUpBonds() {
 		ArrayList<String> endings = compound.getMainChain().getEndings();
@@ -261,9 +261,7 @@ public class NamingGUI extends JPanel {
 		System.out.println("setUpBonds:");
 		for (String s : endings) {
 			System.out.println(s +" | "+ s.substring(0,6));
-			//if substring 0 -> n is alkene, bond nodes ...
-			//if "" alkyne, bond nodes ...
-			//location after colon
+			
 			if (s.substring(0,6).equalsIgnoreCase("alkene")) {
 				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
 				int index = Integer.parseInt(loc) - 1; //size minus one
@@ -293,65 +291,68 @@ public class NamingGUI extends JPanel {
 	private void setUpFuncGroups() {
 		this.setUpHaloAlkanes();
 		this.setUpMiscFuncGroups();
+		this.setUpNOFuncGroups();
 	} //end setUpFuncGroups
 	
 	
 	/*
-	 * Add the haloalkanes to the canvas
+	 * Add the haloalkanes to the canvas by searching through the chains locations
 	 */
 	private void setUpHaloAlkanes() {
 		Chain[] sideChains = compound.getSideChains();
 		
 		System.out.println("setUpHaloAlkanes:");
 		for (int i = 0; i < sideChains.length; i++) {
-			int size = sideChains[i].getSize();
-			
-			c.addSideSize(size); //add chain to attach the func group too
-			
-			System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[-size]);
-			
-			//add the group based on the index
-			switch (size) {
-				case -2:
-					c.addFuncGroup(FuncGroup.BROMINE);
-					break;
-				case -3:
-					c.addFuncGroup(FuncGroup.IODINE);
-					break;
-				case -4:
-					c.addFuncGroup(FuncGroup.FLUORINE);
-					break;
-				case -5:
-					c.addFuncGroup(FuncGroup.CHLORINE);
-					break;
-			} //switch
-			
-			//get the location of the haloalkane on the main chain
-			int location = Integer.parseInt(sideChains[i].getLocation());
-			
-			c.addFuncNode(c.getMainNodes().get(location - 1));
-			
-			//add a direction for the chain
-			if (location == 1) {
-				c.addGroupDirection(DrawDirection.UP_LEFT);
-			} else if (location % 2 == 0) {
-				c.addGroupDirection(DrawDirection.UP_RIGHT);
-			} else {
-				c.addGroupDirection(DrawDirection.DOWN_RIGHT);
-			} //if
+			if (DrawingUtil.isNumber(sideChains[i].getLocation())) {
+				int size = sideChains[i].getSize();
+				
+				c.addSideSize(size); //add chain to attach the func group too
+				
+				System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[-size]);
+				
+				//add the group based on the index
+				switch (size) {
+					case -2:
+						c.addFuncGroup(FuncGroup.BROMINE);
+						break;
+					case -3:
+						c.addFuncGroup(FuncGroup.IODINE);
+						break;
+					case -4:
+						c.addFuncGroup(FuncGroup.FLUORINE);
+						break;
+					case -5:
+						c.addFuncGroup(FuncGroup.CHLORINE);
+						break;
+				} //switch
+				
+				//get the location of the haloalkane on the main chain
+				int location = Integer.parseInt(sideChains[i].getLocation());
+				
+				c.addFuncNode(c.getMainNodes().get(location - 1));
+				
+				//add a direction for the chain
+				if (location == 1) {
+					c.addGroupDirection(DrawDirection.UP_LEFT);
+				} else if (location % 2 == 0) {
+					c.addGroupDirection(DrawDirection.UP_RIGHT);
+				} else {
+					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
+				} //if
+			}
 		} //loop
 		System.out.println("----------");
 	} //end setUpHaloAlkanes
 	
 	/*
-	 * Add miscellaneous functional groups
+	 * Add miscellaneous functional groups by searching through the main chain's endings
 	 */
 	private void setUpMiscFuncGroups() {
 		ArrayList<String> endings = compound.getMainChain().getEndings();
 		
 		System.out.println("setUpMiscFuncGroups:");
 		for (String s : endings) {
-			System.out.println("s: " + s.substring(0,15));
+			System.out.println("setUpMiscFuncGroups: " + s.substring(0,15));
 			if (s.substring(0,7).equalsIgnoreCase("alcohol")) { //alcohol
 				//add the group
 				c.addFuncGroup(FuncGroup.ALCOHOL);
@@ -416,6 +417,55 @@ public class NamingGUI extends JPanel {
 		} //loop
 		System.out.println("----------");
 	} //end setUpMiscFuncGroups
+	
+	/*
+	 * Set up the nitrogen (N) and oxygen (O) functional groups by searching through the side chains
+	 */
+	private void setUpNOFuncGroups() {
+		Chain[] sideChains = compound.getSideChains();
+		
+		System.out.println("setUpNOFuncGroups:");
+		for (int i = 0; i < sideChains.length; i++) {
+			if (!DrawingUtil.isNumber(sideChains[i].getLocation())) {
+				int size = sideChains[i].getSize();
+				
+				c.addSideSize(size); //add chain to attach the func group too
+				
+				System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[-size]);
+				
+				//add the group based on the index
+				switch (size) {
+					case -2:
+						c.addFuncGroup(FuncGroup.BROMINE);
+						break;
+					case -3:
+						c.addFuncGroup(FuncGroup.IODINE);
+						break;
+					case -4:
+						c.addFuncGroup(FuncGroup.FLUORINE);
+						break;
+					case -5:
+						c.addFuncGroup(FuncGroup.CHLORINE);
+						break;
+				} //switch
+				
+				//get the location of the haloalkane on the main chain
+				int location = Integer.parseInt(sideChains[i].getLocation());
+				
+				c.addFuncNode(c.getMainNodes().get(location - 1));
+				
+				//add a direction for the chain
+				if (location == 1) {
+					c.addGroupDirection(DrawDirection.UP_LEFT);
+				} else if (location % 2 == 0) {
+					c.addGroupDirection(DrawDirection.UP_RIGHT);
+				} else {
+					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
+				} //if
+			}
+		} //loop
+		System.out.println("----------");
+	} //end setUpNOFuncGroups
 	
 	/*
 	 * Name direction from location
