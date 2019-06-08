@@ -5,7 +5,8 @@ import java.util.ArrayList;
 /*
  * Chain
  * Created by: Neil Balaskandarajah
- * Last modified: 05/04/2019
+ * Modified By Jordan Lin
+ * Last modified: 06/08/2019
  * A chain for an organic compound holding its length and location on the main chain
  */
 

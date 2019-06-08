@@ -3,7 +3,8 @@ package ochem.organic;
 /*
  * OrganicUtil
  * Created by: Neil Balaskandarajah
- * Last modified: 05/04/2019
+ * Modified By Jordan Lin
+ * Last modified: 06/08/2019
  * A static class with constants and methods for creating Compounds
  */
 
@@ -70,7 +71,6 @@ public class OrganicUtil {
 		c = new Compound(mainSize);
 		c.getMainChain().setBenzene(benzene);
 		c.getMainChain().setCyclo(cyclo);
-
 		pass();
 
 		// set bond type if it turns out to be an alkane set to one
@@ -102,8 +102,8 @@ public class OrganicUtil {
 		} else if (ending != 0) {
 			prefixBond = random(1, 3);
 		} // end if
-
 		pass();
+		
 		// creates random values but with no duplicate values
 		if (bondType != 1 && run) {
 			int idx = 0;
@@ -116,7 +116,6 @@ public class OrganicUtil {
 			for (Integer n : toBond)
 				bondLocation[idx++] = n;
 		} // end if
-
 		pass();
 
 		// if ending position is an amide, acid, ester or aldehyde set the functional
@@ -139,7 +138,6 @@ public class OrganicUtil {
 				groupLocation[i] = random(1, mainSize);
 			// end for
 		} // end if
-
 		pass();
 
 		// depending on the bondtype add the locations
@@ -231,10 +229,12 @@ public class OrganicUtil {
 			case 1:
 			case 2:
 			case 3:
+			case 10:
 				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 4)];
 				break;
 			case 4:
 			case 5:
+			case 6:
 				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 3)];
 				break;
 			default:
@@ -245,13 +245,16 @@ public class OrganicUtil {
 			sideLocation[i] = location(ending, mainSize);
 
 			pass();// dbg
+			System.out.println(mainSize);
+			System.out.println(sideChainType[i]);
 
 			// fix the endings if it is missing something, e.g alkyl only has yl and needs a
 			// chain to go with it
 			if (sideChainType[i].equals("yl")) {
-				while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
-					sideLocation[i] = location(ending, mainSize);
-				} // end while
+				if (mainSize > 2)
+					while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
+						sideLocation[i] = location(ending, mainSize);
+					} // end while
 				sideCyclo = cyclo();
 				if (sideCyclo)
 					pre = random(3, mainSize);
@@ -413,7 +416,7 @@ public class OrganicUtil {
 	}// end mainToName
 
 	private static String prefixFromNumber(int n) {
-		if (n<2)
+		if (n < 2)
 			return "";
 		else
 			return PREFIX[n - 2];
@@ -423,7 +426,6 @@ public class OrganicUtil {
 		// declare temporary variables
 		boolean space = false;
 		boolean ether = false;
-		
 		StringBuffer beforeMain = new StringBuffer();
 		TreeMap<String, Integer> groups;
 		ArrayList<String> toCheck = new ArrayList<String>();
@@ -479,6 +481,8 @@ public class OrganicUtil {
 		for (String key : groups.keySet()) {
 			// place the value of the key into a variable for ease of use
 			int prefix = groups.get(key);
+			int idx = 0;
+			ArrayList<String> toSort = new ArrayList<String>();
 			space = false;
 			ether = false;
 
@@ -489,59 +493,80 @@ public class OrganicUtil {
 				for (int i = 0; i < toCheck.size(); i++) {
 					if (key.equals(toCheck.get(i))) {
 						if (!position.get(i).equalsIgnoreCase("o")) {
+							toSort.add(position.get(i));
 							if (key.substring(key.length() - 3, key.length()).equals("oxy") && !key.equals("hydroxy")) {
-								ether =true;
-								beforeMain.insert(0,position.get(i) + ",");
-							}else {
-								beforeMain.append(position.get(i) + ",");
-							}//end if
-						}else {
+								ether = true;
+							} // end if
+						} else {
 							space = true;
-						}// end if
+						} // end if
 					} // end if
 				} // end for
 
+				// sort the array in default order
+				toSort.sort(null);;
+
+				for (String i : toSort) {
+					if (ether) {
+						beforeMain.insert(idx, i + ",");
+						idx+=2;
+					}
+					else
+						beforeMain.append(i + ",");
+					//end if
+				}//end for
+
 				// add hyphens in between the the number and words
 				if (!space) {
+					// if the side chain is an ether add the locations to the front else add them to
+					// the end of the stringbuffer
 					if (ether) {
-						if (prefix>2) {
-							beforeMain.deleteCharAt(prefix+(int)(Math.round(prefix/2.0)));
-							beforeMain.insert(prefix+(int)(Math.round(prefix/2.0)), '-');
-						}else {
-						beforeMain.deleteCharAt(prefix);
-						beforeMain.insert(prefix, '-');
+						if (prefix >= 2) {
+							beforeMain.deleteCharAt(prefix + (int) (Math.round(prefix / 2.0)));
+							beforeMain.insert(prefix + (int) (Math.round(prefix / 2.0)), '-');
+						} else {
+							beforeMain.deleteCharAt(prefix);
+							beforeMain.insert(prefix, '-');
 						}
-					}else {
-						beforeMain.deleteCharAt(beforeMain.length()-1);
+					} else {
+						beforeMain.deleteCharAt(beforeMain.length() - 1);
 						beforeMain.append("-");
-					}
-				}
+					} // end if
+				} // end if
+				
+				System.out.println("BEFORE MAIN "+beforeMain.toString());
 
 				// if the prefix is greater than or equal to 2 add the prefix infront of the key
 				if (prefix >= 2) {
-					beforeMain.append(prefixFromNumber(prefix));
-				}
+					if (!ether)
+						beforeMain.append(prefixFromNumber(prefix));
+					else
+						beforeMain.insert(prefix + 1 + (int) (Math.round(prefix / 2.0)), prefixFromNumber(prefix));
+				}//end if
+				
+				System.out.println("BEFORE MAIN "+beforeMain.toString());
 
 				// if the key has an oxy in the end and is not a
 				// hydroxy add a space; else if the
 				// boolean space is true, add a space or else add a hyphen
 				if (ether) {
 					int word = prefixFromNumber(prefix).length();
-					beforeMain.insert(prefix+ word +(int)(Math.round(prefix/2.0)),key+ " ");
+					beforeMain.insert(prefix + word + 1 + (int) (Math.round(prefix / 2.0)), key + "  ");
 				} else if (space) {
-					//beforeMain = key + " " + beforeMain;
-					beforeMain.insert(0,key+" ");
+					beforeMain.insert(0, key + "  ");
 				} else {
 					beforeMain.append(key + "-");
-				}//end if
+				} // end if
 			} // end if
 		} // end for
 
+		System.out.println("BEFORE MAIN "+beforeMain.toString());
+		System.out.println(ether);
+		
 		// if the length of side is greater than 0
 		if (side.length > 0) {
-			if (!(ether && side.length<3) || !space )
-			beforeMain.deleteCharAt(beforeMain.length()-1);
-		}//end if
+			beforeMain.deleteCharAt(beforeMain.length() - 1);
+		} // end if
 		return beforeMain.toString();
 	}// end assignPrefix
 
@@ -567,7 +592,6 @@ public class OrganicUtil {
 		// add in the cyclo side chains
 		for (int i = 2; i < CHAIN.length - 3; i++)
 			t.put("cyclo" + CHAIN[i] + "yl", 0);
-
 		return t;
 	}
 
@@ -612,7 +636,7 @@ public class OrganicUtil {
 			return true;
 		else
 			return false;
-	}
+	}// end compareCompound
 
 	// main for testing purposes
 	public static void main(String[] args) {

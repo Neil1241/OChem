@@ -3,7 +3,8 @@ package ochem.organic;
 /*
  * Compound
  * Created by: Neil Balaskandarajah
- * Last modified: 05/04/2019
+ * Modified By Jordan Lin
+ * Last modified: 06/08/2019
  * Creates a compound with chains on it
  */
 

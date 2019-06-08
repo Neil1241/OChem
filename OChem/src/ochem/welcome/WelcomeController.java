@@ -6,6 +6,7 @@ package ochem.welcome;
 
 //import packages
 import java.awt.event.*;
+import ochem.quiz.*;
 import ochem.drawing.*;
 import ochem.naming.*;
 import ochem.*;
@@ -29,7 +30,7 @@ public class WelcomeController implements ActionListener
 		} else if (e.getActionCommand().equals("Drawing")) {
 			this.model.setGUI(new DrawingGUI(this.width, this.height));
 		} else {
-			this.model.setGUI(null);
+			this.model.setGUI(new QuizGUI());
 		}
 	}
 }

@@ -4,9 +4,8 @@ package ochem.organic;
  * Interpreter
  * Created by: Neil Balaskandarajah
  * Everything else: Jordan
- * Last modified: 05/07/2019
+ * Last modified: 06/08/19
  * Converts text names of compounds into compound objects
- * TODO: fix the way locations are added
  */
 
 import java.util.ArrayList;
