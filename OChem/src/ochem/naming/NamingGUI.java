@@ -60,7 +60,6 @@ public class NamingGUI extends JPanel {
 		this.add(c);
 		this.add(test);
 		this.add(input);
-
 	}
 	
 	private void registerControllers() {
@@ -74,16 +73,18 @@ public class NamingGUI extends JPanel {
 			this.model.setValid(true);
 		}
 		else {
-			compound = model.getCompound();
+			//set the compound to the one from the model
+			this.compound = model.getCompound();
 			
+			//set the text to what is being drawn
 			this.test.setText(OrganicUtil.nameFromCompound(this.compound));
-			input.setText(null);
+			input.setText(null); //clear the textbox
 			
 			this.setUpCanvas(); //set the canvas up
 			
-			this.c.updateDisplay(); //update the display to show the canvas
-		} 
-	}
+			this.c.updateDisplay(); //update the canvas to show the compound
+		} //if
+	} //end update
 	
 	/*
 	 * Request the focus of the input field
@@ -122,7 +123,7 @@ public class NamingGUI extends JPanel {
 	} //end setUpCanvas
 	
 	/*
-	 * Set the canvas main start position based on the compound size
+	 * Set the canvas main start position by centering the main chain based on its size
 	 * return - starting node for the main chain
 	 */
 	private Node calcMainStart() {
@@ -155,7 +156,7 @@ public class NamingGUI extends JPanel {
 	} //end setMainStart
 	
 	/*
-	 * Set all the main nodes to the canvas
+	 * Set all the main nodes to the canvas by calculating their positions
 	 * Node start - starting node for the chain
 	 */
 	private void setUpMain(Node start) {
@@ -234,6 +235,7 @@ public class NamingGUI extends JPanel {
 				
 				c.addSideSize(chains[i].getSize());
 				
+				//if regular chain, make direction up/down based on even/odd
 				if (!compound.getMainChain().isBenzene() || !compound.getMainChain().isCyclo()) {
 					if (location % 2 == 0) {
 						c.addSideDirection(DrawDirection.UP_RIGHT);
@@ -241,14 +243,14 @@ public class NamingGUI extends JPanel {
 						c.addSideDirection(DrawDirection.DOWN_RIGHT);
 					} //if
 					
-				} else {
+				} else { //cycloidal chain, depending on size direct chain
 					c.addSideDirection(nameDir(location));
 					
 				} //big if 
 				
+				//add the side node to the list
 				c.addSideNode(side);
-				
-			}
+			} //if
 		} //loop
 	} //end setSideNodes
 	
@@ -258,19 +260,14 @@ public class NamingGUI extends JPanel {
 	private void setUpBonds() {
 		ArrayList<String> endings = compound.getMainChain().getEndings();
 		
-		System.out.println("setUpBonds:");
 		for (String s : endings) {
-			System.out.println(s +" | "+ s.substring(0,6));
 			
 			if (s.substring(0,6).equalsIgnoreCase("alkene")) {
 				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				
-				System.out.println("alkene " + loc +" "+ index);
-				
 				c.addBondNode(index);
 				c.addBondSize(2);
-				System.out.println("2 bond added at " + (index+1));
 						
 			} else if (s.substring(0,6).equalsIgnoreCase("alkyne")) {
 				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
@@ -278,11 +275,8 @@ public class NamingGUI extends JPanel {
 				
 				c.addBondNode(index);
 				c.addBondSize(3);
-				
-				System.out.println("3 bond added at " + (index+1));
 			} //if
 		} //loop
-		System.out.println("----------");
 	} //end setBondNoddes
 	
 	/*
@@ -307,8 +301,6 @@ public class NamingGUI extends JPanel {
 				int size = sideChains[i].getSize();
 				
 				c.addSideSize(size); //add chain to attach the func group too
-				
-				System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[-size]);
 				
 				//add the group based on the index
 				switch (size) {
@@ -341,7 +333,6 @@ public class NamingGUI extends JPanel {
 				} //if
 			}
 		} //loop
-		System.out.println("----------");
 	} //end setUpHaloAlkanes
 	
 	/*
@@ -350,9 +341,7 @@ public class NamingGUI extends JPanel {
 	private void setUpMiscFuncGroups() {
 		ArrayList<String> endings = compound.getMainChain().getEndings();
 		
-		System.out.println("setUpMiscFuncGroups:");
 		for (String s : endings) {
-			System.out.println("setUpMiscFuncGroups: " + s.substring(0,15));
 			if (s.substring(0,7).equalsIgnoreCase("alcohol")) { //alcohol
 				//add the group
 				c.addFuncGroup(FuncGroup.ALCOHOL);
@@ -400,7 +389,7 @@ public class NamingGUI extends JPanel {
 				c.addFuncNode(c.getMainNodes().get(index));
 				
 				c.addGroupDirection(DrawDirection.UP_RIGHT);
-			} else if (s.substring(0,15).equalsIgnoreCase("Carboxylic Acid")) { //carboxylic acid
+			} else if (stringContainsString(s, "carboxylic acid")) { //carboxylic acid
 				//add the group
 				c.addFuncGroup(FuncGroup.CARBOXYLIC_ACID);
 				c.addSideSize(0); //add side chain for drawing
@@ -411,11 +400,8 @@ public class NamingGUI extends JPanel {
 				c.addFuncNode(c.getMainNodes().get(index));
 				
 				c.addGroupDirection(DrawDirection.UP_RIGHT);
-				
 			} //else if
-			
 		} //loop
-		System.out.println("----------");
 	} //end setUpMiscFuncGroups
 	
 	/*
@@ -431,37 +417,9 @@ public class NamingGUI extends JPanel {
 				
 				c.addSideSize(size); //add chain to attach the func group too
 				
-				System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[-size]);
+				System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[Math.abs(size)]);
 				
-				//add the group based on the index
-				switch (size) {
-					case -2:
-						c.addFuncGroup(FuncGroup.BROMINE);
-						break;
-					case -3:
-						c.addFuncGroup(FuncGroup.IODINE);
-						break;
-					case -4:
-						c.addFuncGroup(FuncGroup.FLUORINE);
-						break;
-					case -5:
-						c.addFuncGroup(FuncGroup.CHLORINE);
-						break;
-				} //switch
 				
-				//get the location of the haloalkane on the main chain
-				int location = Integer.parseInt(sideChains[i].getLocation());
-				
-				c.addFuncNode(c.getMainNodes().get(location - 1));
-				
-				//add a direction for the chain
-				if (location == 1) {
-					c.addGroupDirection(DrawDirection.UP_LEFT);
-				} else if (location % 2 == 0) {
-					c.addGroupDirection(DrawDirection.UP_RIGHT);
-				} else {
-					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
-				} //if
 			}
 		} //loop
 		System.out.println("----------");
@@ -488,5 +446,27 @@ public class NamingGUI extends JPanel {
 			return DrawDirection.LEFT;
 		} //if
 	} //end nameDir
+	
+	/*
+	 * Checks whether one string contains another substring
+	 * String s - original string to check
+	 * String key - String to check for inside of String s
+	 */
+	private boolean stringContainsString(String s, String key) {
+		boolean contains = false;
+		
+		try {
+			for (int i = 0; i < s.length() - key.length(); i++) {
+				if (s.substring(i, i + key.length()).equalsIgnoreCase(key)) {
+					contains = true;
+					break;
+				}
+			}
+		} catch (StringIndexOutOfBoundsException e) {
+			e.printStackTrace();
+		} //try-catch
+		
+		return contains;
+	} //end stringContainsString
 	
 }//end class
