@@ -909,7 +909,9 @@ public class Canvas extends JComponent {
 	private void drawGroups(Graphics2D g2) {
 		if (!groups.isEmpty() && !groupNodes.isEmpty()) {
 			for (int i = 0; i < groupNodes.size(); i++) {
-				drawFunc(g2, groupNodes.get(i), groups.get(i), groupDirs.get(i));
+				drawFunc(g2, groupNodes.get(i),
+						groups.get(i), 
+						groupDirs.get(i));
 			} // loop
 		} // if
 	} // end drawGroups
@@ -1358,7 +1360,7 @@ public class Canvas extends JComponent {
 	 * Add a direction for a functional group DrawDirection dir - direction for
 	 * latest side chain
 	 */
-	public void addGroupDirection(DrawDirection dir) {
+	public void addFuncDirection(DrawDirection dir) {
 		groupDirs.add(dir);
 	} // end addGroupDirection
 

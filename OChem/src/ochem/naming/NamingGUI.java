@@ -325,11 +325,11 @@ public class NamingGUI extends JPanel {
 				
 				//add a direction for the chain
 				if (location == 1) {
-					c.addGroupDirection(DrawDirection.UP_LEFT);
+					c.addFuncDirection(DrawDirection.UP_LEFT);
 				} else if (location % 2 == 0) {
-					c.addGroupDirection(DrawDirection.UP_RIGHT);
+					c.addFuncDirection(DrawDirection.UP_RIGHT);
 				} else {
-					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
+					c.addFuncDirection(DrawDirection.DOWN_RIGHT);
 				} //if
 			}
 		} //loop
@@ -352,14 +352,7 @@ public class NamingGUI extends JPanel {
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				//add a direction for the chain
-				if (index+1 == 1) {
-					c.addGroupDirection(DrawDirection.UP_LEFT);
-				} else if ((index+1) % 2 == 0) {
-					c.addGroupDirection(DrawDirection.UP_RIGHT);
-				} else {
-					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
-				} //if
+				funcDirection(index);
 				
 			} else if (s.substring(0,6).equalsIgnoreCase("ketone")) { //ketone
 				//add the group
@@ -373,9 +366,9 @@ public class NamingGUI extends JPanel {
 				
 				//add a direction for the chain
 				if ((index+1 == 1) || (index+1) % 2 == 0) {
-					c.addGroupDirection(DrawDirection.UP_RIGHT);
+					c.addFuncDirection(DrawDirection.UP_RIGHT);
 				} else {
-					c.addGroupDirection(DrawDirection.DOWN_RIGHT);
+					c.addFuncDirection(DrawDirection.DOWN_RIGHT);
 				} //if
 				
 			} else if (s.substring(0,8).equalsIgnoreCase("aldehyde")) { //aldehyde
@@ -388,7 +381,7 @@ public class NamingGUI extends JPanel {
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				c.addGroupDirection(DrawDirection.UP_RIGHT);
+				c.addFuncDirection(DrawDirection.UP_RIGHT);
 			} else if (stringContainsString(s, "carboxylic acid")) { //carboxylic acid
 				//add the group
 				c.addFuncGroup(FuncGroup.CARBOXYLIC_ACID);
@@ -399,7 +392,7 @@ public class NamingGUI extends JPanel {
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				c.addGroupDirection(DrawDirection.UP_RIGHT);
+				c.addFuncDirection(DrawDirection.UP_RIGHT);
 			} //else if
 		} //loop
 	} //end setUpMiscFuncGroups
@@ -407,23 +400,75 @@ public class NamingGUI extends JPanel {
 	/*
 	 * Set up the nitrogen (N) and oxygen (O) functional groups by searching through the side chains
 	 */
-	private void setUpNOFuncGroups() {
-		Chain[] sideChains = compound.getSideChains();
+	private void setUpNOFuncGroups() {	
+		//loop through all the endings to add the main chain nitrogen/oxygen
+		ArrayList<String> endings = compound.getMainChain().getEndings();
 		
 		System.out.println("setUpNOFuncGroups:");
-		for (int i = 0; i < sideChains.length; i++) {
-			if (!DrawingUtil.isNumber(sideChains[i].getLocation())) {
-				int size = sideChains[i].getSize();
+		for (String s : endings) {
+			System.out.println(s);
+			
+			if (stringContainsString(s, "amine")) { //amine ending
+				c.addFuncGroup(FuncGroup.AMINE); //add amine group
 				
-				c.addSideSize(size); //add chain to attach the func group too
-				
-				System.out.println(size +" "+ OrganicUtil.SIDE_CHAIN_SUFFIX[Math.abs(size)]);
-				
-				
+			} else if (stringContainsString(s, "ether")) { //ether ending
+				c.addFuncGroup(FuncGroup.ETHER);
 			}
+			
+			c.addSideSize(0); //add side chain
+			
+			//add the node
+			String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
+			int index = Integer.parseInt(loc) - 1; //size minus one
+			c.addFuncNode(c.getMainNodes().get(index));
+			
+			c.addFuncDirection(funcDirection(index));
 		} //loop
-		System.out.println("----------");
+		
+		int length = compound.getSideChains().length;
+		
+		//loop through all the side chains to add the chains on a nitrogen/oxygen
+		for (int i = 0; i < length; i++) {
+			if (compound.getSideChains()[i].getSize() < 0) { //(-) size for functional groups
+				int size = compound.getSideChains()[i].getSize();
+				int idx = Math.abs(size);
+				
+				/*System.out.println(currentMethod() + OrganicUtil.SIDE_CHAIN_SUFFIX[idx]);
+				
+				c.addFuncGroup(group);
+				
+				//add the node
+				c.addFuncNode(c.getMainNodes().get(c.getMainNodes().size()-1));
+				
+				c.addFuncDirection(funcDirection(idx));*/
+			} //if
+		} //loop
+		
 	} //end setUpNOFuncGroups
+	
+	/*
+	 * Checks whether one string contains another substring
+	 * String s - original string to check
+	 * String key - String to check for inside of String s
+	 * return contains - whether the key was found in String s
+	 */
+	private boolean stringContainsString(String s, String key) {
+		boolean contains = false; //default false
+		
+		try {
+			//loop through entire string checking if substrings are equal
+			for (int i = 0; i < s.length() - key.length(); i++) {
+				if (s.substring(i, i + key.length()).equalsIgnoreCase(key)) {
+					contains = true;
+					break; //no need to continue loop, break out
+				} //if
+			}
+		} catch (StringIndexOutOfBoundsException e) { //if key is longer than s
+			e.printStackTrace();
+		} //try-catch
+		
+		return contains;
+	} //end stringContainsString
 	
 	/*
 	 * Name direction from location
@@ -448,25 +493,23 @@ public class NamingGUI extends JPanel {
 	} //end nameDir
 	
 	/*
-	 * Checks whether one string contains another substring
-	 * String s - original string to check
-	 * String key - String to check for inside of String s
+	 * Get a direction for a functional group
+	 * int i - position on main chain
+	 * return - direction to draw the functional group in
 	 */
-	private boolean stringContainsString(String s, String key) {
-		boolean contains = false;
-		
-		try {
-			for (int i = 0; i < s.length() - key.length(); i++) {
-				if (s.substring(i, i + key.length()).equalsIgnoreCase(key)) {
-					contains = true;
-					break;
-				}
-			}
-		} catch (StringIndexOutOfBoundsException e) {
-			e.printStackTrace();
-		} //try-catch
-		
-		return contains;
-	} //end stringContainsString
+	private DrawDirection funcDirection(int i) {
+		System.out.println(i);
+		//add a direction for the chain
+		if (i == 0) {
+			return DrawDirection.UP_LEFT;
+		} else if ((i+1) % 2 == 0) {
+			return DrawDirection.UP_RIGHT;
+		} else {
+			return DrawDirection.DOWN_RIGHT;
+		} //if
+	} //end funcDirection
 	
+	private String currentMethod() {
+		return new Exception().getStackTrace()[1].getMethodName() +" : ";
+	}
 }//end class

@@ -183,7 +183,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 							n.getDia())) {
 						canvas.addFuncNode(n); // add that node to the functional group nodes
-						canvas.addGroupDirection(dir); // save that direction into the list
+						canvas.addFuncDirection(dir); // save that direction into the list
 						canvas.setFuncStep(2); // increment the bond step
 						break; // exit loop
 					} // if
@@ -198,7 +198,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), mainNodes.get(0).getCenterX(),
 						mainNodes.get(0).getCenterY(), mainNodes.get(0).getDia())) {
 					canvas.addFuncNode(mainNodes.get(0)); // add the first node
-					canvas.addGroupDirection(dir); // save that direction into the list
+					canvas.addFuncDirection(dir); // save that direction into the list
 					canvas.setFuncStep(2); // increment the bond step
 
 				//last node
@@ -207,7 +207,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 						mainNodes.get(mainNodes.size() - 1).getCenterY(),
 						mainNodes.get(mainNodes.size() - 1).getDia())) {
 					canvas.addFuncNode(mainNodes.get(mainNodes.size() - 1)); // add the first node
-					canvas.addGroupDirection(dir); // save that direction into the list
+					canvas.addFuncDirection(dir); // save that direction into the list
 					canvas.setFuncStep(2); // increment the bond step
 				} // if
 
@@ -222,7 +222,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 					if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
 							n.getDia())) {
 						canvas.addFuncNode(n); // add that node to the functional group nodes
-						canvas.addGroupDirection(dir); // save that direction into the list
+						canvas.addFuncDirection(dir); // save that direction into the list
 						canvas.setFuncStep(2); // increment the bond step
 						break; // exit loop
 					} // if
