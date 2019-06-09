@@ -551,7 +551,7 @@ public class OrganicUtil {
 				// boolean space is true, add a space or else add a hyphen
 				if (ether) {
 					int word = prefixFromNumber(prefix).length();
-					beforeMain.insert(prefix + word + 1 + (int) (Math.round(prefix / 2.0)), key + "  ");
+					beforeMain.insert(prefix + word + (int) (Math.round(prefix / 2.0)), key + "  ");
 				} else if (space) {
 					beforeMain.insert(0, key + "  ");
 				} else {
