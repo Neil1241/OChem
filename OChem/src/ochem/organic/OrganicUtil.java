@@ -93,7 +93,7 @@ public class OrganicUtil {
 			prefixBond = random(1, 2);
 			bondLocation = new int[prefixBond];
 			if (prefixBond == 1)
-				bondLocation[0] = random(1, mainSize);
+				bondLocation[0] = Integer.parseInt(location(ending,mainSize,true));
 			else {
 				bondLocation[0] = 1;
 				bondLocation[1] = 2;
@@ -110,7 +110,7 @@ public class OrganicUtil {
 			bondLocation = new int[prefixBond];
 			HashSet<Integer> toBond = new HashSet<Integer>();
 			for (int i = 0; i < prefixBond; i++) {
-				if (!toBond.add(random(1, mainSize - 1)))
+				if (!toBond.add(Integer.parseInt(location(ending,mainSize,true))))
 					i--;
 			} // end for
 			for (Integer n : toBond)
@@ -308,7 +308,34 @@ public class OrganicUtil {
 			sideLocation = LOCATIONS[random(startOn, mainSize - 1)];
 		}
 		return sideLocation;
-	}
+	}//end location
+	
+	private static String location(int ending, int mainSize, boolean bondLocation) {
+		// temporary variable to hold the location
+		String sideLocation = "";
+		int startOn = 0;
+
+		// set starting location to be on the second carbon if the ending is either an
+		// ester,acid,amide
+		if (ending == 9 || ending == 8 || ending == 7)
+			startOn = 1;
+		// end if
+
+		// if ending is an amine or amide allow for a special case of nitrogen location,
+		// else create a random number within the mainSize
+		if (!bondLocation) {
+			int r = random(startOn, mainSize);
+			if (r == mainSize)
+				sideLocation = LOCATIONS[LOCATIONS.length - 1];
+			else
+				sideLocation = LOCATIONS[r];
+
+		} else {
+			sideLocation = LOCATIONS[random(startOn, mainSize - 1)];
+		}
+		return sideLocation;
+	}//end location
+	
 
 	// returns true or false whether the a component should be a cyclo or not
 	private static boolean cyclo() {

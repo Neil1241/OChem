@@ -28,7 +28,13 @@ public class QuizController implements MouseListener{
 	}
 
 	public void mouseClicked(MouseEvent e) {
-		System.out.println(this.button);
+		if (this.button.getText().equalsIgnoreCase("name")) {
+			this.model.setDraw(false);
+			this.model.generateCompound();
+		}else if(this.button.getText().equalsIgnoreCase("draw")) {
+			this.model.setDraw(true);
+			this.model.generateCompound();
+		}
 	}
 
 	public void mouseEntered(MouseEvent e) {
