@@ -21,13 +21,15 @@ public class WelcomeGUI extends JPanel {
 	private WelcomeButton drawing = new WelcomeButton("Drawing");
 	private JLabel quote = new JLabel("Best Period of The Day!");
 	private JLabel title = new JLabel("OChem");
-	private Model model = new Model();
+	private Model model;
 
 	// constructor
-	public WelcomeGUI() {
+	public WelcomeGUI(Model model) {
 		super();
+		this.model = model;
 		this.layoutView();
 		this.model.setGUI(this);
+		this.model.setWelcome(this);
 		this.registerControllers();
 	}
 

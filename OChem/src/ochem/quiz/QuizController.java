@@ -6,6 +6,8 @@ package ochem.quiz;
 import java.awt.event.*;
 import java.awt.*;
 import ochem.drawing.*;
+import ochem.*;
+import javax.swing.*;
 
 public class QuizController implements MouseListener{
 	private final Color NORMAL;
@@ -13,6 +15,7 @@ public class QuizController implements MouseListener{
 	private final Color PRESSED;
 	private OBox button;
 	private QuizModel model;
+	private Model p;
 	
 	public QuizController(QuizModel model, OBox button) {
 		this.model = model;
@@ -24,7 +27,18 @@ public class QuizController implements MouseListener{
 		this.button.setBackgroundColor(NORMAL);
 		// redraw with the new color
 		this.button.update();
+	}
+	
+	public QuizController(Model model, OBox button) {
+		this.p = model;
+		this.button = button;
+		NORMAL = DrawingGUI.BG_COLOR;
+		ENTERED = NORMAL.darker();
+		PRESSED = ENTERED.darker();
 		
+		this.button.setBackgroundColor(NORMAL);
+		// redraw with the new color
+		this.button.update();
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -34,6 +48,8 @@ public class QuizController implements MouseListener{
 		}else if(this.button.getText().equalsIgnoreCase("draw")) {
 			this.model.setDraw(true);
 			this.model.generateCompound();
+		}else {
+			this.p.setGUI(this.p.getWelcome());
 		}
 	}
 
