@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.io.File;
 
 import ochem.OChem;
+import ochem.drawing.DrawingUtil.DrawDirection;
 
 /*
  * CanvasUtil
@@ -180,25 +181,36 @@ public class DrawingUtil {
 				return DrawDirection.values()[pos+2]; //done
 				
 			case 4:
-				return DrawingUtil.incDirection(DrawDirection.values()[pos], 2);
+				return DrawingUtil.incDirection(DrawDirection.values()[pos], 2); //done
 				
 			case 5:
-				return DrawDirection.values()[pos];
-				
 			case 6:
-				return DrawDirection.values()[pos];
-				
 			case 7:
-				return DrawDirection.values()[pos];
-				
 			case 8:
-				return DrawDirection.values()[pos];
+				return DrawDirection.values()[3-pos]; //done
 				
 			default:
 				printCM("default case");
 				return DrawDirection.UP_RIGHT;
 		}
 	} //end cycloDir
+	
+	/*
+	 * Get a direction for a functional group
+	 * int i - position on main chain
+	 * return - direction to draw the functional group in
+	 */
+	public static DrawDirection regDirection(int i) {
+		printCM("" + i);
+		//add a direction for the chain
+		if (i == 1) {
+			return DrawDirection.UP_LEFT;
+		} else if (i % 2 == 0) {
+			return DrawDirection.UP_RIGHT;
+		} else {
+			return DrawDirection.DOWN_RIGHT;
+		} //if
+	} //end regDirection
 	
 	/*
 	 * Calculate an angle to rotate a functional group based on a direction

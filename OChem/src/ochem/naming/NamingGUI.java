@@ -289,7 +289,7 @@ public class NamingGUI extends JPanel {
 	private void setUpHaloAlkanes() {
 		Chain[] sideChains = compound.getSideChains();
 		
-		System.out.println("setUpHaloAlkanes:");
+		DrawingUtil.printCM();
 		for (int i = 0; i < sideChains.length; i++) {
 			if (DrawingUtil.isNumber(sideChains[i].getLocation())) {
 				int size = sideChains[i].getSize();
@@ -315,11 +315,13 @@ public class NamingGUI extends JPanel {
 				//get the location of the haloalkane on the main chain
 				int location = Integer.parseInt(sideChains[i].getLocation());
 				
+				//add the node
 				c.addFuncNode(c.getMainNodes().get(location - 1));
 				
 				//add a direction for the chain
-				c.addFuncDirection(namingDirection(false, 0, location));
-			}
+				boolean isCycloidal = compound.getMainChain().isCyclo() || compound.getMainChain().isBenzene();
+				c.addFuncDirection(namingDirection(isCycloidal, 0, location));
+			} //if
 		} //loop
 	} //end setUpHaloAlkanes
 	
@@ -464,27 +466,11 @@ public class NamingGUI extends JPanel {
 	 * int pos - position on the chain
 	 */
 	private DrawDirection namingDirection(boolean isCycloidal, int size, int pos) {
+		DrawingUtil.printCM(""+isCycloidal);
 		if (isCycloidal) {
 			return DrawingUtil.cycloDir(size, pos);
 		} else {
-			return regDirection(pos);
+			return DrawingUtil.regDirection(pos);
 		} //if
 	} //end namingDirection
-	
-	/*
-	 * Get a direction for a functional group
-	 * int i - position on main chain
-	 * return - direction to draw the functional group in
-	 */
-	private DrawDirection regDirection(int i) {
-		System.out.println(i);
-		//add a direction for the chain
-		if (i == 0) {
-			return DrawDirection.UP_LEFT;
-		} else if ((i+1) % 2 == 0) {
-			return DrawDirection.UP_RIGHT;
-		} else {
-			return DrawDirection.DOWN_RIGHT;
-		} //if
-	} //end funcDirection
 }//end class
