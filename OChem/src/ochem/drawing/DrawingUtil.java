@@ -170,6 +170,37 @@ public class DrawingUtil {
 	} //end angleFromDirection
 	
 	/*
+	 * Direction from the index on a cycloidal chain
+	 * int size - size of the chian
+	 * int pos - position on chain
+	 */
+	public static DrawDirection cycloDir(int size, int pos) {	
+		switch (size) {
+			case 3:
+				return DrawDirection.values()[pos+2]; //done
+				
+			case 4:
+				return DrawingUtil.incDirection(DrawDirection.values()[pos], 2);
+				
+			case 5:
+				return DrawDirection.values()[pos];
+				
+			case 6:
+				return DrawDirection.values()[pos];
+				
+			case 7:
+				return DrawDirection.values()[pos];
+				
+			case 8:
+				return DrawDirection.values()[pos];
+				
+			default:
+				printCM("default case");
+				return DrawDirection.UP_RIGHT;
+		}
+	} //end cycloDir
+	
+	/*
 	 * Calculate an angle to rotate a functional group based on a direction
 	 * DrawDirection dir - direction to draw in
 	 * return - angle based on the direction
@@ -369,5 +400,14 @@ public class DrawingUtil {
 	 */
 	public static void printCM() {
 		System.out.println(new Exception().getStackTrace()[1].getMethodName());
-	}
+	} //end printCM
+	
+	/*
+	 * Prints the current method to the screen with a message
+	 * String msg - message to print
+	 */
+	public static void printCM(String msg) {
+		printCM();
+		System.out.println(": " + msg + "\n");
+	} //end printCM
 } //end class

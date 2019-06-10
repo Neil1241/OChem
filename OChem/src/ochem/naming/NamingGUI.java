@@ -235,18 +235,13 @@ public class NamingGUI extends JPanel {
 				
 				c.addSideSize(chains[i].getSize());
 				
-				//if regular chain, make direction up/down based on even/odd
-				if (!compound.getMainChain().isBenzene() || !compound.getMainChain().isCyclo()) {
-					if (location % 2 == 0) {
-						c.addSideDirection(DrawDirection.UP_RIGHT);
-					} else {
-						c.addSideDirection(DrawDirection.DOWN_RIGHT);
-					} //if
-					
-				} else { //cycloidal chain, depending on size direct chain
-					c.addSideDirection(nameDir(location));
-					
-				} //big if 
+				//add a direction for the side chain
+				boolean isCyclo = compound.getMainChain().isBenzene() || compound.getMainChain().isCyclo();
+				c.addSideDirection(namingDirection(isCyclo, compound.getMainSize(), location-1));
+				
+				//set the chain to cyclo/benzene
+				c.addSideCyclo(chains[i].isCyclo());
+				c.addSideBenzene(chains[i].isBenzene());
 				
 				//add the side node to the list
 				c.addSideNode(side);
@@ -288,7 +283,6 @@ public class NamingGUI extends JPanel {
 		this.setUpNOFuncGroups();
 	} //end setUpFuncGroups
 	
-	
 	/*
 	 * Add the haloalkanes to the canvas by searching through the chains locations
 	 */
@@ -324,13 +318,7 @@ public class NamingGUI extends JPanel {
 				c.addFuncNode(c.getMainNodes().get(location - 1));
 				
 				//add a direction for the chain
-				if (location == 1) {
-					c.addFuncDirection(DrawDirection.UP_LEFT);
-				} else if (location % 2 == 0) {
-					c.addFuncDirection(DrawDirection.UP_RIGHT);
-				} else {
-					c.addFuncDirection(DrawDirection.DOWN_RIGHT);
-				} //if
+				c.addFuncDirection(namingDirection(false, 0, location));
 			}
 		} //loop
 	} //end setUpHaloAlkanes
@@ -352,7 +340,7 @@ public class NamingGUI extends JPanel {
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				funcDirection(index);
+				c.addFuncDirection(namingDirection(false, 0, index+1));
 				
 			} else if (s.substring(0,6).equalsIgnoreCase("ketone")) { //ketone
 				//add the group
@@ -364,12 +352,7 @@ public class NamingGUI extends JPanel {
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				//add a direction for the chain
-				if ((index+1 == 1) || (index+1) % 2 == 0) {
-					c.addFuncDirection(DrawDirection.UP_RIGHT);
-				} else {
-					c.addFuncDirection(DrawDirection.DOWN_RIGHT);
-				} //if
+				c.addFuncDirection(namingDirection(false, 0, index+1));
 				
 			} else if (s.substring(0,8).equalsIgnoreCase("aldehyde")) { //aldehyde
 				//add the group
@@ -381,7 +364,7 @@ public class NamingGUI extends JPanel {
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				c.addFuncDirection(DrawDirection.UP_RIGHT);
+				c.addFuncDirection(namingDirection(false, 0, index+1));
 			} else if (stringContainsString(s, "carboxylic acid")) { //carboxylic acid
 				//add the group
 				c.addFuncGroup(FuncGroup.CARBOXYLIC_ACID);
@@ -392,7 +375,7 @@ public class NamingGUI extends JPanel {
 				int index = Integer.parseInt(loc) - 1; //size minus one
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				c.addFuncDirection(DrawDirection.UP_RIGHT);
+				c.addFuncDirection(namingDirection(false, 0, index+1));
 			} //else if
 		} //loop
 	} //end setUpMiscFuncGroups
@@ -408,19 +391,25 @@ public class NamingGUI extends JPanel {
 		for (String s : endings) {
 			
 			if (stringContainsString(s, "amine")) { //amine ending
-				c.addFuncGroup(FuncGroup.AMINE); //add amine group//add the node
+				c.addFuncGroup(FuncGroup.AMINE); //add amine group
+				
+				//add the node
 				int index = compound.getMainSize()-1;
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				c.addFuncDirection(funcDirection(index));
+				//add the direction
+				c.addFuncDirection(namingDirection(false, 0, index+1));
 				
 			} else if (stringContainsString(s, "ether")) { //ether ending
-				c.addFuncGroup(FuncGroup.ETHER);//add the node
+				c.addFuncGroup(FuncGroup.ETHER);
+				
+				//add the node
 				int index = compound.getMainSize()-1;
 				c.addFuncNode(c.getMainNodes().get(index));
 				
-				c.addFuncDirection(funcDirection(index));
-			}
+				//add the direction
+				c.addFuncDirection(namingDirection(false, 0, index+1));
+			} //if
 		} //loop
 		
 		int length = compound.getSideChains().length;
@@ -469,33 +458,25 @@ public class NamingGUI extends JPanel {
 	} //end stringContainsString
 	
 	/*
-	 * Name direction from location
-	 * int location - location on main chain
+	 * Get the correct direction for a chain
+	 * boolean isCycloidal - whether the chain is cycloidal (cyclo or benzene)
+	 * int size - size of the chain
+	 * int pos - position on the chain
 	 */
-	private DrawDirection nameDir(int location) {
-		if (location == 1 || location == 2) { //lower
-			return DrawDirection.DOWN_LEFT;
-			
-		} else if (location == 3) { //right
-			return DrawDirection.RIGHT;
-			
-		} else if (location == 4 || location == 5) { //top
-			return DrawDirection.UP_LEFT;
-			
-		} else if (location == 6) { //left
-			return DrawDirection.LEFT;
-			
-		} else { //other cases 
-			return DrawDirection.LEFT;
+	private DrawDirection namingDirection(boolean isCycloidal, int size, int pos) {
+		if (isCycloidal) {
+			return DrawingUtil.cycloDir(size, pos);
+		} else {
+			return regDirection(pos);
 		} //if
-	} //end nameDir
+	} //end namingDirection
 	
 	/*
 	 * Get a direction for a functional group
 	 * int i - position on main chain
 	 * return - direction to draw the functional group in
 	 */
-	private DrawDirection funcDirection(int i) {
+	private DrawDirection regDirection(int i) {
 		System.out.println(i);
 		//add a direction for the chain
 		if (i == 0) {

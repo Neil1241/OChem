@@ -926,8 +926,8 @@ public class Canvas extends JComponent {
 						groupDirs.get(i)); 
 			} // loop
 		} else {
-			DrawingUtil.printCM();
-			System.out.println("GND " + groups.size() +" "+ groupNodes.size() +" "+ groupDirs.size());
+//			DrawingUtil.printCM();
+//			System.out.println("GND " + groups.size() +" "+ groupNodes.size() +" "+ groupDirs.size());
 		} //if
 	} // end drawGroups
 
