@@ -601,6 +601,7 @@ public class OrganicUtil {
 
 		// if the length of side is greater than 0
 		if (side.length > 0) {
+			System.out.println("SHOWUP "+beforeMain.toString());
 			beforeMain.deleteCharAt(beforeMain.length() - 1);
 		} // end if
 		return beforeMain.toString();
@@ -653,6 +654,8 @@ public class OrganicUtil {
 		// add in the cyclo side chains
 		for (int i = 2; i < CHAIN.length - 3; i++)
 			t.put("cyclo" + CHAIN[i] + "yl", 0);
+		for (int i = 2; i < CHAIN.length - 3; i++)
+			t.put("cyclo" + CHAIN[i] + "oxy", 0);
 		return t;
 	}
 
