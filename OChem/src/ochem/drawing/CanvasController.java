@@ -92,7 +92,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 			canvas.setMainStep(4); // step forward
 		} // if
 	} // end mainLeft
-
 	
 	/*
 	 * Action for when screen is left clicked with the "side" type
@@ -285,6 +284,9 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 				// if mouse is over the node
 				if (DrawingUtil.isWithinBounds(ms.getCenterX(), ms.getCenterY(), mainNodes.get(i).getCenterX(),
 						mainNodes.get(i).getCenterY(), mainNodes.get(i).getRad())) {
+					
+					DrawingUtil.printCM();
+					System.out.println(mainNodes.get(i).getTag());
 					
 					// make its color darker
 					mainNodes.get(i).setColor(DrawingUtil.DARK_YELLOW); 

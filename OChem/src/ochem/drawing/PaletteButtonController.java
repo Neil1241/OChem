@@ -284,7 +284,7 @@ public class PaletteButtonController implements MouseListener {
 	 * Action for when the "amine" button is pressed
 	 */
 	private void amineAction() {
-		if (canvas.getMainOnScreen()) {
+		if (canvas.getMainOnScreen() && !canvas.getHasNO()) {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.AMINE);
 			canvas.setFuncStep(1);
@@ -297,7 +297,7 @@ public class PaletteButtonController implements MouseListener {
 	 * Action for when the "amide" button is pressed
 	 */
 	private void amideAction() {
-		if (canvas.getMainOnScreen()) {
+		if (canvas.getMainOnScreen() && !canvas.getHasNO()) {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.AMIDE);
 			canvas.setFuncStep(1);
@@ -310,7 +310,7 @@ public class PaletteButtonController implements MouseListener {
 	 * Action for when the "carboxylic acid" button is pressed
 	 */
 	private void etherAction() {
-		if (canvas.getMainOnScreen()) {
+		if (canvas.getMainOnScreen() && !canvas.getHasNO()) {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ETHER);
 			canvas.setFuncStep(1);
@@ -323,7 +323,7 @@ public class PaletteButtonController implements MouseListener {
 	 * Action for when the "amine" button is pressed
 	 */
 	private void esterAction() {
-		if (canvas.getMainOnScreen()) {
+		if (canvas.getMainOnScreen() && !canvas.getHasNO()) {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ESTER);
 			canvas.setFuncStep(1);

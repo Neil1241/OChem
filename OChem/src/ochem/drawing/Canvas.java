@@ -54,6 +54,7 @@ public class Canvas extends JComponent {
 	private ArrayList<DrawDirection> groupDirs; // all the directions for the groups
 
 	private boolean mainOnScreen; // whether a main chain is on the screen
+	private boolean hasNO; // whether the compound has a nitrogen or oxygen
 
 	private ActionType type; // type of action
 
@@ -66,7 +67,6 @@ public class Canvas extends JComponent {
 	private int bondStep; // step for the "bond" button
 	private int funcStep; // step for the "functional group" button
 
-	private int bondNum; // global bond number counter
 	private boolean draw; // whether the canvas is in the DrawingGUI or not
 
 	private HashSet<String> noUpdate; // the list of Strings to not update with
@@ -96,8 +96,9 @@ public class Canvas extends JComponent {
 		// set the type
 		type = ActionType.CLEAR;
 
-		// set the main on screen to false
+		// set the main on screen and nitrogen/oxygen check to false
 		mainOnScreen = false;
+		hasNO = false;
 
 		// instantiate the compound and the chain
 		compound = new Compound(0);
@@ -125,9 +126,6 @@ public class Canvas extends JComponent {
 		directions = new ArrayList<DrawDirection>();
 		groups = new ArrayList<FuncGroup>();
 		groupDirs = new ArrayList<DrawDirection>();
-
-		// set the global bond counter to zero
-		bondNum = 0;
 
 		// size of all the bonds
 		bondSizes = new ArrayList<Integer>();
@@ -188,8 +186,6 @@ public class Canvas extends JComponent {
 			 * g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE));
 			 * mouse.setTag("M");
 			 */
-
-			// System.out.println(Thread.currentThread().toString());
 		} // for drawing GUI
 	} // end paintComponent
 
@@ -215,8 +211,9 @@ public class Canvas extends JComponent {
 			funcStep = 0;
 			nameStep = 0;
 
-			// set mainOnScreen to false
+			// set compound checks to false
 			mainOnScreen = false;
+			hasNO = false;
 
 			// clear the lists of nodes
 			mainNodes.clear();
@@ -386,7 +383,7 @@ public class Canvas extends JComponent {
 					noUpdate.add("1"); // can't add side chain to first node
 					noUpdate.add(Integer.toString(compound.getMainSize())); // or last node
 				} // if
-
+				
 				// draw all selectable nodes
 				drawSelectableNodes(g2);
 				break;
@@ -669,10 +666,17 @@ public class Canvas extends JComponent {
 	 * responsible for drawing
 	 */
 	private void drawSelectableNodes(Graphics2D g2) {
+		
 		// draw all selectable nodes
 		for (Node n : mainNodes) {
 			if (!noUpdate.contains(n.getTag())) { // if the tag passes the no update test
-
+				try {
+					if (n.getColor().equals(DrawingUtil.DARK_YELLOW)) {
+						DrawingUtil.printCM();
+						System.out.println(n.getTag() +"\n");
+					}
+				} catch (NullPointerException e) {}
+				
 				// draw node or symbol depending on tag
 				if (DrawingUtil.isNumber(n.getTag())) { // numeric tag
 					g2.setColor(n.getColor());
@@ -909,9 +913,7 @@ public class Canvas extends JComponent {
 	private void drawGroups(Graphics2D g2) {
 		if (!groups.isEmpty() && !groupNodes.isEmpty()) {
 			for (int i = 0; i < groupNodes.size(); i++) {
-				drawFunc(g2, groupNodes.get(i),
-						groups.get(i), 
-						groupDirs.get(i));
+				drawFunc(g2, groupNodes.get(i), groups.get(i), groupDirs.get(i));
 			} // loop
 		} // if
 	} // end drawGroups
@@ -958,22 +960,24 @@ public class Canvas extends JComponent {
 				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4));
 
 			case AMINE: // save location to node
-				if ((compound.getMainSize() + groups.size()) > mainNodes.size()) {
+				if (!hasNO && funcStep == 2) { //first time being called when set
 					mainNodes.add(drawLetterFunc(g2, "N", start, dir));
+					hasNO = true;
 				} else {
-					mainNodes.set(mainNodes.size() - 1, drawLetterFunc(g2, "N", start, dir));
-				}
+					drawLetterFunc(g2, "N", start, dir);
+				} //if
 				break;
 
 			case ESTER:
 				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4));
 
 			case ETHER: // save location to node
-				if ((compound.getMainSize() + groups.size()) > mainNodes.size()) {
+				if (!hasNO && funcStep == 2) {
 					mainNodes.add(drawLetterFunc(g2, "O", start, dir));
+					hasNO = true;
 				} else {
-					mainNodes.set(mainNodes.size() - 1, drawLetterFunc(g2, "O", start, dir));
-				}
+					drawLetterFunc(g2, "O", start, dir);
+				} //if
 				break;
 
 		} // switch
@@ -1015,7 +1019,7 @@ public class Canvas extends JComponent {
 		Node text = new Node(textX + fm.stringWidth(symbol) / 2, textY - (int) (fm.getAscent() * 0.375),
 				fm.stringWidth(symbol) / 2);
 		text.setTag(symbol);
-		text.setColor(mainNodes.get(0).getColor());
+//		text.setColor(mainNodes.get(0).getColor());
 
 		return text;
 	} // end drawHaloAlkane
@@ -1134,15 +1138,6 @@ public class Canvas extends JComponent {
 			mainNodes.set(0, new Node(x, y, DrawingUtil.NODE_RAD));
 		} // inner if
 	} // end setMainStart
-
-	/*
-	 * Get whether there is a main chain on the screen return mainOnScreen - whether
-	 * the main chain is on the screen
-	 */
-	public boolean getMainOnScreen() {
-
-		return mainOnScreen;
-	} // end getMainOnScreen
 
 	/*
 	 * Get the nodes on the main chain return nodes - list of all the nodes of the
@@ -1465,12 +1460,28 @@ public class Canvas extends JComponent {
 	}
 
 	/*
-	 * Get the no updates set return noUpdate - set of Strings containing what to
-	 * not update
+	 * Get the no updates set
+	 * return noUpdate - set of Strings containing what to not update
 	 */
 	public HashSet<String> getNoUpdate() {
 		return noUpdate;
 	} // end getNoUpdate
+
+	/*
+	 * Get whether there is a main chain on the screen return mainOnScreen - whether
+	 * the main chain is on the screen
+	 */
+	public boolean getMainOnScreen() {
+		return mainOnScreen;
+	} // end getMainOnScreen
+
+	/*
+	 * Get whether or not the compound has a nitrogen or an oxygen
+	 * return hasNO - whether the compound has a Nitrogen/Oxygen or not
+	 */
+	public boolean getHasNO() {
+		return hasNO;
+	} // end getHasNO
 
 	// NAMING GUI//
 
@@ -1485,10 +1496,6 @@ public class Canvas extends JComponent {
 	 * Get the endings String list return - list of endings for the main chain
 	 */
 	public ArrayList<String> getEndings() {
-		// add the number of groups
-		bondNum++;
-		// compound.getMainChain().addNumOfGroups(bondNum);
-
 		// set the ending
 		compound.getMainChain().setEnding(compound.getMainChain().getBond() - 1); // position in organic util array
 
@@ -1499,7 +1506,6 @@ public class Canvas extends JComponent {
 	 * String representation of the String used for debugging
 	 */
 	public String toString() {
-
 		return "Canvas:";
 	} // end toString
 

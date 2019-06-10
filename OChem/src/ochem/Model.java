@@ -18,6 +18,7 @@ public class Model extends Object
 		frame.setContentPane(p);
 		frame.pack();
 		frame.setVisible(true);
+		frame.setLocation(OChem.width/2 - p.getWidth()/2, OChem.height/2 - 3*p.getHeight()/4); //get rid of x offset
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }

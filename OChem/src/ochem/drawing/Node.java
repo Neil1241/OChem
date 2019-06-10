@@ -163,6 +163,15 @@ public class Node {
 	} //end getTag
 	
 	/*
+	 * Checks whether the tag matches the given String
+	 * String key - key to compare to node tag
+	 * return - true if matches, false if doesn't
+	 */
+	public boolean isTag(String key) {
+		return tag.equalsIgnoreCase(key);
+	} //end isTag
+	
+	/*
 	 * Coordinates of the node as a String for debugging
 	 */
 	public String toString() {

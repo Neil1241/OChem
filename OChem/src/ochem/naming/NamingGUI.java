@@ -415,11 +415,12 @@ public class NamingGUI extends JPanel {
 				c.addFuncGroup(FuncGroup.ETHER);
 			}
 			
-			c.addSideSize(0); //add side chain
+//			c.addSideSize(0); //add side chain
 			
 			//add the node
 			String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
-			int index = Integer.parseInt(loc) - 1; //size minus one
+//			int index = Integer.parseInt(loc) - 1; //size minus one
+			int index = compound.getMainSize();
 			c.addFuncNode(c.getMainNodes().get(index));
 			
 			c.addFuncDirection(funcDirection(index));
@@ -508,8 +509,4 @@ public class NamingGUI extends JPanel {
 			return DrawDirection.DOWN_RIGHT;
 		} //if
 	} //end funcDirection
-	
-	private String currentMethod() {
-		return new Exception().getStackTrace()[1].getMethodName() +" : ";
-	}
 }//end class

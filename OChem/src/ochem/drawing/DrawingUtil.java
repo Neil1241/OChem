@@ -355,4 +355,19 @@ public class DrawingUtil {
 	public static int rSin(int arm, double angRad) {
 		return (int) (arm * Math.sin(angRad));
 	} // end rSin
+	
+	/*
+	 * Name of the method that calls this method (for debugging)
+	 * return - name of method calling this method as String
+	 */
+	public static String currentMethod() {
+		return new Exception().getStackTrace()[1].getMethodName() +" : ";
+	} //end currentMethod
+	
+	/*
+	 * Prints the current method to the screen
+	 */
+	public static void printCM() {
+		System.out.println(new Exception().getStackTrace()[1].getMethodName());
+	}
 } //end class
