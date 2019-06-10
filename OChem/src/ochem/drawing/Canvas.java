@@ -1251,7 +1251,7 @@ public class Canvas extends JComponent {
 		Chain lastSide = sideChains.get(sideChains.size() - 1);
 		lastSide.setLocation(n.getTag());
 		compound.addSideChain(lastSide.getSize(), lastSide.getLocation(), lastSide.isCyclo(), lastSide.isBenzene());
-		if (lastSide.getSize() < -5)
+		if (lastSide.getSize() < -5 && lastSide.getSize()!=-8)
 			compound.addFunctionalLocation(lastSide.getLocation());
 		else
 			System.out.println("MUHAHAHAHAHAHAHA");
