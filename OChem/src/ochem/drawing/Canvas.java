@@ -699,11 +699,11 @@ public class Canvas extends JComponent {
 	} // end drawSelectableNodes
 
 	/*
-	 * Draw a node to the screen Graphics2D g2 - object responsible for drawing Node
-	 * n - node to draw
+	 * Draw a node to the screen 
+	 * Graphics2D g2 - object responsible for drawing 
+	 * Node n - node to draw
 	 */
 	private void drawNode(Graphics2D g2, Node n) {
-
 		g2.fillOval(n.getCenterX(), n.getCenterY(), n.getDia(), n.getDia());
 	} // end drawNode
 
@@ -713,7 +713,6 @@ public class Canvas extends JComponent {
 	 * at
 	 */
 	private void drawSymbol(Graphics2D g2, String symbol, Node n) {
-
 		g2.setFont(g2.getFont().deriveFont((DrawingUtil.FONT_SIZE)));
 		FontMetrics fm = g2.getFontMetrics();
 

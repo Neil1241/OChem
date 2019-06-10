@@ -408,19 +408,19 @@ public class NamingGUI extends JPanel {
 		for (String s : endings) {
 			
 			if (stringContainsString(s, "amine")) { //amine ending
-				c.addFuncGroup(FuncGroup.AMINE); //add amine group
+				c.addFuncGroup(FuncGroup.AMINE); //add amine group//add the node
+				int index = compound.getMainSize()-1;
+				c.addFuncNode(c.getMainNodes().get(index));
+				
+				c.addFuncDirection(funcDirection(index));
 				
 			} else if (stringContainsString(s, "ether")) { //ether ending
-				c.addFuncGroup(FuncGroup.ETHER);
+				c.addFuncGroup(FuncGroup.ETHER);//add the node
+				int index = compound.getMainSize()-1;
+				c.addFuncNode(c.getMainNodes().get(index));
+				
+				c.addFuncDirection(funcDirection(index));
 			}
-			
-//			c.addSideSize(0); //add side chain
-			
-			//add the node
-			int index = compound.getMainSize()-1;
-			c.addFuncNode(c.getMainNodes().get(index));
-			
-			c.addFuncDirection(funcDirection(index));
 		} //loop
 		
 		int length = compound.getSideChains().length;
