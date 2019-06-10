@@ -353,8 +353,9 @@ public class PaletteButtonController implements MouseListener {
 			Compound c = this.adjustEnding();
 			System.out.println(c.toString());
 			System.out.println(c.getMainChain().getBond());
-			System.out.println(OrganicUtil.nameFromCompound(c));
-			canvas.nameStep(OrganicUtil.nameFromCompound(c));
+			String hold = OrganicUtil.nameFromCompound(c);
+			System.out.println(hold);
+			canvas.nameStep(hold);
 		} // if
 	} // end nameAction
 
@@ -388,7 +389,7 @@ public class PaletteButtonController implements MouseListener {
 		} // end for
 
 		// add functional locations
-		if (num <= -6) {
+		if (num <= -6 && num!=-8) {
 		for (int i : spots) {
 			c.getMainChain().addFunctionalLocation(sides[i].getLocation());
 			locations.add(sides[i].getLocation());

@@ -29,8 +29,10 @@ public class WelcomeController implements ActionListener
 			NamingGUI.requestFieldFocus();
 		} else if (e.getActionCommand().equals("Drawing")) {
 			this.model.setGUI(new DrawingGUI(this.width, this.height));
+		} else if (e.getActionCommand().equals("Quiz")){
+			this.model.setGUI(new QuizGUI(this.model));
 		} else {
-			this.model.setGUI(new QuizGUI());
-		}
-	}
+			this.model.setGUI(this.model.getWelcome());
+		}//end if
+	}//end actionPerformed
 }

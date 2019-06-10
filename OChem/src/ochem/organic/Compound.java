@@ -59,6 +59,7 @@ public class Compound {
 		}
 	} // end addSideChain
 	
+	//removes the the desired chain size from the compound and returns the the new chain
 	public Chain[] removeSideChain(int size) {
 		for (int i=0; i<sideChains.size();i++) {
 			if (this.sideChains.get(i).getSize() == size) {
@@ -67,7 +68,7 @@ public class Compound {
 			}//end if
 		}//end for
 		return this.getSideChains();
-	}
+	}//end removeSideChain
 
 	/*
 	 * Get an array of all the side chains return side - array containing all the

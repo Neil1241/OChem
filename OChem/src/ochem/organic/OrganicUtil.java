@@ -93,7 +93,7 @@ public class OrganicUtil {
 			prefixBond = random(1, 2);
 			bondLocation = new int[prefixBond];
 			if (prefixBond == 1)
-				bondLocation[0] = random(1, mainSize);
+				bondLocation[0] = Integer.parseInt(location(ending,mainSize,true));
 			else {
 				bondLocation[0] = 1;
 				bondLocation[1] = 2;
@@ -103,14 +103,14 @@ public class OrganicUtil {
 			prefixBond = random(1, 3);
 		} // end if
 		pass();
-		
+
 		// creates random values but with no duplicate values
 		if (bondType != 1 && run) {
 			int idx = 0;
 			bondLocation = new int[prefixBond];
 			HashSet<Integer> toBond = new HashSet<Integer>();
 			for (int i = 0; i < prefixBond; i++) {
-				if (!toBond.add(random(1, mainSize - 1)))
+				if (!toBond.add(Integer.parseInt(location(ending,mainSize,true))))
 					i--;
 			} // end for
 			for (Integer n : toBond)
@@ -287,21 +287,55 @@ public class OrganicUtil {
 	private static String location(int ending, int mainSize) {
 		// temporary variable to hold the location
 		String sideLocation = "";
+		int startOn = 0;
+
+		// set starting location to be on the second carbon if the ending is either an
+		// ester,acid,amide
+		if (ending == 9 || ending == 8 || ending == 7)
+			startOn = 1;
+		// end if
 
 		// if ending is an amine or amide allow for a special case of nitrogen location,
 		// else create a random number within the mainSize
 		if (ending == 6 || ending == 7) {
-			int r = random(0, mainSize);
+			int r = random(startOn, mainSize);
 			if (r == mainSize)
 				sideLocation = LOCATIONS[LOCATIONS.length - 1];
 			else
 				sideLocation = LOCATIONS[r];
 
 		} else {
-			sideLocation = LOCATIONS[random(0, mainSize - 1)];
+			sideLocation = LOCATIONS[random(startOn, mainSize - 1)];
 		}
 		return sideLocation;
-	}
+	}//end location
+	
+	private static String location(int ending, int mainSize, boolean bondLocation) {
+		// temporary variable to hold the location
+		String sideLocation = "";
+		int startOn = 0;
+
+		// set starting location to be on the second carbon if the ending is either an
+		// ester,acid,amide
+		if (ending == 9 || ending == 8 || ending == 7)
+			startOn = 1;
+		// end if
+
+		// if ending is an amine or amide allow for a special case of nitrogen location,
+		// else create a random number within the mainSize
+		if (!bondLocation) {
+			int r = random(startOn, mainSize);
+			if (r == mainSize)
+				sideLocation = LOCATIONS[LOCATIONS.length - 1];
+			else
+				sideLocation = LOCATIONS[r];
+
+		} else {
+			sideLocation = LOCATIONS[random(startOn, mainSize - 1)];
+		}
+		return sideLocation;
+	}//end location
+	
 
 	// returns true or false whether the a component should be a cyclo or not
 	private static boolean cyclo() {
@@ -504,17 +538,16 @@ public class OrganicUtil {
 				} // end for
 
 				// sort the array in default order
-				toSort.sort(null);;
+				toSort = positionSort(toSort);
 
 				for (String i : toSort) {
 					if (ether) {
 						beforeMain.insert(idx, i + ",");
-						idx+=2;
-					}
-					else
+						idx += 2;
+					} else
 						beforeMain.append(i + ",");
-					//end if
-				}//end for
+					// end if
+				} // end for
 
 				// add hyphens in between the the number and words
 				if (!space) {
@@ -533,8 +566,8 @@ public class OrganicUtil {
 						beforeMain.append("-");
 					} // end if
 				} // end if
-				
-				System.out.println("BEFORE MAIN "+beforeMain.toString());
+
+				System.out.println("BEFORE MAIN " + beforeMain.toString());
 
 				// if the prefix is greater than or equal to 2 add the prefix infront of the key
 				if (prefix >= 2) {
@@ -542,16 +575,19 @@ public class OrganicUtil {
 						beforeMain.append(prefixFromNumber(prefix));
 					else
 						beforeMain.insert(prefix + 1 + (int) (Math.round(prefix / 2.0)), prefixFromNumber(prefix));
-				}//end if
-				
-				System.out.println("BEFORE MAIN "+beforeMain.toString());
+				} // end if
+
+				System.out.println("BEFORE MAIN " + beforeMain.toString());
 
 				// if the key has an oxy in the end and is not a
 				// hydroxy add a space; else if the
 				// boolean space is true, add a space or else add a hyphen
 				if (ether) {
-					int word = prefixFromNumber(prefix).length();
-					beforeMain.insert(prefix + word + (int) (Math.round(prefix / 2.0)), key + "  ");
+					if (prefix != 1) {
+						int word = prefixFromNumber(prefix).length();
+						beforeMain.insert(prefix + word + 1 + (int) (Math.round(prefix / 2.0)), key + "  ");
+					} else
+						beforeMain.insert(prefix + (int) (Math.round(prefix / 2.0)), key + "  ");
 				} else if (space) {
 					beforeMain.insert(0, key + "  ");
 				} else {
@@ -560,15 +596,40 @@ public class OrganicUtil {
 			} // end if
 		} // end for
 
-		System.out.println("BEFORE MAIN "+beforeMain.toString());
+		System.out.println("BEFORE MAIN " + beforeMain.toString());
 		System.out.println(ether);
-		
+
 		// if the length of side is greater than 0
 		if (side.length > 0) {
 			beforeMain.deleteCharAt(beforeMain.length() - 1);
 		} // end if
 		return beforeMain.toString();
 	}// end assignPrefix
+
+	private static ArrayList<String> positionSort(ArrayList<String> toBe) {
+		// counter to know how many N locations there are
+		int letters = 0;
+
+		// use the default sort to get the letters to be at end and numbers to be in
+		// ascending order
+		Collections.sort(toBe);
+		for (int i = 0; i < toBe.size(); i++) {
+			char[] c = toBe.get(i).toCharArray();
+			if (!Character.isDigit(c[0])) {
+				letters++;
+			} // end if
+		} // end for
+
+		// moves the letters to the front, and deletes the ones that were at the end
+		for (int i = 0; i < letters; i++) {
+			toBe.add(0, toBe.get(toBe.size() - 1));
+			toBe.remove(toBe.size() - 1);
+		} // end for
+
+		// trim and return the arraylist
+		toBe.trimToSize();
+		return toBe;
+	}// end position sort
 
 	// creates a treemap and sets all the values to 0
 	private static TreeMap<String, Integer> initializeMap() {
