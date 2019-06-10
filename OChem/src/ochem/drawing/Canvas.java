@@ -924,7 +924,7 @@ public class Canvas extends JComponent {
 			for (int i = 0; i < groupNodes.size(); i++) {
 				drawFunc(g2, groupNodes.get(i), 
 						groups.get(i), 
-						groupDirs.get(i));
+						groupDirs.get(i)); 
 			} // loop
 		} else {
 			DrawingUtil.printCM();
