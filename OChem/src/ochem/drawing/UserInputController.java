@@ -46,13 +46,11 @@ public class UserInputController implements KeyListener {
 					//main action
 					case MAIN:
 						mainAction(num);
-						
 						break;
 						
 					//side action
 					case SIDE:
 						sideAction(num);
-						
 						break;
 						
 					//bond action
@@ -80,8 +78,6 @@ public class UserInputController implements KeyListener {
 			} //if
 		} //outer if
 	} //end keyTyped
-
-	
 	
 	//MAIN TYPE//
 	
@@ -157,7 +153,7 @@ public class UserInputController implements KeyListener {
 			canvas.addSideCyclo(false); //set it to false
 			canvas.setSideStep(3); //skip over cyclo step
 			
-		} else if (num > 10) { //to big to be a side chain
+		} else if (num > 10) { //too big to be a side chain
 			DrawingGUI.reportError("Size entered too big");		
 			
 		} else { //valid and can be cyclo

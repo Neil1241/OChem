@@ -272,9 +272,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 		//set of all node tags that can't be updated
 		HashSet<String> noUpdate = canvas.getNoUpdate();
-		/*for (String s : noUpdate) {
-			System.out.println(s);
-		}*/
 		
 		// loop through all main nodes
 		for (int i = 0; i < mainNodes.size(); i++) {
@@ -404,6 +401,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 			case ALDEHYDE:
 			case CARBOXYLIC_ACID:
+			case AMIDE:
+			case ESTER:
 				// first node
 				if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), nodes.get(0).getCenterX(),
 						nodes.get(0).getCenterY(), nodes.get(0).getDia())) {

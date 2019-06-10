@@ -406,7 +406,6 @@ public class NamingGUI extends JPanel {
 		
 		System.out.println("setUpNOFuncGroups:");
 		for (String s : endings) {
-			System.out.println(s);
 			
 			if (stringContainsString(s, "amine")) { //amine ending
 				c.addFuncGroup(FuncGroup.AMINE); //add amine group
@@ -418,9 +417,7 @@ public class NamingGUI extends JPanel {
 //			c.addSideSize(0); //add side chain
 			
 			//add the node
-			String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
-//			int index = Integer.parseInt(loc) - 1; //size minus one
-			int index = compound.getMainSize();
+			int index = compound.getMainSize()-1;
 			c.addFuncNode(c.getMainNodes().get(index));
 			
 			c.addFuncDirection(funcDirection(index));

@@ -87,8 +87,8 @@ public class WelcomeGUI extends JPanel {
 		buttons.setLayout(buttonAligment);
 
 		// add buttons to button panel
-		buttons.add(naming);
 		buttons.add(drawing);
+		buttons.add(naming);
 		buttons.add(quizing);
 
 		// add components to this panel
