@@ -53,6 +53,7 @@ public class Canvas extends JComponent {
 	private ArrayList<Node> groupNodes; // list with all the group nodes
 	private ArrayList<DrawDirection> groupDirs; // all the directions for the groups
 
+	//drawinng checks
 	private boolean mainOnScreen; // whether a main chain is on the screen
 	private boolean hasNO; // whether the compound has a nitrogen or oxygen
 

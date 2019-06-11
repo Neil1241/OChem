@@ -98,7 +98,6 @@ public class NamingGUI extends JPanel {
 		JFrame f= new JFrame();
 		NamingGUI g= new NamingGUI();
 		
-		
 		f.setLocation(OChem.width/2 - g.width/2, OChem.height/2 - 3*g.height/4);
 		f.setContentPane(g);
 		f.setVisible(true);
