@@ -19,7 +19,7 @@ public class QuizGUI extends JPanel {
 	private QuizModel model = new QuizModel();
 	private JLabel displayName = new JLabel("");
 	private JLabel rating = new JLabel("");
-	private NamingGUI names = new NamingGUI();
+	private NamingGUI names = new NamingGUI(new NameInputController(this.model));
 	private DrawingGUI draws = new DrawingGUI((int) (0.5 * OChem.width + 2 * View.PAD),(int) (0.5 * OChem.height + 2 * View.PAD));
 	private OBox back = new OBox(120,75,"Back",true,false);
 	private Model openModel;
@@ -31,17 +31,19 @@ public class QuizGUI extends JPanel {
 		this.layoutView();
 		this.model.setGUI(this);
 		this.registerControllers();
-		this.setPreferredSize(new Dimension((int) (0.5 * OChem.width + 2 * View.PAD),(int) (0.5 * OChem.height + 2 * View.PAD)));
-	}//end Constructor
-	
+		this.setPreferredSize(
+				new Dimension((int) (0.5 * OChem.width + 2 * View.PAD), (int) (0.5 * OChem.height + 2 * View.PAD)));
+	}// end Constructor
+
 	public QuizGUI(Model m) {
 		super();
 		this.openModel = m;
 		this.layoutView();
 		this.model.setGUI(this);
 		this.registerControllers();
-		this.setPreferredSize(new Dimension((int) (0.5 * OChem.width + 2 * View.PAD),(int) (0.5 * OChem.height + 2 * View.PAD)));
-	}//end Constructor
+		this.setPreferredSize(
+				new Dimension((int) (0.5 * OChem.width + 2 * View.PAD), (int) (0.5 * OChem.height + 2 * View.PAD)));
+	}// end Constructor
 	
 	private void layoutView() {
 		JPanel buttons = new JPanel();
@@ -92,10 +94,14 @@ public class QuizGUI extends JPanel {
 			this.setSize((int) (0.5 * OChem.width + 2 * View.PAD),(int) (0.5 * OChem.height + 2 * View.PAD));
 			SwingUtilities.updateComponentTreeUI(this);
 		}else {
-			this.displayName.setText(null);
 			this.add(names,BorderLayout.CENTER);
+			this.names.setCompound(this.model.getCompound());
+			this.names.update();
+			this.displayName.setText(null);
 			SwingUtilities.updateComponentTreeUI(this);
 		}//end if
+		
+		this.rating.setText(this.model.getCorrect()+"/"+this.model.getQuestions());
 	}//end update
 	
 

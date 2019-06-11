@@ -24,6 +24,7 @@ import ochem.drawing.Node;
 import ochem.organic.Chain;
 import ochem.organic.Compound;
 import ochem.organic.OrganicUtil;
+import ochem.quiz.*;
 
 public class NamingGUI extends JPanel {
 	//declare instance variables
@@ -33,6 +34,7 @@ public class NamingGUI extends JPanel {
 	private Canvas c;
 	private int width = (int) (0.5 * OChem.width + 2 * View.PAD);
 	private int height = (int) (0.5 * OChem.height + 2 * View.PAD);
+	private boolean quiz;
 	
 	private Compound compound; //local copy of the compound to be drawn
 
@@ -41,6 +43,15 @@ public class NamingGUI extends JPanel {
 		this.layoutView();
 		this.model.setGUI(this);
 		this.registerControllers();
+		this.quiz = false;
+	}
+	
+	public NamingGUI(NameInputController n) {
+		super();
+		this.layoutView();
+		this.model.setGUI(this);
+		input.addActionListener(n);
+		this.quiz = true;
 	}
 	
 	private void layoutView()
@@ -77,7 +88,9 @@ public class NamingGUI extends JPanel {
 			this.compound = model.getCompound();
 			
 			//set the text to what is being drawn
-			this.test.setText(OrganicUtil.nameFromCompound(this.compound));
+			if (!quiz)
+				this.test.setText(OrganicUtil.nameFromCompound(this.compound));
+			
 			input.setText(null); //clear the textbox
 			
 			this.setUpCanvas(); //set the canvas up
@@ -85,6 +98,10 @@ public class NamingGUI extends JPanel {
 			this.c.updateDisplay(); //update the canvas to show the compound
 		} //if
 	} //end update
+	
+	public void setCompound(Compound c) {
+		this.model.giveCompound(c);
+	}
 	
 	/*
 	 * Request the focus of the input field
