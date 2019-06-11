@@ -573,14 +573,16 @@ public class Canvas extends JComponent {
 			g2.setColor(DrawingUtil.CHAIN_COLOR);
 
 			int sizeIdx = i; // index for the chain to get the size from
+			int cycloIdx = i; //index for the chain to get the cyclo from
 			if (sideChains.get(i).getSize() < 0) { // skip over negative sizes (used for naming, not drawing)
 				sizeIdx++;
+				cycloIdx++;
 			} // if
 
-			if (sideChains.get(i).isCyclo()) { // cycloidal chain
+			if (sideChains.get(cycloIdx).isCyclo()) { // cycloidal chain
 				drawCyclo(g2, sideNodes.get(i), sideChains.get(sizeIdx).getSize(), true, directions.get(i));
 
-			} else if (sideChains.get(i).isBenzene()) { // benzene ring
+			} else if (sideChains.get(cycloIdx).isBenzene()) { // benzene ring
 				drawBenzene(g2, sideNodes.get(i), true, directions.get(sizeIdx));
 
 			} else { // regular chain
@@ -729,23 +731,11 @@ public class Canvas extends JComponent {
 	 * return nodes - nodes for that chain
 	 */
 	private ArrayList<Node> drawCyclo(Graphics2D g2, Node start, int chainSize, boolean extend, DrawDirection dir) {
-
 		ArrayList<Node> nodes = new ArrayList<Node>();
 
 		// offset length in pixels
 		int r = DrawingUtil.CYCLO_RAD;
-
-		// start point
-		int x1 = start.getX();
-		int y1 = start.getY();
-
-		// end point
-		int x2 = 0;
-		int y2 = 0;
-
-		// value to increment angle by each step
-		double theta = Math.toRadians(-360.0 / chainSize);
-
+		
 		// offsets based on side and size
 		int xOffset;
 		int yOffset;
@@ -765,6 +755,27 @@ public class Canvas extends JComponent {
 			xOffset = 0;
 			yOffset = 0;
 		} // if
+		
+		//initial position
+		int x0 = start.getX();
+		int y0 = start.getY();
+		
+		if (start.getTag().equals("N") || start.getTag().equals("O")) { // if starting on a symbol
+			// move up further
+			x0 += DrawingUtil.rCos(DrawingUtil.CHAIN_ARM / 2, angOffset);
+			y0 += DrawingUtil.rSin(DrawingUtil.CHAIN_ARM / 2, angOffset);
+		} // if
+		
+		// start point
+		int x1 = x0;
+		int y1 = y0;
+		
+		// end point
+		int x2 = 0;
+		int y2 = 0;
+
+		// value to increment angle by each step
+		double theta = Math.toRadians(-360.0 / chainSize);
 
 		// translate start point
 		x1 += xOffset;
@@ -778,16 +789,16 @@ public class Canvas extends JComponent {
 			g2.drawLine(x1, y1, x2, y2);
 
 			// add the node to the list
-			nodes.add(new Node(x1, y1, 20, "" + (i + 1)));
+			nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (i + 1)));
 
 			x1 = x2;
 			y1 = y2;
 		} // loop
-
+		
 		// draw the final bonds
-		g2.drawLine(start.getX(), start.getY(), x2, y2);
+		g2.drawLine(x0, y0, x2, y2);
 		if (extend) {
-			g2.drawLine(start.getX(), start.getY(), start.getX() + xOffset, start.getY() + yOffset);
+			g2.drawLine(x0, y0, x0 + xOffset, y0 + yOffset);
 		} // if
 
 		// draw the #s for debugging
