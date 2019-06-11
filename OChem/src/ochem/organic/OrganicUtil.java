@@ -18,8 +18,8 @@ public class OrganicUtil {
 	// Suffixes
 	public static final String[] MAIN_CHAIN_SUFFIX = { "ane", "ene", "yne", "ol", "al", "one", "amine", "amide", "oate",
 			"oic acid" };
-	public static final String[] SIDE_CHAIN_SUFFIX = { "phenyl", "yl", "bromo", "iodo", "fluoro", "chloro", "oxo",
-			"hydroxy", "oxy", "amino" };
+	public static final String[] SIDE_CHAIN_SUFFIX = { "phenyl", "yl", "bromo", "iodo", "fluoro", "chloro", 
+			"hydroxy", "oxy", "oxo", "amino" };
 
 	public static final String[] SIDE_CHAIN_PRIORITY = { "bromo", "iodo", "fluoro", "chloro", "phenyl", "yl", "oxy",
 			"hydroxy", "oxo", "amino" };
@@ -400,7 +400,7 @@ public class OrganicUtil {
 			name = name.substring(0, name.length() - 1);
 			name += "-" + prefixFromNumber(prefixes[0]);
 		} else if (prefixes[0] == 1) {
-			name += "-" + location.get(location.size() - prefixes[0]) + "-";
+			name += "-" + location.get(0) + "-";
 		} // end if
 
 		if (main.getBond() == 1)
@@ -414,36 +414,40 @@ public class OrganicUtil {
 		if (prefixes[1] > 1) {
 			name += "-";
 			for (int i = 0; i < prefixes[1]; i++)
-				name += location.get(i) + ",";
+				name += location.get(i+prefixes[0]) + ",";
 			name = name.substring(0, name.length() - 1);
 			name += "-" + prefixFromNumber(prefixes[1]);
 		} else if (prefixes[1] == 1) {
-			name += "-" + location.get(0) + "-";
+			name += "-" + location.get(location.size() - 1) + "-";
 		} // end if
 
 		try {
-			hold = endings.get(endings.size() - prefixes[0] - 1);
-			hold = hold.substring(0, hold.length() - 4);
-			if (hold.equals(FUNCTIONAL_NAMES[0]) || hold.equals(FUNCTIONAL_NAMES[1]) || hold.equals(FUNCTIONAL_NAMES[2])
-					|| hold.equals(FUNCTIONAL_NAMES[11]))
+			if (endings.isEmpty()) {
 				name += "e";
-			else {
-				for (int i = 3; i < FUNCTIONAL_NAMES.length - 1; i++) {
-					if (hold.equalsIgnoreCase(FUNCTIONAL_NAMES[i])) {
-						if (hold.equals("Amide") || hold.equals("Ester") || hold.equals("Carboxylic Acid")
-								|| hold.equals("Aldehyde"))
-							name = name.substring(0, name.length() - 3) + MAIN_CHAIN_SUFFIX[i];
-						else
-							name += MAIN_CHAIN_SUFFIX[i];
-						break;
-					} // end if
-				} // end for
-			} // end if
+			} else {
+				if (endings.size() > prefixes[0]) {
+					hold = endings.get(prefixes[0]);
+				} else {
+					hold = endings.get(0);
+				}
+				hold = hold.substring(0, hold.length() - 4);
+				if (hold.equals(FUNCTIONAL_NAMES[1]) || hold.equals(FUNCTIONAL_NAMES[2]))
+					name += "e";
+				else {
+					for (int i = 3; i < FUNCTIONAL_NAMES.length - 1; i++) {
+						if (hold.equalsIgnoreCase(FUNCTIONAL_NAMES[i])) {
+							if (hold.equals("Amide") || hold.equals("Ester") || hold.equals("Carboxylic Acid")
+									|| hold.equals("Aldehyde"))
+								name = name.substring(0, name.length() - 3) + MAIN_CHAIN_SUFFIX[i];
+							else
+								name += MAIN_CHAIN_SUFFIX[i];
+							break;
+						} // end if
+					} // end for
+				} // end if
+			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			// adds to the name if the compound is an alkane
-			name += "e";
-		} catch (IndexOutOfBoundsException e) {
-		}
+		} // catch(IndexOutOfBoundsException e) {}
 
 		// return the mainchain name
 		return name;
@@ -601,7 +605,7 @@ public class OrganicUtil {
 
 		// if the length of side is greater than 0
 		if (side.length > 0) {
-			System.out.println("SHOWUP "+beforeMain.toString());
+			System.out.println("SHOWUP "+ beforeMain.toString());
 			beforeMain.deleteCharAt(beforeMain.length() - 1);
 		} // end if
 		return beforeMain.toString();

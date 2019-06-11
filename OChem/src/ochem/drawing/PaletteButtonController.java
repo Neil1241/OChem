@@ -236,7 +236,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ALDEHYDE);
 			canvas.setFuncStep(1);
-			canvas.addSideSize(-6);
+			canvas.addSideSize(-8);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); // set the node colors
 		} // if
 	} // end aldehydeAction
@@ -249,7 +249,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.KETONE);
 			canvas.setFuncStep(1);
-			canvas.addSideSize(-6);
+			canvas.addSideSize(-8);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); // set the node colors
 		} // if
 	} // end aldehydeAction
@@ -262,7 +262,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ALCOHOL);
 			canvas.setFuncStep(1);
-			canvas.addSideSize(-7);
+			canvas.addSideSize(-6);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); // set the node colors
 		} // if
 	} // end ketoneAction
@@ -314,7 +314,7 @@ public class PaletteButtonController implements MouseListener {
 			palette.setSelectedType(ActionType.FUNC_GROUP);
 			canvas.addFuncGroup(FuncGroup.ETHER);
 			canvas.setFuncStep(1);
-			canvas.addSideSize(-8);
+			canvas.addSideSize(-7);
 			setMainNodeColor(DrawingUtil.LIGHT_BLUE); // set the node colors
 		} // if
 	} // end ketoneAction
@@ -380,25 +380,26 @@ public class PaletteButtonController implements MouseListener {
 		// saves the indexes of the positions with the highest priority
 		for (int i = 0; i < sides.length; i++) {
 			if (sides[i].getSize() < num) {
-				num = sides[i].getSize();
-				spots = new ArrayList<Integer>();
-				spots.add(i);
+				if (sides[i].getSize()!=-6) {
+					num = sides[i].getSize();
+					spots = new ArrayList<Integer>();
+					spots.add(i);
+				}
 			} else if (sides[i].getSize() == num) {
 				spots.add(i);
 			}//end if
 		} // end for
 
 		// add functional locations
-		if (num <= -6 && num!=-8) {
-		for (int i : spots) {
-			c.getMainChain().addFunctionalLocation(sides[i].getLocation());
-			locations.add(sides[i].getLocation());
-		}// end for
+		if (num <= -6) {
+			for (int i : spots) {
+				c.getMainChain().addFunctionalLocation(sides[i].getLocation());
+				locations.add(sides[i].getLocation());
+			} // end for
 
-		c.getMainChain().addNumOfGroups(spots.size(), 1);
-		// remove side chains
-		sides = c.removeSideChain(num);
-
+			c.getMainChain().addNumOfGroups(spots.size(), 1);
+			// remove side chains
+			sides = c.removeSideChain(num);
 		switch (num) {
 		case -12:
 			c.getMainChain().setEnding(OrganicUtil.FUNCTIONAL_NAMES.length-3, 1);
@@ -412,10 +413,10 @@ public class PaletteButtonController implements MouseListener {
 		case -9:
 			c.getMainChain().setEnding(OrganicUtil.FUNCTIONAL_NAMES.length-6, 1);
 			break;
-		case -7:
+		case -6:
 			c.getMainChain().setEnding(3, 1);
 			break;
-		case -6:
+		case -8:
 			int al = 0;
 			for (String s: locations) {
 				if (s.equals("1")||s.equals(""+c.getMainChain().getSize()))

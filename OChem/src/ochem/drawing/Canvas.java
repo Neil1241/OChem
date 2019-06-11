@@ -32,7 +32,6 @@ public class Canvas extends JComponent {
 	private Palette palette; // instance of the palette
 
 	private Node mouse; // for hovering effects
-	private Chain chain;
 
 	// main
 	private Compound compound; // compound being drawn
@@ -1261,8 +1260,8 @@ public class Canvas extends JComponent {
 		Chain lastSide = sideChains.get(sideChains.size() - 1);
 		lastSide.setLocation(n.getTag());
 		compound.addSideChain(lastSide.getSize(), lastSide.getLocation(), lastSide.isCyclo(), lastSide.isBenzene());
-		if (lastSide.getSize() < -5 && lastSide.getSize() != -8)
-			compound.addFunctionalLocation(lastSide.getLocation());
+		if (lastSide.getSize() < -5 && lastSide.getSize() != -8);
+			//compound.addFunctionalLocation(lastSide.getLocation());
 		else
 			System.out.println("MUHAHAHAHAHAHAHA");
 	}
@@ -1288,14 +1287,6 @@ public class Canvas extends JComponent {
 		if (compound.getMainChain().getBond() < bond) {
 			compound.getMainChain().setBond(bond);
 		}
-		bondSizes.add(bond);
-
-		if (bond == 2)
-			chain = new Chain(-14, "");
-		else if (bond == 3) {
-			chain = new Chain(-15, "");
-		}
-
 		bondSizes.add(bond);
 	} // end setBondSize
 
@@ -1327,9 +1318,7 @@ public class Canvas extends JComponent {
 		bondNodes.add(end);
 
 		// add the location to the main chain
-		compound.getMainChain().addFunctionalLocation("" + (idx + 1));
 		compound.getMainChain().addFunctionalLocation(idx + 1 + "");
-		compound.getMainChain().addFunctionalLocation("" + (idx + 1));
 
 	} // end addBondedNode
 
