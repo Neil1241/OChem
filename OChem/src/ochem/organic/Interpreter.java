@@ -368,7 +368,7 @@ public class Interpreter {
 			// temporary variables
 			String temp = chainNames.get(i);
 			String prefix = "";
-			int spot = -8;
+			int spot = 0;
 			boolean cyclo = false;
 			boolean benzene = false;
 			int cycloLength = OrganicUtil.PREFIX[9].length();
@@ -425,7 +425,7 @@ public class Interpreter {
 	private static void ether(String chainName, String prefix, boolean cyclo, String location) {
 		String chain = chainName.substring(0, chainName.length() - 3);
 		compound.addSideChain(chainToNumber(chain + "yl", "yl", prefix), "O", cyclo, false);
-		compound.addSideChain(-8, location, false, false);
+		compound.addSideChain(-7, location, false, false);
 	}
 
 	/*

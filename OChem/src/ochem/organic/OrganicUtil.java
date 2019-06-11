@@ -117,6 +117,16 @@ public class OrganicUtil {
 				bondLocation[idx++] = n;
 		} // end if
 		pass();
+		
+		if (bondLocation != null) {
+			bubbleSort(bondLocation);
+			for (int i = 0; i < prefixBond; i++)
+				c.getMainChain().addFunctionalLocation(Integer.toString(bondLocation[i]));
+			// end for
+
+			c.getMainChain().addNumOfGroups(prefixBond, 0);
+			c.getMainChain().setEnding(bondType - 1);
+		}//end if
 
 		// if ending position is an amide, acid, ester or aldehyde set the functional
 		// location to one
@@ -150,15 +160,6 @@ public class OrganicUtil {
 				c.getMainChain().addNumOfGroups(prefixGroup, 1);
 				c.getMainChain().setEnding(ending, 1);
 			} // end if
-			if (bondLocation != null) {
-				bubbleSort(bondLocation);
-				for (int i = 0; i < prefixBond; i++)
-					c.getMainChain().addFunctionalLocation(Integer.toString(bondLocation[i]));
-				// end for
-
-				c.getMainChain().addNumOfGroups(prefixBond, 0);
-				c.getMainChain().setEnding(bondType - 1, 0);
-			}
 		} else {
 			// add locations to mainchain
 			if (groupLocation != null) {
@@ -265,7 +266,7 @@ public class OrganicUtil {
 				pre = 6;
 				phenyl = true;
 			} else if (sideChainType[i].equals("oxy")) {
-				pre = -8;
+				pre = -7;
 				c.addSideChain(random(1, 3), "O", false, false);
 			} else {
 				for (int j = 2; j < SIDE_CHAIN_SUFFIX.length; j++) {
@@ -396,7 +397,7 @@ public class OrganicUtil {
 		if (prefixes[0] > 1) {
 			name += "-";
 			for (int i = 0; i < prefixes[0]; i++)
-				name += location.get(i + prefixes[1]) + ",";
+				name += location.get(i) + ",";
 			name = name.substring(0, name.length() - 1);
 			name += "-" + prefixFromNumber(prefixes[0]);
 		} else if (prefixes[0] == 1) {
@@ -426,7 +427,7 @@ public class OrganicUtil {
 				name += "e";
 			} else {
 				if (endings.size() > prefixes[0]) {
-					hold = endings.get(prefixes[0]);
+					hold = endings.get(endings.size()-1);
 				} else {
 					hold = endings.get(0);
 				}
