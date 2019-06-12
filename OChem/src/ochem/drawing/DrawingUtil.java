@@ -213,12 +213,26 @@ public class DrawingUtil {
 	} //end regDirection
 	
 	/*
+	 * Get a direction for a group with a double bonded oxygen
+	 * int location - position on main chain
+	 * return - direction to draw the double oxygen in
+	 */
+	public static DrawDirection oxyDirection(int location) {
+		if (location % 2 == 0) { //even location
+			return DrawDirection.DOWN_LEFT; 
+		} else { //odd location
+			return DrawDirection.UP_RIGHT; 
+		} //if
+	} //end oxyDirection
+	
+	/*
 	 * Calculate an angle to rotate a functional group based on a direction
 	 * DrawDirection dir - direction to draw in
 	 * return - angle based on the direction
 	 */
 	public static double funcAngle(DrawDirection dir) {
-		return Math.toRadians(dir.ordinal() * 60 - 90); //ordinal is the enum's position in its parent set
+		//ordinal is the enum's position in its parent set
+		return Math.toRadians(dir.ordinal() * 60 - 90); 
 	} //end angleFromDirection
 	
 	/*
@@ -326,7 +340,7 @@ public class DrawingUtil {
 	/*
 	 * Convert a String to an integer
 	 * String str - string to convert
-	 * return num - numerical form of the String OR default value
+	 * return num - numerical form of the String OR a default value of zero
 	 */
 	public static int stringToNum(String str) {
 		int num;
@@ -381,6 +395,8 @@ public class DrawingUtil {
 		return f;
 	} //end getFileFont
 	
+	//MATH//
+	
 	/*
 	 * Calculate the x offset from rotating a line 'arm' long by 'angRad' CCW
 	 * int arm - length of line in pixels
@@ -398,6 +414,8 @@ public class DrawingUtil {
 	public static int rSin(int arm, double angRad) {
 		return (int) (arm * Math.sin(angRad));
 	} // end rSin
+	
+	//DEBUGGING//
 	
 	/*
 	 * Name of the method that calls this method (for debugging)
@@ -419,7 +437,7 @@ public class DrawingUtil {
 	 * String msg - message to print
 	 */
 	public static void printCM(String msg) {
-		printCM();
-		System.out.println(": " + msg + "\n");
+		System.out.print(new Exception().getStackTrace()[1].getMethodName());		
+		System.out.print(":\n" + msg + "\n-----------\n");
 	} //end printCM
 } //end class

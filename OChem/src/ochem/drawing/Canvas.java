@@ -1061,10 +1061,6 @@ public class Canvas extends JComponent {
 		int oExtend = (int) (DrawingUtil.CHAIN_ARM * 0.5); // how much letter sticks out from endpoints
 		
 		double angle = DrawingUtil.funcAngle(dir); // angle to draw with
-		
-		DrawingUtil.printCM();
-		System.out.println(ghostGroup.toString() +" "+ angle);
-		System.out.println();
 
 		// perpendicular offsets for each line
 		double aPerp = angle + Math.PI / 2;
