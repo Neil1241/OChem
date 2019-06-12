@@ -440,6 +440,8 @@ public class PaletteButtonController implements MouseListener {
 		default:
 		}//end switch case
 		}//end if
+		
+		c = OrganicUtil.reorderCompound(c);
 		return c;
 	}// end adjust ending
 

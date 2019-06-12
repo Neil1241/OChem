@@ -84,6 +84,8 @@ public class QuizGUI extends JPanel {
 		this.add(rightSide,BorderLayout.EAST);
 		this.add(top,BorderLayout.NORTH);
 		
+		check.hide();
+		
 	}//end layoutView
 	
 	private void registerControllers() {
@@ -107,9 +109,11 @@ public class QuizGUI extends JPanel {
 				this.displayName.setText("CORRECT");
 			}
 		}else if (this.model.getDraw()) {
+			this.check.show();
 			this.add(draws,BorderLayout.CENTER);
 			this.displayName.setText(this.model.getCompoundName());
 		}else {
+			this.check.hide();
 			this.add(names,BorderLayout.CENTER);
 			this.names.setCompound(this.model.getCompound());
 			this.names.update();

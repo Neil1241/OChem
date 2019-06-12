@@ -280,6 +280,8 @@ public class OrganicUtil {
 			// add the sideChain
 			c.addSideChain(pre, sideLocation[i], sideCyclo, phenyl);
 		} // end for
+		
+		c = reorderCompound(c);
 		return c;
 	}// end generate sideChains
 
@@ -707,38 +709,92 @@ public class OrganicUtil {
 			return false;
 	}// end compareCompound
 	
-	public static void reorderCompound(Compound c) {
+	public static Compound reorderCompound(Compound c) {
 		Compound ordered = new Compound(c.getMainSize());
 		int position;
 		int mainSize = c.getMainSize();
 		ArrayList<String> endings = c.getMainChain().getEndings();
 		int [] numOfGroups = c.getMainChain().getNumOfGroups();
 		
-		if (numOfGroups[1]>0) {
+		//set up new compound
+		ordered.getMainChain().setBenzene(c.getMainChain().isBenzene());
+		ordered.getMainChain().setCyclo(c.getMainChain().isCyclo());
+		ordered.getMainChain().setNumOfGroups(numOfGroups);
+		ordered.getMainChain().setBond(c.getMainChain().getBond());
+		
+		if (numOfGroups[1]>0 || numOfGroups[0]>0) {
 			String temp = endings.get(endings.size()-1);
 			position = Integer.parseInt(temp.substring(temp.length()-1));
+			
+			//if position is greater than half, invert the order
 			if (position>mainSize/2) {
 				int bond = c.getMainChain().getBond();
 				for (int i = 0;i<numOfGroups[0];i++) {
 					String hold = endings.get(i).substring(temp.length()-1);
-					ordered.addFunctionalLocation(hold);
-				}
-				if (bond == 1) {
-					
-				}else if (bond == 2) {
-					
+					int toSwitch = Integer.parseInt(hold);
+					ordered.addFunctionalLocation(""+invertPosition(mainSize,toSwitch));
+				}//end for
+				
+				//set the ending on the bond if it is higher than an alkane
+				if (bond == 2) {
+					ordered.getMainChain().setEnding(1);
 				}else if (bond == 3) {
-					
-				}
+					ordered.getMainChain().setEnding(2);
+				}//end if
+				
+				//invert the positions
+				for (int i=0;i<numOfGroups[1];i++) {
+					String hold = endings.get(i+numOfGroups[0]).substring(temp.length()-1);
+					int toSwitch = Integer.parseInt(hold);
+					ordered.addFunctionalLocation(""+invertPosition(mainSize,toSwitch));
+				}//end for
+				
+				//get the type of ending and save it to compound
+				for (int i = 0; i<FUNCTIONAL_NAMES.length;i++)
+					if (temp.substring(0, temp.length()-4).equalsIgnoreCase(FUNCTIONAL_NAMES[i]))
+						ordered.getMainChain().setEnding(i);
+				ordered = invertSides(c,ordered);
+				return ordered;
+			}else{
+				return c;
 			}//end if
+			
+		}else{
+			Chain [] s = c.getSideChains();
+			if (s.length>0) {
+				
+			}
+			return c;
 		}//end if
 	}//end reorder
+	
+	private static Compound invertSides(Compound c, Compound ordered) {
+		Chain[] s = c.getSideChains();
+		String location;
+		
+		for (int i=0;i<s.length;i++) {
+			try {
+				int temp = Integer.parseInt(s[i].getLocation());
+				location = Integer.toString(invertPosition(c.getMainSize(),temp));
+			}catch (NumberFormatException e) {
+				location = s[i].getLocation();
+			}
+			ordered.addSideChain(s[i].getSize(), location, s[i].isCyclo(), s[i].isBenzene());
+		}//end for
+		
+		return ordered;
+	}//end invert sides
+	
+	private static int invertPosition(int mainSize,int p) {
+		return (mainSize - p +1);
+	}
 
 	// main for testing purposes
 	public static void main(String[] args) {
 		Compound c = generateRandomCompound();
 		System.out.println(c.toString());
 		System.out.println(nameFromCompound(c));
+
 	}
 
 } // end OrganicUtil
