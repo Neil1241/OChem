@@ -44,6 +44,7 @@ public class QuizModel extends Object{
 	
 	public void generateCompound() {
 		this.compound = OrganicUtil.generateRandomCompound();
+		System.out.println(compound.toString());
 		this.questions++;
 		this.g.update();
 	}
@@ -59,8 +60,8 @@ public class QuizModel extends Object{
 	}
 	
 	public void checkCompound(String c) {
-		Compound cmpd2;
-		this.attempted = true;
+		Compound cmpd2; 
+		this.attempted = true; 
 		try {
 			cmpd2 = Interpreter.compoundFromName(c);
 			if (OrganicUtil.compareCompound(this.compound,cmpd2)) {

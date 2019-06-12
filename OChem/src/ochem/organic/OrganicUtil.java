@@ -706,6 +706,33 @@ public class OrganicUtil {
 		else
 			return false;
 	}// end compareCompound
+	
+	public static void reorderCompound(Compound c) {
+		Compound ordered = new Compound(c.getMainSize());
+		int position;
+		int mainSize = c.getMainSize();
+		ArrayList<String> endings = c.getMainChain().getEndings();
+		int [] numOfGroups = c.getMainChain().getNumOfGroups();
+		
+		if (numOfGroups[1]>0) {
+			String temp = endings.get(endings.size()-1);
+			position = Integer.parseInt(temp.substring(temp.length()-1));
+			if (position>mainSize/2) {
+				int bond = c.getMainChain().getBond();
+				for (int i = 0;i<numOfGroups[0];i++) {
+					String hold = endings.get(i).substring(temp.length()-1);
+					ordered.addFunctionalLocation(hold);
+				}
+				if (bond == 1) {
+					
+				}else if (bond == 2) {
+					
+				}else if (bond == 3) {
+					
+				}
+			}//end if
+		}//end if
+	}//end reorder
 
 	// main for testing purposes
 	public static void main(String[] args) {
