@@ -13,9 +13,13 @@ public class QuizModel extends Object{
 	private boolean draw;
 	private int correct = 0;
 	private int questions = 0;
+	private boolean attempted;
+	private boolean lastRight;
 	
 	public QuizModel() {
 		super();
+		this.attempted = false;
+		this.lastRight = false;
 	}
 	
 	public void setGUI(QuizGUI g) {
@@ -56,12 +60,41 @@ public class QuizModel extends Object{
 	
 	public void checkCompound(String c) {
 		Compound cmpd2;
+		this.attempted = true;
 		try {
 			cmpd2 = Interpreter.compoundFromName(c);
-			if (OrganicUtil.compareCompound(this.compound,cmpd2))
+			if (OrganicUtil.compareCompound(this.compound,cmpd2)) {
 				this.correct++;
+				this.lastRight = true;
+			}else
+				this.lastRight = false;
 		}catch (Exception e) {}
 		this.g.update();
+	}
+	
+	public void checkDrawn() {
+		Compound cmpd2 = this.g.getCompound();
+		
+		if (OrganicUtil.compareCompound(this.compound,cmpd2)) {
+			this.correct++;
+			this.lastRight = true;
+		}else
+			this.lastRight = false;
+		this.compound = null;
+		this.attempted = true;
+		this.g.update();
+	}
+	
+	public boolean isCorrect() {
+		return this.lastRight;
+	}
+	
+	public boolean getAttempted() {
+		return this.attempted;
+	}
+	
+	public void setAttempted(boolean b) {
+		this.attempted = b;
 	}
 
 }

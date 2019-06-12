@@ -356,6 +356,7 @@ public class PaletteButtonController implements MouseListener {
 			String hold = OrganicUtil.nameFromCompound(c);
 			System.out.println(hold);
 			canvas.nameStep(hold);
+			canvas.setCompound(c);
 		} // if
 	} // end nameAction
 

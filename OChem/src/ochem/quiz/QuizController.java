@@ -48,7 +48,11 @@ public class QuizController implements MouseListener{
 		}else if(this.button.getText().equalsIgnoreCase("draw")) {
 			this.model.setDraw(true);
 			this.model.generateCompound();
-		}else {
+		}else if(this.button.getText().equalsIgnoreCase("check")){
+			try {
+			this.model.checkDrawn();
+			}catch (NullPointerException err) {}
+		}else{
 			this.p.setGUI(this.p.getWelcome());
 		}
 	}

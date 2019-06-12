@@ -16,7 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import ochem.View;
+	import ochem.View;
+import ochem.organic.Compound;
 
 public class DrawingGUI extends JPanel {
 	//Attributes
@@ -153,4 +154,8 @@ public class DrawingGUI extends JPanel {
 		
 		userInput.setText("");
 	} //end clear
+	
+	public Compound getCompound() {
+		return this.canvas.getCompound();
+	}
 } //end class
