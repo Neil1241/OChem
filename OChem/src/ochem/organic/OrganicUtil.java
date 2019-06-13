@@ -39,7 +39,7 @@ public class OrganicUtil {
 	public static Compound generateRandomCompound() {
 		// declare variables
 		Compound c;
-		int mainSize = 0; // size of main chain
+		int mainSize[]; // size of main chain
 		int bondType = 0; // bond type
 		int ending = 0; // ending in reference to the functional names variable
 		int prefixBond = 0; // value of the to be prefix of the bond
@@ -54,7 +54,11 @@ public class OrganicUtil {
 		boolean cyclo = false;
 
 		// generate main chain size
-		mainSize = random(2, 10);
+		mainSize = new int [random(2, 10)];
+		
+		//initialize the list
+		for (int i=0;i<mainSize.length;i++)
+			mainSize[i]=1;
 		pass();
 
 		// generate type of bond and functional group
@@ -64,11 +68,18 @@ public class OrganicUtil {
 		// check for benzene and cyclo and set the main chain accordingly
 		if (ending == 10) {
 			benzene = true;
-			mainSize = 6;
-		} else if (mainSize > 2 && mainSize < 7)
+			mainSize = new int[6];
+		} else if (mainSize.length > 2 && mainSize.length < 8)
 			cyclo = cyclo();
+		
+		//readjust the bond type if there is a cycloidal chain
+		if (cyclo) {
+			if (ending == 2)
+				ending = 1;
+			bondType = random(1,2);
+		}
 
-		c = new Compound(mainSize);
+		c = new Compound(mainSize.length);
 		c.getMainChain().setBenzene(benzene);
 		c.getMainChain().setCyclo(cyclo);
 		pass();
@@ -84,16 +95,16 @@ public class OrganicUtil {
 		c.getMainChain().setBond(bondType);
 
 		// generate a prefix if there are double or triple bonds
-		if (mainSize == 2) {
+		if (mainSize.length == 2) {
 			prefixBond = 1;
 			bondLocation = new int[1];
 			bondLocation[0] = 1;
 			run = false;
-		} else if (mainSize == 3) {
+		} else if (mainSize.length == 3) {
 			prefixBond = random(1, 2);
 			bondLocation = new int[prefixBond];
 			if (prefixBond == 1)
-				bondLocation[0] = Integer.parseInt(location(ending,mainSize,true));
+				bondLocation[0] = Integer.parseInt(location(ending,mainSize,true,bondType));
 			else {
 				bondLocation[0] = 1;
 				bondLocation[1] = 2;
@@ -110,7 +121,7 @@ public class OrganicUtil {
 			bondLocation = new int[prefixBond];
 			HashSet<Integer> toBond = new HashSet<Integer>();
 			for (int i = 0; i < prefixBond; i++) {
-				if (!toBond.add(Integer.parseInt(location(ending,mainSize,true))))
+				if (!toBond.add(Integer.parseInt(location(ending,mainSize,true,bondType))))
 					i--;
 			} // end for
 			for (Integer n : toBond)
@@ -131,6 +142,8 @@ public class OrganicUtil {
 		// if ending position is an amide, acid, ester or aldehyde set the functional
 		// location to one
 		if (ending == 9 || ending == 8 || ending == 7 || ending == 4) {
+			if (ending !=4)
+				c.getMainChain().setCyclo(false);
 			c.getMainChain().addFunctionalLocation("1");
 			prefixGroup = 1;
 			c.getMainChain().addNumOfGroups(prefixGroup, 1);
@@ -142,10 +155,18 @@ public class OrganicUtil {
 		} else if (ending != 0) {
 			// generate a random number between 1 and 3 for a prefix on the functional group
 			// and generate a random location for the group
-			prefixGroup = random(1, 3);
+			if (ending == 6)
+				prefixGroup = 1;
+			else {
+				prefixGroup = random(1, 3);
+			}
 			groupLocation = new int[prefixGroup];
-			for (int i = 0; i < prefixGroup; i++)
-				groupLocation[i] = random(1, mainSize);
+			for (int i = 0; i < prefixGroup; i++) {
+				int r = random(1, mainSize.length-1);
+				groupLocation[i] = r;
+				if (mainSize[r]<1)
+					i--;
+			}
 			// end for
 		} // end if
 		pass();
@@ -212,11 +233,26 @@ public class OrganicUtil {
 		System.out.println("\n------------------------------------------");
 
 		// return the compound
+		reorderCompound(c);
 		return c;
 	}// end generateRandomCompound
 
-	private static Compound generateSideChains(Compound c, int ending, int mainSize, String[] sideChainType,
+	private static Compound generateSideChains(Compound c, int ending, int mainSize[], String[] sideChainType,
 			String[] sideLocation) {
+		//local variables
+		boolean ether = false;
+		boolean ester = false;
+		boolean amine = false;
+		boolean amide = false;
+		
+		//set endings to true if they exist to prevent others from occuring
+		if (ending == 7)
+			amide = true;
+		//end if
+		if (ending == 8)
+			ester = true;
+		//end if
+		
 		// add the sidechains to the compound
 		for (int i = 0; i < sideLocation.length; i++) {
 			// temp variables for the loop
@@ -231,15 +267,28 @@ public class OrganicUtil {
 			case 2:
 			case 3:
 			case 10:
-				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 4)];
+				if (ether || ester || amine || amide)
+					sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, 5)];
+				else
+					sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 4)];
 				break;
 			case 4:
 			case 5:
 			case 6:
-				sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 3)];
+				if (ether || ester || amine || amide) {
+					int hold = random(0,6);
+					if (hold == 6)
+						sideChainType[i] = SIDE_CHAIN_PRIORITY[8];
+					else
+						sideChainType[i]= SIDE_CHAIN_PRIORITY[hold];
+				}else
+					sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, SIDE_CHAIN_PRIORITY.length - 3)];
 				break;
 			default:
-				sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
+				if (ether || ester || amine || amide)
+					sideChainType[i] = SIDE_CHAIN_PRIORITY[random(0, 5)];
+				else
+					sideChainType[i] = SIDE_CHAIN_SUFFIX[random(0, SIDE_CHAIN_SUFFIX.length - 1)];
 			}// end switch case
 
 			// get a location for the sideChain
@@ -252,13 +301,13 @@ public class OrganicUtil {
 			// fix the endings if it is missing something, e.g alkyl only has yl and needs a
 			// chain to go with it
 			if (sideChainType[i].equals("yl")) {
-				if (mainSize > 2)
+				if (mainSize.length > 2)
 					while (sideLocation[i].equals("1") || sideLocation[i].equals("" + mainSize)) {
 						sideLocation[i] = location(ending, mainSize);
 					} // end while
 				sideCyclo = cyclo();
 				if (sideCyclo)
-					pre = random(3, mainSize);
+					pre = random(3, mainSize.length);
 				else
 					pre = random(1, 4);
 				sideChainType[i] = CHAIN[pre] + sideChainType[i];
@@ -266,12 +315,16 @@ public class OrganicUtil {
 				pre = 6;
 				phenyl = true;
 			} else if (sideChainType[i].equals("oxy")) {
+				ether = true;
 				pre = -7;
 				c.addSideChain(random(1, 3), "O", false, false);
+				ether = true;
 			} else {
 				for (int j = 2; j < SIDE_CHAIN_SUFFIX.length; j++) {
 					if (sideChainType[i].equals(SIDE_CHAIN_SUFFIX[j])) {
 						pre = -j;
+						if (pre == -9)
+							amide = true;
 						break;
 					} // end if
 				} // end for
@@ -281,13 +334,12 @@ public class OrganicUtil {
 			c.addSideChain(pre, sideLocation[i], sideCyclo, phenyl);
 		} // end for
 		
-		c = reorderCompound(c);
 		return c;
 	}// end generate sideChains
 
 	// generates a random number within the main chain and based on the ending, if
 	// the compound is an amine or amide, allow for a nitrogen location
-	private static String location(int ending, int mainSize) {
+	private static String location(int ending, int [] mainSize) {
 		// temporary variable to hold the location
 		String sideLocation = "";
 		int startOn = 0;
@@ -301,19 +353,20 @@ public class OrganicUtil {
 		// if ending is an amine or amide allow for a special case of nitrogen location,
 		// else create a random number within the mainSize
 		if (ending == 6 || ending == 7) {
-			int r = random(startOn, mainSize);
-			if (r == mainSize)
+			int r = random(startOn, mainSize.length);
+			if (r == mainSize.length)
 				sideLocation = LOCATIONS[LOCATIONS.length - 1];
-			else
+			else {
 				sideLocation = LOCATIONS[r];
-
+				mainSize[r]++;
+			}
 		} else {
-			sideLocation = LOCATIONS[random(startOn, mainSize - 1)];
+			sideLocation = LOCATIONS[random(startOn, mainSize.length - 1)];
 		}
 		return sideLocation;
 	}//end location
 	
-	private static String location(int ending, int mainSize, boolean bondLocation) {
+	private static String location(int ending, int mainSize[], boolean bondLocation, int bondType) {
 		// temporary variable to hold the location
 		String sideLocation = "";
 		int startOn = 0;
@@ -327,14 +380,19 @@ public class OrganicUtil {
 		// if ending is an amine or amide allow for a special case of nitrogen location,
 		// else create a random number within the mainSize
 		if (!bondLocation) {
-			int r = random(startOn, mainSize);
-			if (r == mainSize)
+			int r = random(startOn, mainSize.length);
+			if (r == mainSize.length)
 				sideLocation = LOCATIONS[LOCATIONS.length - 1];
 			else
 				sideLocation = LOCATIONS[r];
 
 		} else {
-			sideLocation = LOCATIONS[random(startOn, mainSize - 1)];
+			int r=random(startOn, mainSize.length - 1);
+			if (mainSize[r]>4)
+				while(mainSize[r]>2)
+					r = random(startOn,mainSize.length-1);
+			sideLocation = LOCATIONS[r];
+			mainSize[r]+=bondType;
 		}
 		return sideLocation;
 	}//end location
@@ -434,7 +492,7 @@ public class OrganicUtil {
 					hold = endings.get(0);
 				}
 				hold = hold.substring(0, hold.length() - 4);
-				if (hold.equals(FUNCTIONAL_NAMES[1]) || hold.equals(FUNCTIONAL_NAMES[2]))
+				if (hold.equals(FUNCTIONAL_NAMES[0]) ||hold.equals(FUNCTIONAL_NAMES[1]) || hold.equals(FUNCTIONAL_NAMES[2]))
 					name += "e";
 				else {
 					for (int i = 3; i < FUNCTIONAL_NAMES.length - 1; i++) {
@@ -710,6 +768,7 @@ public class OrganicUtil {
 	}// end compareCompound
 	
 	public static Compound reorderCompound(Compound c) {
+		//local variables
 		Compound ordered = new Compound(c.getMainSize());
 		int position;
 		int mainSize = c.getMainSize();
@@ -722,16 +781,28 @@ public class OrganicUtil {
 		ordered.getMainChain().setNumOfGroups(numOfGroups);
 		ordered.getMainChain().setBond(c.getMainChain().getBond());
 		
+		//if the compound has a functional group or a bondtype higher than 1 reorder the compound
 		if (numOfGroups[1]>0 || numOfGroups[0]>0) {
-			String temp = endings.get(endings.size()-1);
-			position = Integer.parseInt(temp.substring(temp.length()-1));
+			String temp="";
+			int majorityOver = 0;
+			for (int i=0;i<numOfGroups[1];i++) {
+				temp = endings.get(endings.size()-1);
+				position = Integer.parseInt(temp.substring(temp.length()-1));
+				if (position>mainSize/2)
+					majorityOver++;
+			}
 			
 			//if position is greater than half, invert the order
-			if (position>mainSize/2) {
+			if (majorityOver>numOfGroups[1]) {
 				int bond = c.getMainChain().getBond();
 				for (int i = 0;i<numOfGroups[0];i++) {
 					String hold = endings.get(i).substring(temp.length()-1);
-					int toSwitch = Integer.parseInt(hold);
+					int toSwitch;
+					try {
+						toSwitch = Integer.parseInt(hold);
+					}catch(NumberFormatException e){
+						toSwitch = 1;
+					}
 					ordered.addFunctionalLocation(""+invertPosition(mainSize,toSwitch));
 				}//end for
 				
@@ -750,7 +821,7 @@ public class OrganicUtil {
 				}//end for
 				
 				//get the type of ending and save it to compound
-				for (int i = 0; i<FUNCTIONAL_NAMES.length;i++)
+				for (int i = 1; i<FUNCTIONAL_NAMES.length-2;i++)
 					if (temp.substring(0, temp.length()-4).equalsIgnoreCase(FUNCTIONAL_NAMES[i]))
 						ordered.getMainChain().setEnding(i);
 				ordered = invertSides(c,ordered);
@@ -761,13 +832,22 @@ public class OrganicUtil {
 			
 		}else{
 			Chain [] s = c.getSideChains();
-			if (s.length>0) {
-				
+			int numOverHalf = 0;
+			for (int i=0;i<s.length;i++) {
+				int temp = Integer.parseInt(s[i].getLocation());
+				if (temp>mainSize/2)
+					numOverHalf++;
+			}//end for
+			
+			if (numOverHalf>s.length/2) {
+				ordered = invertSides(c,ordered);
+				return ordered;
 			}
 			return c;
 		}//end if
 	}//end reorder
 	
+	//takes the side chains sfrom Compound c and inverts them into Compound ordered to be returned
 	private static Compound invertSides(Compound c, Compound ordered) {
 		Chain[] s = c.getSideChains();
 		String location;
