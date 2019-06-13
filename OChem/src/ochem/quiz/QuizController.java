@@ -2,7 +2,10 @@ package ochem.quiz;
 /* QuizController
  * Jordan Lin
  * June 8 2019
+ * Controller used for the quizzing gui actions
  */
+
+//imports
 import java.awt.event.*;
 import java.awt.*;
 import ochem.drawing.*;
@@ -10,6 +13,7 @@ import ochem.*;
 import javax.swing.*;
 
 public class QuizController implements MouseListener{
+	//instance variables
 	private final Color NORMAL;
 	private final Color ENTERED;
 	private final Color PRESSED;
@@ -17,6 +21,7 @@ public class QuizController implements MouseListener{
 	private QuizModel model;
 	private Model p;
 	
+	//constructor
 	public QuizController(QuizModel model, OBox button) {
 		this.model = model;
 		this.button = button;
@@ -29,6 +34,7 @@ public class QuizController implements MouseListener{
 		this.button.update();
 	}
 	
+	//constructor
 	public QuizController(Model model, OBox button) {
 		this.p = model;
 		this.button = button;
@@ -57,6 +63,7 @@ public class QuizController implements MouseListener{
 		}
 	}
 
+	//methods below are just used to darken the button
 	public void mouseEntered(MouseEvent e) {
 		button.setBackgroundColor(ENTERED);
 		this.button.update();
