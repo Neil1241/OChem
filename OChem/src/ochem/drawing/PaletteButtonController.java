@@ -381,7 +381,7 @@ public class PaletteButtonController implements MouseListener {
 		// saves the indexes of the positions with the highest priority
 		for (int i = 0; i < sides.length; i++) {
 			if (sides[i].getSize() < num) {
-				if (sides[i].getSize()!=-6) {
+				if (sides[i].getSize()!=-8) {
 					num = sides[i].getSize();
 					spots = new ArrayList<Integer>();
 					spots.add(i);
