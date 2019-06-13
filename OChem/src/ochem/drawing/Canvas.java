@@ -1583,7 +1583,7 @@ public class Canvas extends JComponent {
 	 */
 	public void setCompound(Compound c) {
 		/// set the compound
-		this.compound = c;
+		this.compound = c; 
 
 		// set all the steps to the final drawing steps
 		this.mainStep = 4;
