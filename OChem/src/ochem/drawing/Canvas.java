@@ -52,16 +52,17 @@ public class Canvas extends JComponent {
 	private ArrayList<Node> groupNodes; // list with all the group nodes
 	private ArrayList<DrawDirection> groupDirs; // all the directions for the groups
 
-	//drawinng checks
+	//drawing checks
 	private boolean mainOnScreen; // whether a main chain is on the screen
 	private boolean hasNO; // whether the compound has a nitrogen or oxygen
+	private int hydrogenCounter; //how many hydrogens are on the nitrogen
 
 	private ActionType type; // type of action
 
 	// ghost drawing (showing where the final action would be)
 	private DrawDirection ghostDir; // direction of the ghost side chain
 	private int ghostBondIdx; // index of the main chain node for bond drawing
-
+	
 	private int mainStep; // step for the "main" button
 	private int sideStep; // step for the "side" button
 	private int bondStep; // step for the "bond" button
@@ -96,9 +97,10 @@ public class Canvas extends JComponent {
 		// set the type
 		type = ActionType.CLEAR;
 
-		// set the main on screen and nitrogen/oxygen check to false
+		// set all the drawing checks to their defaults
 		mainOnScreen = false;
 		hasNO = false;
+		hydrogenCounter = 2;
 
 		// instantiate the compound and the chain
 		compound = new Compound(0);
@@ -162,7 +164,7 @@ public class Canvas extends JComponent {
 		g2.setStroke(bs);
 
 		// background
-		g2.setBackground(DrawingUtil.BACKGROUND_COLOR);
+		g2.setBackground(DrawingUtil.CANVAS_BACKGROUND);
 		g2.clearRect(0, 0, width, height);
 
 		if (draw) {
@@ -211,9 +213,10 @@ public class Canvas extends JComponent {
 			funcStep = 0;
 			nameStep = 0;
 
-			// set compound checks to false
+			// set drawing checks to default
 			mainOnScreen = false;
 			hasNO = false;
+			hydrogenCounter = 2;
 
 			// clear the lists of nodes
 			mainNodes.clear();
@@ -378,11 +381,17 @@ public class Canvas extends JComponent {
 				// draw the side chains already on the compound
 				drawSides(g2);
 
+				//decide what nodes can be clicked
 				noUpdate.clear();
 				if (!compound.getMainChain().isBenzene() && !compound.getMainChain().isCyclo()) {
 					noUpdate.add("1"); // can't add side chain to first node
 					noUpdate.add(Integer.toString(compound.getMainSize())); // or last node
 				} // if
+				
+				//if hydrogen counter is zero, nitrogen can't be added onto
+				if (hydrogenCounter == 0) {
+					noUpdate.add("N");
+				} //if
 
 				// draw all selectable nodes
 				drawSelectableNodes(g2);
@@ -500,7 +509,7 @@ public class Canvas extends JComponent {
 
 				// clear the set of tags to not update if detected
 				noUpdate.clear();
-
+				
 				// different nodes can be clicked depending on group
 				switch (ghostGroup) {
 					case FLUORINE:
@@ -538,6 +547,11 @@ public class Canvas extends JComponent {
 						break;
 
 				} // switch
+				
+				//if hydrogen counter is zero, nitrogen can't be added onto
+				if (hydrogenCounter == 0) {
+					noUpdate.add("N");
+				} //if
 
 				drawSelectableNodes(g2); // draw the nodes
 				break;
@@ -675,7 +689,6 @@ public class Canvas extends JComponent {
 	 * responsible for drawing
 	 */
 	private void drawSelectableNodes(Graphics2D g2) {
-
 		// draw all selectable nodes
 		for (Node n : mainNodes) {
 			if (!noUpdate.contains(n.getTag())) { // if the tag passes the no update test
@@ -801,15 +814,6 @@ public class Canvas extends JComponent {
 			g2.drawLine(x0, y0, x0 + xOffset, y0 + yOffset);
 		} // if
 
-		// draw the #s for debugging
-		g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE / 2));
-		Color oldClr = g2.getColor();
-		g2.setColor(Color.RED);
-		for (Node n : nodes) {
-			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
-		}
-		g2.setColor(oldClr);
-
 		return nodes;
 	} // end drawCyclo
 
@@ -875,15 +879,7 @@ public class Canvas extends JComponent {
 		} else {
 			nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (chainSize), DrawingUtil.LIGHT_YELLOW));
 		} // if
-
-		// draw the #s for debugging
-		g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE / 2));
-		g2.setColor(Color.RED);
-		for (Node n : nodes) {
-			g2.drawString(n.getTag(), n.getCenterX(), n.getCenterY());
-		}
-		g2.setColor(DrawingUtil.CHAIN_COLOR);
-
+		
 		return nodes;
 	} // end drawChain
 
@@ -919,26 +915,25 @@ public class Canvas extends JComponent {
 
 		drawNode(g2, new Node(centerX, centerY, outRad));
 
-		g2.setColor(DrawingUtil.BACKGROUND_COLOR);
+		g2.setColor(DrawingUtil.CANVAS_BACKGROUND);
 		drawNode(g2, new Node(centerX, centerY, (int) (outRad * 0.85)));
 
 		return nodes;
 	} // end drawBenzene
 
 	/*
-	 * Draw all the functional groups Graphics2D g2 - object responsible for drawing
+	 * Draw all the functional groups 
+	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void drawGroups(Graphics2D g2) {
 		//run only if the lists aren't empty
 		if (!groups.isEmpty() && !groupNodes.isEmpty() && !groupDirs.isEmpty()) { 
 			for (int i = 0; i < groupNodes.size(); i++) {
+				DrawingUtil.printCM(groups.size() +" "+ groupNodes.size() +" "+ groupDirs.size());
 				drawFunc(g2, groupNodes.get(i), 
 						groups.get(i), 
 						groupDirs.get(i)); 
 			} // loop
-		} else {
-//			DrawingUtil.printCM();
-//			System.out.println("GND " + groups.size() +" "+ groupNodes.size() +" "+ groupDirs.size());
 		} //if
 	} // end drawGroups
 
@@ -967,8 +962,10 @@ public class Canvas extends JComponent {
 				break;
 
 			case KETONE: 
+				drawDoubleOxygen(g2, start, dir, false);
+				break;
 			case ALDEHYDE:
-				drawDoubleOxygen(g2, start, dir);
+				drawDoubleOxygen(g2, start, dir, true);
 				break;
 
 			case ALCOHOL: // different symbol
@@ -976,24 +973,24 @@ public class Canvas extends JComponent {
 				break;
 
 			case CARBOXYLIC_ACID: // combination
-				drawDoubleOxygen(g2, start, dir);
-				drawLetterFunc(g2, "OH", start, DrawingUtil.incDirection(dir, 2));
+				drawDoubleOxygen(g2, start, dir, true);
+				drawLetterFunc(g2, "OH", start, DrawingUtil.incDirection(dir,2));
 				break;
 
-			case AMIDE:
-				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4));
+			case AMIDE: //roll over onto amine
+				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4), false);
 
 			case AMINE: // save location to node
 				if (!hasNO && funcStep == 2) { // first time being called when set
-					mainNodes.add(drawLetterFunc(g2, "N", start, dir));
+					mainNodes.add(drawNitrogen(g2, start, dir));
 					hasNO = true;
 				} else {
-					drawLetterFunc(g2, "N", start, dir);
+					drawNitrogen(g2, start, dir);
 				} // if
 				break;
 
-			case ESTER:
-				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4));
+			case ESTER: //roll over onto ether
+				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4), true);
 
 			case ETHER: // save location to node
 				if (!hasNO && funcStep == 2) {
@@ -1046,19 +1043,50 @@ public class Canvas extends JComponent {
 		// text.setColor(mainNodes.get(0).getColor());
 
 		return text;
-	} // end drawHaloAlkane
+	} // end drawLetterFunc
+	
+	/*
+	 * Draws a nitrogen chain with the associated hydrogens
+	 * Graphics2D g2 - object responsible for drawing
+	 * Node start - start position of the nitrogen
+	 * DrawDirection dir - direction to draw in
+	 * return nitro - node representing the coordinates of the nitrogen
+	 */
+	private Node drawNitrogen(Graphics2D g2, Node start, DrawDirection dir) {
+		Node nitro = drawLetterFunc(g2, "N", start, dir);
+		
+		switch (hydrogenCounter) {
+			//two hydrogens, show subscript
+			case 2:
+				//u2082 is the subscript 2 symbol
+				g2.drawString("H\u2082", nitro.getX() + nitro.getRad(), nitro.getY() + nitro.getRad());
+				break;
+				
+			//single hydrogen
+			case 1: 
+				g2.drawString("H", nitro.getX() + nitro.getRad(), nitro.getY() + nitro.getRad());
+				break;
+		} //switch
+		
+		return nitro;
+	} //end drawNitrogen
 
 	/*
 	 * Draw a double bonded oxygen group Graphics2D g2 - object responsible for
 	 * drawing Node start - start position of the group DrawDirection dir -
 	 * direction to draw in
 	 */
-	private void drawDoubleOxygen(Graphics2D g2, Node start, DrawDirection dir) {
-
+	private void drawDoubleOxygen(Graphics2D g2, Node start, DrawDirection dir, boolean isStart) {		
 		int arm = (int) (DrawingUtil.CHAIN_ARM * 0.8); // length of bond
 		int offset = (int) (DrawingUtil.CHAIN_ARM * 0.085); // length to move back from start
 		int perpOut = (int) (DrawingUtil.CHAIN_ARM * 0.15); // distance to stick out
 		int oExtend = (int) (DrawingUtil.CHAIN_ARM * 0.5); // how much letter sticks out from endpoints
+		
+		double translateFactorX = 0.19;
+		double translateFactorY = 0.15;
+		if (isStart) {
+			g2.translate((int) (-arm * translateFactorX), (int) (-arm * translateFactorY));
+		} //if
 		
 		double angle = DrawingUtil.funcAngle(dir); // angle to draw with
 
@@ -1090,18 +1118,24 @@ public class Canvas extends JComponent {
 
 		g2.drawLine(bx1, by1, bx2, by2); // draw the second line
 
-		// draw the oxygen
-		String o = "O"; // symbol for oxygen
-		FontMetrics fm = g2.getFontMetrics(); // object containing details about font
-		g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE)); // set the font size
-
-		// coordinates to draw String to
-		// string width is width of the symbol
-		int oX = start.getX() + DrawingUtil.rCos(arm + oExtend, angle) - fm.stringWidth(o) / 2; 
-		//ascent is how high the typeface draws
-		int oY = start.getY() + DrawingUtil.rSin(arm + oExtend, angle) + (int) (fm.getAscent() * 0.375); 
-
-		g2.drawString(o, oX, oY); // draw the symbol
+		//draw the oxygen
+		//calculate coordinates
+		int oX = start.getX() + DrawingUtil.rCos(arm + oExtend, angle);
+		int oY = start.getY() + DrawingUtil.rSin(arm + oExtend, angle);
+		
+		//save the old color for changing back later
+		Color oldColor = g2.getColor();
+		
+		drawNode(g2, new Node(oX, oY, (int) (DrawingUtil.NODE_RAD * 1.7))); //outer ring
+		
+		g2.setColor(DrawingUtil.CANVAS_BACKGROUND); 
+		drawNode(g2, new Node(oX, oY, (int) (DrawingUtil.NODE_RAD * 1.3))); //inner circle
+		
+		//set Graphics2D back to as it was for next drawing action
+		g2.setColor(oldColor); //old color
+		if (isStart) { 
+			g2.translate((int) (arm * translateFactorX), (int) (arm * translateFactorY)); //translate back
+		} //if
 	} // end drawDoubleOxygen
 
 	// COMPONENT//
@@ -1257,40 +1291,49 @@ public class Canvas extends JComponent {
 	} // end addSideSize
 
 	/*
-	 * Add side node to the side nodes list Node n - node to add to the side Nodes
+	 * Add side node to the side nodes list 
+	 * Node n - node to add to the side Nodes
 	 */
 	public void addSideNode(Node n) {
 		sideNodes.add(n);
 		addSideChain(n);
+		
+		if (n.getTag().equals("N")) { //if on a nitrogen
+			hydrogenCounter--;
+		} //if
 	} // end addSideNode
 
+	/*
+	 * Add a side chain to the canvas
+	 * Node n - node to get the tag from
+	 */
 	public void addSideChain(Node n) {
 		Chain lastSide = sideChains.get(sideChains.size() - 1);
 		lastSide.setLocation(n.getTag());
 		compound.addSideChain(lastSide.getSize(), lastSide.getLocation(), lastSide.isCyclo(), lastSide.isBenzene());
-	}
+	} //end addSideChain
 
 	/*
 	 * Set the direction for the ghost to be drawn DrawDirection dir - new direction
 	 * for ghost chain
 	 */
 	public void setGhostDirection(DrawDirection dir) {
-
 		ghostDir = dir;
 	} // end setGhostDirection
 
 	// BONDS
 
-	/**
-	 * Add a bond to the compound
-	 * 
-	 * @param bond
-	 *            - bond size to add
+	/*
+	 * Add a bond size to the compound
+	 * int bond - size of the bond to add
 	 */
 	public void addBondSize(int bond) {
+		//adjust the main compound according to the bond size
 		if (compound.getMainChain().getBond() < bond) {
 			compound.getMainChain().setBond(bond);
-		}
+		} //if
+		
+		//add the bond size to the list for drawing 
 		bondSizes.add(bond);
 	} // end setBondSize
 

@@ -102,17 +102,20 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 
 		// loop through all nodes to see if click was on a main node
 		for (int i = 0; i < mainNodes.size(); i++) {
-			Node n = mainNodes.get(i); // current side node
+			//if the node's tag is valid
+			if (!canvas.getNoUpdate().contains(mainNodes.get(i).getTag())) {
+				Node n = mainNodes.get(i); // current side node
 
-			// if click was on a main node
-			if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
-					n.getDia())) {
-				n.setTag(n.getTag()); // set the location for that chain
-				canvas.addSideNode(n); // add that node to the side nodes list
-				canvas.addSideDirection(dir); // save that direction into the chain
-				canvas.setSideStep(4); // step forward
-				break; // exit loop (don't need to check other nodes)
-			} // if
+				// if click was on a main node
+				if (DrawingUtil.isWithinBounds(current.getCenterX(), current.getCenterY(), n.getCenterX(), n.getCenterY(),
+						n.getDia())) {
+					n.setTag(n.getTag()); // set the location for that chain
+					canvas.addSideNode(n); // add that node to the side nodes list
+					canvas.addSideDirection(dir); // save that direction into the chain
+					canvas.setSideStep(4); // step forward
+					break; // exit loop (don't need to check other nodes)
+				} // if
+			} //big if
 		} // loop
 	} // end sideLeft
 
@@ -132,7 +135,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 	 * Action for when screen is left clicked with the "bond" type
 	 */
 	private void bondLeft() {
-
 		// temporary list with all the nodes
 		ArrayList<Node> mainNodes = canvas.getMainNodes();
 
@@ -433,11 +435,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
 						// if not a cycloidal chain
 						if (!canvas.getMainCyclo() && !canvas.getMainBenzene()) {
 							// change direction of the ghost chain depending on node position on chain
-							if (i % 2 == 0) {
-								dir = DrawDirection.DOWN_RIGHT; // even, down
-							} else {
-								dir = DrawDirection.UP_RIGHT; // odd, up
-							} // if
+							dir = DrawingUtil.oxyDirection(i);
 
 							canvas.setGhostDirection(dir); // set the ghost direction for the canvas
 						} // if

@@ -40,7 +40,7 @@ public class DrawingUtil {
 	public static final Color CHAIN_COLOR = new Color(44, 62, 80);
 	
 	//drawing colors
-	public static final Color BACKGROUND_COLOR = new Color(253, 254, 254); //canvas 224, 255, 253 old
+	public static final Color CANVAS_BACKGROUND = new Color(253, 254, 254); //canvas 224, 255, 253 old
 	
 	//angles for bond drawing
 	public static final double DOWN_BOND_ODD = Math.toRadians(45);
@@ -190,7 +190,6 @@ public class DrawingUtil {
 				return DrawDirection.values()[3-pos]; //done
 				
 			default:
-				printCM("default case");
 				return DrawDirection.UP_RIGHT;
 		}
 	} //end cycloDir
@@ -201,7 +200,6 @@ public class DrawingUtil {
 	 * return - direction to draw the functional group in
 	 */
 	public static DrawDirection regDirection(int i) {
-		printCM("" + i);
 		//add a direction for the chain
 		if (i == 1) {
 			return DrawDirection.UP_LEFT;

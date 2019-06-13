@@ -5,6 +5,7 @@ package ochem.naming;
  */
 
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.util.ArrayList;
 
 //import packages
@@ -123,6 +124,7 @@ public class NamingGUI extends JPanel {
 	}
 	
 	//SET UP CANVAS//
+	
 	/**
 	 * Set up the canvas for drawing the compound
 	 */
@@ -241,10 +243,12 @@ public class NamingGUI extends JPanel {
 	private void setUpSides() {	
 		//all the chains from the compound
 		Chain[] chains = compound.getSideChains();
+		DrawingUtil.printCM(compound.toString());
 		
 		//loop through all the chains adding them to the list
 		for (int i = 0; i < chains.length; i++) {
-			if (chains[i].getSize() > 0 && DrawingUtil.stringToNum(chains[i].getLocation()) > 0) { //(+) size for alkyl chain
+			//(+) size for alkyl chain
+			if (chains[i].getSize() > 0 && DrawingUtil.stringToNum(chains[i].getLocation()) > 0) { 
 				int location = DrawingUtil.stringToNum(chains[i].getLocation());
 				
 				Node side = c.getMainNodes().get(location - 1);
@@ -261,7 +265,26 @@ public class NamingGUI extends JPanel {
 				
 				//add the side node to the list
 				c.addSideNode(side);
-			} //if
+				
+			} else if (!DrawingUtil.isNumber(chains[i].getLocation())) { //chain is on symbol
+				DrawingUtil.printCM("" + c.getMainNodes().size());
+				
+				Node side = c.getMainNodes().get(c.getMainNodes().size()-1); //most recent node
+				
+				c.addSideSize(chains[i].getSize());
+				
+				//add a direction for the side chain
+				boolean isCyclo = compound.getMainChain().isBenzene() || compound.getMainChain().isCyclo();
+				c.addSideDirection(namingDirection(isCyclo, compound.getMainSize(), 2));
+				
+				//set the chain to cyclo/benzene
+				c.addSideCyclo(chains[i].isCyclo());
+				c.addSideBenzene(chains[i].isBenzene());
+				
+				//add the side node to the list
+				c.addSideNode(side);
+			}
+			
 		} //loop
 	} //end setSideNodes
 	
@@ -293,10 +316,10 @@ public class NamingGUI extends JPanel {
 	/*
 	 * Set up the functional groups on the compound
 	 */
-	private void setUpFuncGroups() {
+	private void setUpFuncGroups() {	
+		this.setUpNOFuncGroups();	
 		this.setUpHaloAlkanes();
 		this.setUpOxygens();
-		this.setUpNOFuncGroups();
 	} //end setUpFuncGroups
 	
 	/*
@@ -306,7 +329,7 @@ public class NamingGUI extends JPanel {
 		Chain[] sideChains = compound.getSideChains();
 		
 		for (int i = 0; i < sideChains.length; i++) {
-			if (DrawingUtil.isNumber(sideChains[i].getLocation())) {
+			if (DrawingUtil.isNumber(sideChains[i].getLocation())) { //if group is on a node
 				int size = sideChains[i].getSize();
 				
 				c.addSideSize(size); //add chain to attach the func group too
@@ -324,18 +347,19 @@ public class NamingGUI extends JPanel {
 						break;
 					case -5:
 						c.addFuncGroup(FuncGroup.CHLORINE);
-						break;
 				} //switch
 				
-				//get the location of the haloalkane on the main chain
-				int location = Integer.parseInt(sideChains[i].getLocation());
-				
-				//add the node
-				c.addFuncNode(c.getMainNodes().get(location - 1));
-				
-				//add a direction for the chain
-				boolean isCycloidal = compound.getMainChain().isCyclo() || compound.getMainChain().isBenzene();
-				c.addFuncDirection(namingDirection(isCycloidal, 0, location));
+				if (size < -2 && size > -5) {
+					//get the location of the haloalkane on the main chain
+					int location = Integer.parseInt(sideChains[i].getLocation());
+					
+					//add the node
+					c.addFuncNode(c.getMainNodes().get(location - 1));
+					
+					//add a direction for the chain
+					boolean isCycloidal = compound.getMainChain().isCyclo() || compound.getMainChain().isBenzene();
+					c.addFuncDirection(namingDirection(isCycloidal, 0, location));
+				}
 			} //if
 		} //loop
 	} //end setUpHaloAlkanes
@@ -385,6 +409,7 @@ public class NamingGUI extends JPanel {
 				
 				//different direction case for aldehydes
 				c.addFuncDirection(DrawingUtil.oxyDirection(index + 1));
+				
 			} else if (stringContainsString(s, "carboxylic acid")) { //carboxylic acid
 				//add the group
 				c.addFuncGroup(FuncGroup.CARBOXYLIC_ACID);
@@ -423,7 +448,6 @@ public class NamingGUI extends JPanel {
 				c.addFuncDirection(namingDirection(false, 0, index+1));
 				
 			} else if (stringContainsString(s, "amide")) { //amide ending
-				DrawingUtil.printCM(s);
 				c.addFuncGroup(FuncGroup.AMIDE);
 				c.addSideSize(-7); //position in functional groups array
 				
@@ -435,29 +459,40 @@ public class NamingGUI extends JPanel {
 				//add the direction
 				//if the location is equal to the last number on the chain, begin is false
 				c.addFuncDirection(amideDirection((index+1) == compound.getMainSize()));
-			} //if
-		} //loop
-		
-		int length = compound.getSideChains().length;
-		
-		//loop through all the side chains to add the chains on a nitrogen/oxygen
-		for (int i = 0; i < length; i++) {
-			if (compound.getSideChains()[i].getSize() < 0) { //(-) size for functional groups
-				int size = compound.getSideChains()[i].getSize();
-				int idx = Math.abs(size);
 				
-				/*System.out.println(currentMethod() + OrganicUtil.SIDE_CHAIN_SUFFIX[idx]);
-				
-				c.addFuncGroup(group);
+			} else if (stringContainsString(s, "ester")) { //ester ending
+				c.addFuncGroup(FuncGroup.ESTER);
+				c.addSideSize(-7); //position in functional groups array
 				
 				//add the node
-				c.addFuncNode(c.getMainNodes().get(c.getMainNodes().size()-1));
+				String loc = Character.toString(s.charAt(s.indexOf(":") + 2)); //two after the colon
+				int index = Integer.parseInt(loc) - 1; //size minus one
+				c.addFuncNode(c.getMainNodes().get(index));
 				
-				c.addFuncDirection(funcDirection(idx));*/
+				//add the direction
+				//if the location is equal to the last number on the chain, begin is false
+				c.addFuncDirection(amideDirection((index+1) == compound.getMainSize()));
+			} //if
+		} //loop	
+		
+		//loop through the side chains to add any ethers
+		Chain[] sideChains = compound.getSideChains();
+		
+		for (int i = 0; i < sideChains.length; i++) {
+			if (!DrawingUtil.isNumber(sideChains[i].getLocation())) { //if chain is on symbol
+				DrawingUtil.printCM(sideChains[i].getLocation());
 			} //if
 		} //loop
-		
 	} //end setUpNOFuncGroups
+	
+	/*
+	 * Add the node for the nitrogen to the main nodes list
+	 * Node start - starting point for the nitrogen
+	 * DrawDirection dir - direction to draw the chains in
+	 */
+	private void addNitrogen(Node start, DrawDirection dir) {
+		
+	}
 	
 	/*
 	 * Checks whether one string contains another substring
