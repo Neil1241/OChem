@@ -31,7 +31,7 @@ public class NamingGUI extends JPanel {
 	//declare instance variables
 	private static JTextField input;
 	private NamingModel model = new NamingModel();
-	private JLabel test= new JLabel("");
+	private JLabel test= new JLabel("Enter the Compound To Be Drawn Below");
 	private Canvas c;
 	private int width = (int) (0.5 * OChem.width + 2 * View.PAD);
 	private int height = (int) (0.5 * OChem.height + 2 * View.PAD);
