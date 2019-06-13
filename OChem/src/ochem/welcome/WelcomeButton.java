@@ -12,6 +12,9 @@ import java.awt.Graphics;
 //import packages
 import javax.swing.JButton;
 
+import ochem.drawing.DrawingGUI;
+import ochem.drawing.DrawingUtil;
+
 public class WelcomeButton extends JButton 
 {
 	//declare instance variables
@@ -35,7 +38,7 @@ public class WelcomeButton extends JButton
 		} else if (getModel().isRollover()) {
 			g.setColor(hoverBackgroundColor);
 		} else {
-			g.setColor(getBackground());
+			g.setColor(DrawingGUI.BG_COLOR);
 		}
 		
 		g.fillRect(0, 0, getWidth(), getHeight());

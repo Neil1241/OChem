@@ -97,12 +97,12 @@ public class Palette extends JPanel {
 		JPanel row1 = new JPanel(); //first row
 		
 		//fluorine
-		fluoro = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "F", true, false);
+		fluoro = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Fluorine", true, false);
 		buttons.add(fluoro);
 		row1.add(fluoro);
 		
 		//iodine
-		iodo = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "I", true, false);
+		iodo = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Iodine", true, false);
 		buttons.add(iodo);
 		row1.add(iodo);
 		
@@ -113,12 +113,12 @@ public class Palette extends JPanel {
 		JPanel row2 = new JPanel(); //second row
 		
 		//chlorine
-		chloro = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Cl", true, false);
+		chloro = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Chlorine", true, false);
 		buttons.add(chloro);
 		row2.add(chloro);
 		
 		//bromine
-		bromo = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Br", true, false);
+		bromo = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Bromine", true, false);
 		buttons.add(bromo);
 		row2.add(bromo);
 		
@@ -128,12 +128,12 @@ public class Palette extends JPanel {
 		JPanel row3 = new JPanel(); //third row
 		
 		//aldehyde
-		aldehyde = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Al", true, false);
+		aldehyde = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Aldehyde", true, false);
 		buttons.add(aldehyde);
 		row3.add(aldehyde);
 		
 		//ketone
-		ketone = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Ke", true, false);
+		ketone = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Ketone", true, false);
 		buttons.add(ketone);
 		row3.add(ketone);	
 		
@@ -144,12 +144,12 @@ public class Palette extends JPanel {
 		JPanel row4 = new JPanel(); //fourth row
 		
 		//alcohol
-		alcohol = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "OH", true, false);
+		alcohol = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Alcohol", true, false);
 		buttons.add(alcohol);
 		row4.add(alcohol);	
 		
 		//carboxylic acid
-		carbox = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "CA", true, false);
+		carbox = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Acid", true, false);
 		buttons.add(carbox);
 		row4.add(carbox);
 		
@@ -159,12 +159,12 @@ public class Palette extends JPanel {
 		JPanel row5 = new JPanel(); //row 5
 		
 		//amine
-		amine = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "N", true, false);
+		amine = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Amine", true, false);
 		buttons.add(amine);
 		row5.add(amine);
 		
 		//amide
-		amide = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "ON", true, false);
+		amide = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Amide", true, false);
 		buttons.add(amide);
 		row5.add(amide);
 		
@@ -174,12 +174,12 @@ public class Palette extends JPanel {
 		JPanel row6 = new JPanel(); //row 6
 		
 		//ether
-		ether = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "O", true, false);
+		ether = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Ether", true, false);
 		buttons.add(ether);
 		row6.add(ether);
 		
 		//ester
-		ester = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "OO", true, false);
+		ester = new OBox(width/2, height/NUM_ROWS - 2*View.PAD, "Ester", true, false);
 		buttons.add(ester);
 		row6.add(ester);
 		
@@ -210,9 +210,15 @@ public class Palette extends JPanel {
 	 */
 	private void registerControllers() {
 		for (int i = 0; i < buttons.size(); i++) {
-			buttons.get(i).setFontSize((float) (DrawingUtil.FONT_SIZE * 0.8));
+			buttons.get(i).setFontSize((float) (DrawingUtil.FONT_SIZE * 0.4));
 			buttons.get(i).addMouseListener(new PaletteButtonController(this, buttons.get(i), canvas));
 		} //loop
+		
+		main.setFontSize((float) (DrawingUtil.FONT_SIZE * 0.8)); 
+		side.setFontSize((float) (DrawingUtil.FONT_SIZE * 0.8)); 
+		bond.setFontSize((float) (DrawingUtil.FONT_SIZE * 0.8)); 
+		clear.setFontSize((float) (DrawingUtil.FONT_SIZE * 0.8)); 
+		name.setFontSize((float) (DrawingUtil.FONT_SIZE * 0.8)); 
 	} //end registerControllers
 	
 	/*

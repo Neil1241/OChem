@@ -4,7 +4,7 @@ package ochem.drawing;
  * Canvas
  * Created by: Neil Balaskandarajah
  * Last modified: 05/13/2019
- * Components that handles drawing components to the screen
+ * Components that handles drawing compounds to the screen
  */
 
 import java.awt.BasicStroke;
@@ -31,7 +31,7 @@ public class Canvas extends JComponent {
 	private int height; // height of component
 	private Palette palette; // instance of the palette
 
-	private Node mouse; // for hovering effects
+	private Node mouse; // point with mouse coordinates for hovering effects
 
 	// main
 	private Compound compound; // compound being drawn
@@ -52,32 +52,34 @@ public class Canvas extends JComponent {
 	private ArrayList<Node> groupNodes; // list with all the group nodes
 	private ArrayList<DrawDirection> groupDirs; // all the directions for the groups
 
-	//drawing checks
+	// drawing checks
 	private boolean mainOnScreen; // whether a main chain is on the screen
 	private boolean hasNO; // whether the compound has a nitrogen or oxygen
-	private int hydrogenCounter; //how many hydrogens are on the nitrogen
+	private int hydrogenCounter; // how many hydrogens are on the nitrogen
 
 	private ActionType type; // type of action
 
 	// ghost drawing (showing where the final action would be)
 	private DrawDirection ghostDir; // direction of the ghost side chain
 	private int ghostBondIdx; // index of the main chain node for bond drawing
-	
+
 	private int mainStep; // step for the "main" button
 	private int sideStep; // step for the "side" button
 	private int bondStep; // step for the "bond" button
 	private int funcStep; // step for the "functional group" button
+	private int nameStep; // step for the "name" button
 
 	private boolean draw; // whether the canvas is in the DrawingGUI or not
 
 	private HashSet<String> noUpdate; // the list of Strings to not update with
-	private String name;
-	private int nameStep;
+
+	private String name; // name of the compound being drawn
 
 	/*
-	 * Create a canvas with its parent's width and height int parentWidth - width of
-	 * the parent panel int parentHeight - height of the parent panel Palette
-	 * palette - instance of the palette
+	 * Create a canvas with its parent's width and height
+	 * int width - width of the component
+	 * int width - height of the component
+	 * Palette palette - instance of the palette
 	 */
 	public Canvas(int width, int height, Palette palette) {
 		super();
@@ -135,27 +137,35 @@ public class Canvas extends JComponent {
 		// initialize the no update set
 		noUpdate = new HashSet<String>();
 
-		// set the last index for a nitrogen or oxygen to zero
-		// lastNOIndex = 0;
-
 		// add the controllers to the canvas
 		registerControllers();
 	} // end constructor
 
+	/*
+	 * Create a canvas with a width and height (used in QuizGUI)
+	 * int width - width of the component
+	 * int height - height of the component
+	 */
 	public Canvas(int width, int height) {
+		// call the other constructor but with a null Palette
 		this(width, height, null);
+
+		// set attributes
 		this.width = width;
 		this.height = height;
+
+		// set size
 		this.setPreferredSize(new Dimension(this.width, this.height));
+
+		// false because not in DrawingGUI
 		this.draw = false;
-	}
+	} // end constructor
 
 	/*
-	 * Draw all nodes, bonds and functional groups to the screen Graphics g - AWT
-	 * object responsible for drawing
+	 * Draw all nodes, bonds and functional groups to the screen
+	 * Graphics g - AWT object responsible for drawing
 	 */
 	public void paintComponent(Graphics g) {
-
 		// cast the more capable Graphics2D onto g
 		Graphics2D g2 = (Graphics2D) g;
 
@@ -167,10 +177,12 @@ public class Canvas extends JComponent {
 		g2.setBackground(DrawingUtil.CANVAS_BACKGROUND);
 		g2.clearRect(0, 0, width, height);
 
+		// if drawing is desired
 		if (draw) {
-			if (this.palette != null)
-				// update the type to the palette's type
+			// update the type to the palette's type if its not null
+			if (this.palette != null) {
 				this.type = palette.getSelectedType();
+			} // if
 
 			// set the font type
 			g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE));
@@ -181,13 +193,7 @@ public class Canvas extends JComponent {
 			funcAction(g2);
 			sideAction(g2);
 			bondAction(g2);
-			nameAction(g2);
-
-			/*
-			 * // debug by printing mouse node to screen g2.setColor(Color.GREEN);
-			 * g2.setFont(g2.getFont().deriveFont(DrawingUtil.FONT_SIZE));
-			 * mouse.setTag("M");
-			 */
+			nameAction();
 		} // for drawing GUI
 	} // end paintComponent
 
@@ -198,9 +204,9 @@ public class Canvas extends JComponent {
 	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void clearAction(Graphics2D g2) {
-
 		// only draw the node if the type is CLEAR
 		if (type == ActionType.CLEAR) {
+			// set the mouse color to default if drawing
 			if (g2 != null) {
 				g2.setColor(DrawingUtil.TRANS_GREY); // transparent green
 				drawNode(g2, mouse);
@@ -253,7 +259,6 @@ public class Canvas extends JComponent {
 	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void mainAction(Graphics2D g2) {
-
 		// change what to draw based on what the value of main step is
 		switch (mainStep) {
 			// do nothing step
@@ -332,11 +337,9 @@ public class Canvas extends JComponent {
 
 	/*
 	 * Handles the actions for the side flow
-	 * @param Graphics2D g2 - object responsible for
-	 * drawing
+	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void sideAction(Graphics2D g2) {
-
 		// change what to draw based on what the value of main step is
 		switch (sideStep) {
 			// do nothing step
@@ -381,17 +384,17 @@ public class Canvas extends JComponent {
 				// draw the side chains already on the compound
 				drawSides(g2);
 
-				//decide what nodes can be clicked
+				// decide what nodes can be clicked
 				noUpdate.clear();
 				if (!compound.getMainChain().isBenzene() && !compound.getMainChain().isCyclo()) {
 					noUpdate.add("1"); // can't add side chain to first node
 					noUpdate.add(Integer.toString(compound.getMainSize())); // or last node
 				} // if
-				
-				//if hydrogen counter is zero, nitrogen can't be added onto
+
+				// if hydrogen counter is zero, nitrogen can't be added onto
 				if (hydrogenCounter == 0) {
 					noUpdate.add("N");
-				} //if
+				} // if
 
 				// draw all selectable nodes
 				drawSelectableNodes(g2);
@@ -406,11 +409,10 @@ public class Canvas extends JComponent {
 	} // end sideAction
 
 	/*
-	 * Handles the action for the bond flow Graphics2D g2 - object responsible for
-	 * drawing
+	 * Handles the action for the bond flow
+	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void bondAction(Graphics2D g2) {
-
 		switch (bondStep) {
 			// do nothing step
 			case 0:
@@ -481,8 +483,8 @@ public class Canvas extends JComponent {
 	} // end bondAction
 
 	/*
-	 * Handles the actions for the functional group flow Graphics2D g2 - object
-	 * responsible for drawing
+	 * Handles the actions for the functional group flow
+	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void funcAction(Graphics2D g2) {
 
@@ -509,7 +511,7 @@ public class Canvas extends JComponent {
 
 				// clear the set of tags to not update if detected
 				noUpdate.clear();
-				
+
 				// different nodes can be clicked depending on group
 				switch (ghostGroup) {
 					case FLUORINE:
@@ -547,11 +549,11 @@ public class Canvas extends JComponent {
 						break;
 
 				} // switch
-				
-				//if hydrogen counter is zero, nitrogen can't be added onto
+
+				// if hydrogen counter is zero, nitrogen can't be added onto
 				if (hydrogenCounter == 0) {
 					noUpdate.add("N");
-				} //if
+				} // if
 
 				drawSelectableNodes(g2); // draw the nodes
 				break;
@@ -565,29 +567,32 @@ public class Canvas extends JComponent {
 		} // switch
 	} // end funcAction
 
-	private void nameAction(Graphics2D g2) {
+	/*
+	 * Handles the actions for the naming flow
+	 */
+	private void nameAction() {
 		switch (nameStep) {
-			case 0:
+			case 0: // do nothing step
 				break;
-			default:
+
+			default: // naming step
 				DrawingGUI.showMessage(this.getName());
-		}
-	}
+		} // switch
+	} // end nameAction
 
 	// DRAWING//
 
 	/*
-	 * Draw all the side chains to the screen Graphics2D g2 - object responsible for
-	 * drawing
+	 * Draw all the side chains to the screen
+	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void drawSides(Graphics2D g2) {
 		// draw side chains
-		// g2.setColor(Color.black);
 		for (int i = 0; i < sideNodes.size(); i++) {
 			g2.setColor(DrawingUtil.CHAIN_COLOR);
 
 			int sizeIdx = i; // index for the chain to get the size from
-			int cycloIdx = i; //index for the chain to get the cyclo from
+			int cycloIdx = i; // index for the chain to get the cyclo from
 			if (sideChains.get(i).getSize() < 0) { // skip over negative sizes (used for naming, not drawing)
 				sizeIdx++;
 				cycloIdx++;
@@ -606,11 +611,11 @@ public class Canvas extends JComponent {
 	} // end drawSides
 
 	/*
-	 * Draw all the bonded pairs Graphics2D g2 - object responsible for drawing int
-	 * idx - index of main node to draw on
+	 * Draw all the bonded pairs
+	 * Graphics2D g2 - object responsible for drawing
+	 * int idx - index of main node to draw on
 	 */
 	private void drawBonds(Graphics2D g2) throws NumberFormatException {
-
 		// if there are nodes in the list
 		if (!bondNodes.isEmpty()) {
 
@@ -624,11 +629,13 @@ public class Canvas extends JComponent {
 	} // end drawBonds
 
 	/*
-	 * Draws a bond between two nodes Graphics2D g2 - object responsible for drawing
-	 * Node n1 - first node Node n2 - second node int size - size of bond
+	 * Draws a bond between two nodes 
+	 * Graphics2D g2 - object responsible for drawing
+	 * Node n1 - first node 
+	 * Node n2 - second node
+	 * int bondSize - size of bond
 	 */
 	private void drawBond(Graphics2D g2, Node n1, Node n2, int bondSize) {
-
 		// thinner lines
 		BasicStroke bs = new BasicStroke(DrawingUtil.BOND_STROKE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 		g2.setStroke(bs);
@@ -685,21 +692,13 @@ public class Canvas extends JComponent {
 	} // end drawBond
 
 	/*
-	 * Draw all the selectable nodes to the screen Graphics2D g2 - object
-	 * responsible for drawing
+	 * Draw all the selectable nodes to the screen 
+	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void drawSelectableNodes(Graphics2D g2) {
 		// draw all selectable nodes
 		for (Node n : mainNodes) {
 			if (!noUpdate.contains(n.getTag())) { // if the tag passes the no update test
-				try {
-					if (n.getColor().equals(DrawingUtil.DARK_YELLOW)) {
-						DrawingUtil.printCM();
-						System.out.println(n.getTag() + "\n");
-					}
-				} catch (NullPointerException e) {
-				}
-
 				// draw node or symbol depending on tag
 				if (DrawingUtil.isNumber(n.getTag())) { // numeric tag
 					g2.setColor(n.getColor());
@@ -714,8 +713,8 @@ public class Canvas extends JComponent {
 	} // end drawSelectableNodes
 
 	/*
-	 * Draw a node to the screen 
-	 * Graphics2D g2 - object responsible for drawing 
+	 * Draw a node to the screen
+	 * Graphics2D g2 - object responsible for drawing
 	 * Node n - node to draw
 	 */
 	private void drawNode(Graphics2D g2, Node n) {
@@ -723,9 +722,10 @@ public class Canvas extends JComponent {
 	} // end drawNode
 
 	/*
-	 * Draw a symbol to the screen centered around a node Graphics2D g2 - object
-	 * responsible for drawing String symbol - symbol to draw Node n - node to draw
-	 * at
+	 * Draw a symbol to the screen centered around a node 
+	 * Graphics2D g2 - object responsible for drawing 
+	 * String symbol - symbol to draw 
+	 * Node n - node to draw at
 	 */
 	private void drawSymbol(Graphics2D g2, String symbol, Node n) {
 		g2.setFont(g2.getFont().deriveFont((DrawingUtil.FONT_SIZE)));
@@ -738,22 +738,26 @@ public class Canvas extends JComponent {
 	} // end drawSymbol
 
 	/*
-	 * Draw a cycloidal chain Graphics2D g2 - object responsible for drawing Node
-	 * start - starting node int chainSize - size of chain boolean extend - whether
-	 * the cyclo is a side chain or not DrawDirection dir - direction to draw in
+	 * Draw a cycloidal chain 
+	 * Graphics2D g2 - object responsible for drawing 
+	 * Node start - starting node 
+	 * int chainSize - size of chain 
+	 * boolean extend - whether the cyclo is a side chain or not 
+	 * DrawDirection dir - direction to draw in
 	 * return nodes - nodes for that chain
 	 */
 	private ArrayList<Node> drawCyclo(Graphics2D g2, Node start, int chainSize, boolean extend, DrawDirection dir) {
+		//list of nodes to return
 		ArrayList<Node> nodes = new ArrayList<Node>();
 
 		// offset length in pixels
 		int r = DrawingUtil.CYCLO_RAD;
-		
+
 		// offsets based on side and size
-		int xOffset;
+		int xOffset; 
 		int yOffset;
-		double angOffset;
-		double rotAngle;
+		double angOffset; //angle to offset out
+		double rotAngle; //angle to rotate cyclo
 
 		// if a side chain
 		if (extend) { // calculate offsets
@@ -768,21 +772,22 @@ public class Canvas extends JComponent {
 			xOffset = 0;
 			yOffset = 0;
 		} // if
-		
-		//initial position
+
+		// initial position
 		int x0 = start.getX();
 		int y0 = start.getY();
-		
-		if (start.getTag().equals("N") || start.getTag().equals("O")) { // if starting on a symbol
+
+		// if starting on a symbol
+		if (start.getTag().equals("N") || start.getTag().equals("O")) { 
 			// move up further
 			x0 += DrawingUtil.rCos(DrawingUtil.CHAIN_ARM / 2, angOffset);
 			y0 += DrawingUtil.rSin(DrawingUtil.CHAIN_ARM / 2, angOffset);
 		} // if
-		
+
 		// start point
 		int x1 = x0;
 		int y1 = y0;
-		
+
 		// end point
 		int x2 = 0;
 		int y2 = 0;
@@ -807,7 +812,7 @@ public class Canvas extends JComponent {
 			x1 = x2;
 			y1 = y2;
 		} // loop
-		
+
 		// draw the final bonds
 		g2.drawLine(x0, y0, x2, y2);
 		if (extend) {
@@ -818,10 +823,12 @@ public class Canvas extends JComponent {
 	} // end drawCyclo
 
 	/*
-	 * Draws the main chain from a starting point Node start - starting point
-	 * DrawDirection dir - direction to draw in int chainSize - size of chain to
-	 * draw boolean side - whether the chain is on the side or not return nodes -
-	 * list of nodes for that chain
+	 * Draws the main chain from a starting point 
+	 * Node start - starting point
+	 * DrawDirection dir - direction to draw in 
+	 * int chainSize - size of chain to draw 
+	 * boolean side - whether the chain is on the side or not 
+	 * return nodes - list of nodes for that chain
 	 */
 	private ArrayList<Node> drawChain(Graphics2D g2, Node start, DrawDirection dir, int chainSize, boolean side) {
 		double[] angles = DrawingUtil.angleFromDirection(dir); // get the angles based on the direction
@@ -879,14 +886,16 @@ public class Canvas extends JComponent {
 		} else {
 			nodes.add(new Node(x1, y1, DrawingUtil.NODE_RAD, "" + (chainSize), DrawingUtil.LIGHT_YELLOW));
 		} // if
-		
+
 		return nodes;
 	} // end drawChain
 
 	/*
-	 * Draw a benzene chain Graphics2D g2 - object responsible for drawing Node
-	 * start - start position of the benzene boolean extend - whether chain is side
-	 * or not DrawDirection dir - direction of the chain
+	 * Draw a benzene chain 
+	 * Graphics2D g2 - object responsible for drawing 
+	 * Node start - start position of the benzene 
+	 * boolean extend - whether chain is side or not 
+	 * DrawDirection dir - direction of the chain
 	 */
 	private ArrayList<Node> drawBenzene(Graphics2D g2, Node start, boolean extend, DrawDirection dir) {
 
@@ -922,24 +931,23 @@ public class Canvas extends JComponent {
 	} // end drawBenzene
 
 	/*
-	 * Draw all the functional groups 
+	 * Draw all the functional groups
 	 * Graphics2D g2 - object responsible for drawing
 	 */
 	private void drawGroups(Graphics2D g2) {
-		//run only if the lists aren't empty
-		if (!groups.isEmpty() && !groupNodes.isEmpty() && !groupDirs.isEmpty()) { 
+		// run only if the lists aren't empty
+		if (!groups.isEmpty() && !groupNodes.isEmpty() && !groupDirs.isEmpty()) {
 			for (int i = 0; i < groupNodes.size(); i++) {
-				DrawingUtil.printCM(groups.size() +" "+ groupNodes.size() +" "+ groupDirs.size());
-				drawFunc(g2, groupNodes.get(i), 
-						groups.get(i), 
-						groupDirs.get(i)); 
+				drawFunc(g2, groupNodes.get(i), groups.get(i), groupDirs.get(i));
 			} // loop
-		} //if
+		} // if
 	} // end drawGroups
 
 	/*
-	 * Draw a functional group Graphics2D g2 - object responsible for drawing Node
-	 * start - start position of group FuncGroup group - what group to draw
+	 * Draw a functional group 
+	 * Graphics2D g2 - object responsible for drawing 
+	 * Node start - start position of group 
+	 * FuncGroup group - what group to draw
 	 * DrawDirectiond dir - what direction to draw group in
 	 */
 	private void drawFunc(Graphics2D g2, Node start, FuncGroup group, DrawDirection dir) {
@@ -961,7 +969,7 @@ public class Canvas extends JComponent {
 				drawLetterFunc(g2, "I", start, dir);
 				break;
 
-			case KETONE: 
+			case KETONE:
 				drawDoubleOxygen(g2, start, dir, false);
 				break;
 			case ALDEHYDE:
@@ -974,10 +982,10 @@ public class Canvas extends JComponent {
 
 			case CARBOXYLIC_ACID: // combination
 				drawDoubleOxygen(g2, start, dir, true);
-				drawLetterFunc(g2, "OH", start, DrawingUtil.incDirection(dir,2));
+				drawLetterFunc(g2, "OH", start, DrawingUtil.incDirection(dir, 2));
 				break;
 
-			case AMIDE: //roll over onto amine
+			case AMIDE: // roll over onto amine
 				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4), false);
 
 			case AMINE: // save location to node
@@ -989,7 +997,7 @@ public class Canvas extends JComponent {
 				} // if
 				break;
 
-			case ESTER: //roll over onto ether
+			case ESTER: // roll over onto ether
 				drawDoubleOxygen(g2, start, DrawingUtil.incDirection(dir, 4), true);
 
 			case ETHER: // save location to node
@@ -1005,9 +1013,11 @@ public class Canvas extends JComponent {
 	} // end drawFunc
 
 	/*
-	 * Draw a functional group that's a single letter Graphics2D g2 - object
-	 * reponsible for drawing String symbol - chemical symbol of element Node start
-	 * - start position of the haloalkane DrawDirection dir - direction to draw in
+	 * Draw a functional group that's a single letter 
+	 * Graphics2D g2 - object reponsible for drawing 
+	 * String symbol - chemical symbol of element 
+	 * Node start - start position of the haloalkane 
+	 * DrawDirection dir - direction to draw in
 	 * return text - node with the center coordinate of the symbol
 	 */
 	private Node drawLetterFunc(Graphics2D g2, String symbol, Node start, DrawDirection dir) {
@@ -1044,7 +1054,7 @@ public class Canvas extends JComponent {
 
 		return text;
 	} // end drawLetterFunc
-	
+
 	/*
 	 * Draws a nitrogen chain with the associated hydrogens
 	 * Graphics2D g2 - object responsible for drawing
@@ -1054,40 +1064,41 @@ public class Canvas extends JComponent {
 	 */
 	private Node drawNitrogen(Graphics2D g2, Node start, DrawDirection dir) {
 		Node nitro = drawLetterFunc(g2, "N", start, dir);
-		
+
 		switch (hydrogenCounter) {
-			//two hydrogens, show subscript
+			// two hydrogens, show subscript
 			case 2:
-				//u2082 is the subscript 2 symbol
+				// u2082 is the subscript 2 symbol
 				g2.drawString("H\u2082", nitro.getX() + nitro.getRad(), nitro.getY() + nitro.getRad());
 				break;
-				
-			//single hydrogen
-			case 1: 
+
+			// single hydrogen
+			case 1:
 				g2.drawString("H", nitro.getX() + nitro.getRad(), nitro.getY() + nitro.getRad());
 				break;
-		} //switch
-		
+		} // switch
+
 		return nitro;
-	} //end drawNitrogen
+	} // end drawNitrogen
 
 	/*
-	 * Draw a double bonded oxygen group Graphics2D g2 - object responsible for
-	 * drawing Node start - start position of the group DrawDirection dir -
-	 * direction to draw in
+	 * Draw a double bonded oxygen group 
+	 * Graphics2D g2 - object responsible for drawing 
+	 * Node start - start position of the group 
+	 * DrawDirection dir - direction to draw in
 	 */
-	private void drawDoubleOxygen(Graphics2D g2, Node start, DrawDirection dir, boolean isStart) {		
+	private void drawDoubleOxygen(Graphics2D g2, Node start, DrawDirection dir, boolean isStart) {
 		int arm = (int) (DrawingUtil.CHAIN_ARM * 0.8); // length of bond
 		int offset = (int) (DrawingUtil.CHAIN_ARM * 0.085); // length to move back from start
 		int perpOut = (int) (DrawingUtil.CHAIN_ARM * 0.15); // distance to stick out
 		int oExtend = (int) (DrawingUtil.CHAIN_ARM * 0.5); // how much letter sticks out from endpoints
-		
+
 		double translateFactorX = 0.19;
 		double translateFactorY = 0.15;
 		if (isStart) {
 			g2.translate((int) (-arm * translateFactorX), (int) (-arm * translateFactorY));
-		} //if
-		
+		} // if
+
 		double angle = DrawingUtil.funcAngle(dir); // angle to draw with
 
 		// perpendicular offsets for each line
@@ -1118,24 +1129,24 @@ public class Canvas extends JComponent {
 
 		g2.drawLine(bx1, by1, bx2, by2); // draw the second line
 
-		//draw the oxygen
-		//calculate coordinates
+		// draw the oxygen
+		// calculate coordinates
 		int oX = start.getX() + DrawingUtil.rCos(arm + oExtend, angle);
 		int oY = start.getY() + DrawingUtil.rSin(arm + oExtend, angle);
-		
-		//save the old color for changing back later
+
+		// save the old color for changing back later
 		Color oldColor = g2.getColor();
-		
-		drawNode(g2, new Node(oX, oY, (int) (DrawingUtil.NODE_RAD * 1.7))); //outer ring
-		
-		g2.setColor(DrawingUtil.CANVAS_BACKGROUND); 
-		drawNode(g2, new Node(oX, oY, (int) (DrawingUtil.NODE_RAD * 1.3))); //inner circle
-		
-		//set Graphics2D back to as it was for next drawing action
-		g2.setColor(oldColor); //old color
-		if (isStart) { 
-			g2.translate((int) (arm * translateFactorX), (int) (arm * translateFactorY)); //translate back
-		} //if
+
+		drawNode(g2, new Node(oX, oY, (int) (DrawingUtil.NODE_RAD * 1.7))); // outer ring
+
+		g2.setColor(DrawingUtil.CANVAS_BACKGROUND);
+		drawNode(g2, new Node(oX, oY, (int) (DrawingUtil.NODE_RAD * 1.3))); // inner circle
+
+		// set Graphics2D back to as it was for next drawing action
+		g2.setColor(oldColor); // old color
+		if (isStart) {
+			g2.translate((int) (arm * translateFactorX), (int) (arm * translateFactorY)); // translate back
+		} // if
 	} // end drawDoubleOxygen
 
 	// COMPONENT//
@@ -1151,7 +1162,6 @@ public class Canvas extends JComponent {
 	 * Add the CanvasController to this component
 	 */
 	private void registerControllers() {
-
 		CanvasController cc = new CanvasController(this);
 		this.addMouseListener(cc);
 		this.addMouseMotionListener(cc);
@@ -1161,31 +1171,32 @@ public class Canvas extends JComponent {
 	 * Get the current type for the canvas return type - action type of the canvas
 	 */
 	public ActionType getType() {
-
 		return type;
 	} // end getType
 
 	/*
-	 * Set the x and y of the mouse int x - mouse x int y - mouse y
+	 * Set the x and y of the mouse 
+	 * int x - mouse x 
+	 * int y - mouse y
 	 */
 	public void setMouseXY(int x, int y) {
-
 		mouse.setXY(x, y);
 	} // end setMouseXY
 
 	// MAIN//
 
 	/*
-	 * Set the size of the main chain int main - size of the main chain
+	 * Set the size of the main chain 
+	 * int main - size of the main chain
 	 */
 	public void setMainSize(int main) {
-
 		compound.setMainSize(main);
 	} // end setMainSize
 
 	/*
-	 * Set the node for the start position of the main chain int x - starting x int
-	 * y - starting y
+	 * Set the node for the start position of the main chain 
+	 * int x - starting x 
+	 * int y - starting y
 	 */
 	public void setMainStart(int x, int y) {
 		if (mainNodes.isEmpty()) {
@@ -1196,8 +1207,8 @@ public class Canvas extends JComponent {
 	} // end setMainStart
 
 	/*
-	 * Get the nodes on the main chain return nodes - list of all the nodes of the
-	 * main chain
+	 * Get the nodes on the main chain 
+	 * return nodes - list of all the nodes of the main chain
 	 */
 	public ArrayList<Node> getMainNodes() {
 		return mainNodes;
@@ -1211,45 +1222,39 @@ public class Canvas extends JComponent {
 	} // end setMainNodes
 
 	/*
-	 * Update the type of the canvas from the palette type
+	 * Update the type of the canvas from the Palette
 	 */
 	public void updateActionType() {
-
 		type = palette.getSelectedType();
-
-		// if the type was set to clear, wipe the main chain
-		if (type == ActionType.CLEAR) {
-			mainOnScreen = false;
-		} // if
 	} // end updateActionType
 
 	/*
-	 * Set the main chain to be cycloidal boolean val - whether main chain is cyclo
-	 * or not
+	 * Set the main chain to be cycloidal
+	 * boolean val - whether main chain is cyclo or not
 	 */
 	public void setMainCyclo(boolean val) {
 		compound.getMainChain().setCyclo(val);
 	} // end setMainCyclo
 
 	/*
-	 * Get whether the main chain is a cyclo or not return - whether main chain is
-	 * cycloidal or not
+	 * Get whether the main chain is a cyclo or not
+	 * return - whether main chain is cycloidal or not
 	 */
 	public boolean getMainCyclo() {
 		return compound.getMainChain().isCyclo();
 	} // end getMainCyclo
 
 	/*
-	 * Set the main chain to be a benzene ring boolean val - whether main chain is
-	 * benzene or not
+	 * Set the main chain to be a benzene ring
+	 * boolean val - whether main chain is benzene or not
 	 */
 	public void setMainBenzene(boolean val) {
 		compound.getMainChain().setBenzene(val);
 	} // end setMainBenzene
 
 	/*
-	 * Get whether the main chain is a benzene ring or not return - whether main
-	 * chain is benzene ring or not
+	 * Get whether the main chain is a benzene ring or not
+	 * return - whether main chain is benzene ring or not
 	 */
 	public boolean getMainBenzene() {
 		return compound.getMainChain().isBenzene();
@@ -1258,29 +1263,32 @@ public class Canvas extends JComponent {
 	// SIDE//
 
 	/*
-	 * Add a side cyclo to the list boolean val - value to add to the side list
+	 * Add a side cyclo to the list 
+	 * boolean val - value to add to the side list
 	 */
 	public void addSideCyclo(boolean val) {
 		sideChains.get(sideChains.size() - 1).setCyclo(val);
 	} // end addSideCyclo
 
 	/*
-	 * Add a side benzene to the list boolean val - value to add to the side list
+	 * Add a side benzene to the list 
+	 * boolean val - value to add to the side list
 	 */
 	public void addSideBenzene(boolean val) {
 		sideChains.get(sideChains.size() - 1).setBenzene(val);
 	} // end addSideBenzene
 
 	/*
-	 * Add a direction for a side chain DrawDirection dir - direction for latest
-	 * side chain
+	 * Add a direction for a side chain 
+	 * DrawDirection dir - direction for latest side chain
 	 */
 	public void addSideDirection(DrawDirection dir) {
 		directions.add(dir);
 	} // end addSideDirection
 
 	/*
-	 * Add a side size to the screen int size - new size of side chain
+	 * Add a side size to the screen 
+	 * int size - new size of side chain
 	 */
 	public void addSideSize(int size) {
 		if (sideChains.isEmpty()) {
@@ -1291,16 +1299,16 @@ public class Canvas extends JComponent {
 	} // end addSideSize
 
 	/*
-	 * Add side node to the side nodes list 
+	 * Add side node to the side nodes list
 	 * Node n - node to add to the side Nodes
 	 */
 	public void addSideNode(Node n) {
 		sideNodes.add(n);
 		addSideChain(n);
-		
-		if (n.getTag().equals("N")) { //if on a nitrogen
+
+		if (n.getTag().equals("N")) { // if on a nitrogen
 			hydrogenCounter--;
-		} //if
+		} // if
 	} // end addSideNode
 
 	/*
@@ -1311,11 +1319,11 @@ public class Canvas extends JComponent {
 		Chain lastSide = sideChains.get(sideChains.size() - 1);
 		lastSide.setLocation(n.getTag());
 		compound.addSideChain(lastSide.getSize(), lastSide.getLocation(), lastSide.isCyclo(), lastSide.isBenzene());
-	} //end addSideChain
+	} // end addSideChain
 
 	/*
-	 * Set the direction for the ghost to be drawn DrawDirection dir - new direction
-	 * for ghost chain
+	 * Set the direction for the ghost to be drawn 
+	 * DrawDirection dir - new direction for ghost chain
 	 */
 	public void setGhostDirection(DrawDirection dir) {
 		ghostDir = dir;
@@ -1328,18 +1336,18 @@ public class Canvas extends JComponent {
 	 * int bond - size of the bond to add
 	 */
 	public void addBondSize(int bond) {
-		//adjust the main compound according to the bond size
+		// adjust the main compound according to the bond size
 		if (compound.getMainChain().getBond() < bond) {
 			compound.getMainChain().setBond(bond);
-		} //if
-		
-		//add the bond size to the list for drawing 
+		} // if
+
+		// add the bond size to the list for drawing
 		bondSizes.add(bond);
-	} // end setBondSize
+	} // end addBondSize
 
 	/*
-	 * Add a pair of bonded nodes to the compound int idx - position of the node in
-	 * the main chain
+	 * Add a pair of bonded nodes to the compound 
+	 * int idx - position of the node in the main chain
 	 */
 	public void addBondNode(int idx) {
 		// nodes to add to the bond nodes list
@@ -1367,11 +1375,11 @@ public class Canvas extends JComponent {
 		// add the location to the main chain
 		compound.getMainChain().addFunctionalLocation(idx + 1 + "");
 
-	} // end addBondedNode
+	} // end addBondNode
 
 	/*
-	 * Set the index of the node for ghost bonds int idx - index of the node for the
-	 * bond on the main chain
+	 * Set the index of the node for ghost bonds 
+	 * int idx - index of the node for the bond on the main chain
 	 */
 	public void setGhostBondIndex(int idx) {
 		ghostBondIdx = idx;
@@ -1379,7 +1387,8 @@ public class Canvas extends JComponent {
 
 	// FUNCTIONAL GROUPS//
 	/*
-	 * Add a group to the list FuncGroup group - group to add to the list
+	 * Add a group to the list 
+	 * FuncGroup group - group to add to the list
 	 */
 	public void addFuncGroup(FuncGroup group) {
 		groups.add(group);
@@ -1387,15 +1396,16 @@ public class Canvas extends JComponent {
 	} // end addFuncGroup
 
 	/*
-	 * Get the ghost group return ghostGroup - group currently being attempted to be
-	 * drawn
+	 * Get the ghost group 
+	 * return ghostGroup - group currently being attempted to be drawn
 	 */
 	public FuncGroup getGhostGroup() {
 		return ghostGroup;
 	} // end getGhostGroup
 
 	/*
-	 * Add a node to the functional groups list Node n - node to add to list
+	 * Add a node to the functional groups list 
+	 * Node n - node to add to list
 	 */
 	public void addFuncNode(Node n) {
 		groupNodes.add(n);
@@ -1403,17 +1413,18 @@ public class Canvas extends JComponent {
 	} // end addFuncNode
 
 	/*
-	 * Add a direction for a functional group DrawDirection dir - direction for
-	 * latest side chain
+	 * Add a direction for a functional group 
+	 * DrawDirection dir - direction for latest side chain
 	 */
 	public void addFuncDirection(DrawDirection dir) {
 		groupDirs.add(dir);
-	} // end addGroupDirection
+	} // end addFuncDirection
 
 	// STEPS//
 
 	/*
-	 * Set the step for main drawing int step - step for main drawing
+	 * Set the step for main drawing 
+	 * int step - step for main drawing
 	 */
 	public void setMainStep(int step) {
 		// if outside of the range
@@ -1427,18 +1438,18 @@ public class Canvas extends JComponent {
 	} // end setMainStep
 
 	/*
-	 * Get the step for main drawing return mainStep - step for the main drawing
+	 * Get the step for main drawing 
+	 * return mainStep - step for the main drawing
 	 */
 	public int getMainStep() {
-
 		return mainStep;
 	} // end getMainStep
 
 	/*
-	 * Set the step for side drawing int step - step for side drawing
+	 * Set the step for side drawing 
+	 * int step - step for side drawing
 	 */
 	public void setSideStep(int step) {
-
 		if (step < 0 || step > 4) {
 			throw new IllegalArgumentException("Too much for me :(");
 		} else {
@@ -1446,17 +1457,19 @@ public class Canvas extends JComponent {
 		} // if
 
 		this.updateDisplay();
-	} // end sideStep
+	} // end setSideStep
 
 	/*
-	 * Get the side step for drawing return sideStep - step for drawing side chains
+	 * Get the side step for drawing 
+	 * return sideStep - step for drawing side chains
 	 */
 	public int getSideStep() {
 		return sideStep;
 	} // end getSideStep
 
 	/*
-	 * Set the step for side drawing int step - step for side drawing
+	 * Set the step for side drawing 
+	 * int step - step for side drawing
 	 */
 	public void setBondStep(int step) {
 		if (step < 0 || step > 3) {
@@ -1466,18 +1479,19 @@ public class Canvas extends JComponent {
 		} // if
 
 		this.updateDisplay();
-	} // end sideStep
+	} // end setBondStep
 
 	/*
-	 * Get the side step for drawing return sideStep - step for drawing side chains
+	 * Get the side step for drawing 
+	 * return bondStep - step for drawing bonds
 	 */
 	public int getBondStep() {
-
 		return bondStep;
-	} // end getSideStep
+	} // end getBondStep
 
 	/*
-	 * Set the step for functional group drawing int step - step for group drawing
+	 * Set the step for functional group drawing 
+	 * int step - step for group drawing
 	 */
 	public void setFuncStep(int step) {
 		if (step < 0 || step > 3) {
@@ -1490,25 +1504,32 @@ public class Canvas extends JComponent {
 	} // end setFuncStep
 
 	/*
-	 * Get the functional group step for drawing return funcStep - step for drawing
-	 * side chains
+	 * Get the functional group step for drawing 
+	 * return funcStep - step for drawing functional groups
 	 */
 	public int getFuncStep() {
-
 		return funcStep;
 	} // end getFuncStep
 
-	public void nameStep(String name) {
+	/*
+	 * Set the name of the compound being drawn
+	 * String name - name of the compound
+	 */
+	public void setName(String name) {
 		this.name = name;
 		this.nameStep++;
-	}
+	} //end setName
 
+	/*
+	 * Get the name of the compound
+	 * return - name of the compound OR blank String
+	 */
 	public String getName() {
 		if (this.name == null)
 			return "";
 		else
 			return this.name;
-	}
+	} //end getName
 
 	/*
 	 * Get the no updates set
@@ -1519,8 +1540,8 @@ public class Canvas extends JComponent {
 	} // end getNoUpdate
 
 	/*
-	 * Get whether there is a main chain on the screen return mainOnScreen - whether
-	 * the main chain is on the screen
+	 * Get whether there is a main chain on the screen
+	 * return mainOnScreen - whether the main chain is on the screen
 	 */
 	public boolean getMainOnScreen() {
 		return mainOnScreen;
@@ -1537,14 +1558,16 @@ public class Canvas extends JComponent {
 	// NAMING GUI//
 
 	/*
-	 * Get the compound return compound - compound being created
+	 * Get the compound 
+	 * return compound - compound being created
 	 */
 	public Compound getCompound() {
 		return compound;
 	} // end getCompound
 
 	/*
-	 * Get the endings String list return - list of endings for the main chain
+	 * Get the endings String list 
+	 * return - list of endings for the main chain
 	 */
 	public ArrayList<String> getEndings() {
 		// set the ending
@@ -1554,15 +1577,9 @@ public class Canvas extends JComponent {
 	} // end getEndings
 
 	/*
-	 * String representation of the String used for debugging
-	 */
-	public String toString() {
-		return "Canvas:";
-	} // end toString
-
-	/*
-	 * Sets the Compound Object to the given compound object. Changes all the
-	 * stepValues to be within the nodes create nodes for drawing
+	 * Sets the Compound Object to the given compound object
+	 * Changes all the steps to final drawing
+	 * Compound c - compound to draw
 	 */
 	public void setCompound(Compound c) {
 		/// set the compound
@@ -1589,5 +1606,4 @@ public class Canvas extends JComponent {
 		clearAction(null);
 		type = ActionType.MAIN;
 	} // end reset
-
 } // end class

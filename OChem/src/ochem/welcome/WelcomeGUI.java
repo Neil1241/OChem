@@ -8,6 +8,7 @@ package ochem.welcome;
 
 //import packages
 import ochem.*;
+import ochem.drawing.DrawingGUI;
 import ochem.drawing.DrawingUtil;
 
 import java.awt.*;
@@ -43,8 +44,8 @@ public class WelcomeGUI extends JPanel {
 	}
 
 	private void layoutView() {
-		Color hover = Color.CYAN;
-		Color press = Color.BLUE;
+		Color hover = DrawingGUI.BG_COLOR.darker();
+		Color press = DrawingGUI.BG_COLOR.darker().darker();
 		JLabel gif = new JLabel("");
 
 		try {
@@ -69,18 +70,30 @@ public class WelcomeGUI extends JPanel {
 		GridLayout buttonAligment = new GridLayout(3, 1);
 
 		// change JLabel justification
-		title.setFont(new Font("Arial", Font.PLAIN, 45));
+		title.setFont(DrawingUtil.getFileFont(DrawingUtil.VOICE_ACTIVATED_LOCATION));
 		title.setHorizontalAlignment(JLabel.CENTER);
+		title.setOpaque(true);
+		title.setBackground(DrawingGUI.BG_COLOR);
+		title.setForeground(DrawingGUI.TEXT_COLOR);
+		
 		quote.setHorizontalAlignment(JLabel.CENTER);
 		quote.setFont(new Font("Arial", Font.PLAIN, 25));
+		quote.setOpaque(true);
+		quote.setBackground(DrawingGUI.BG_COLOR);
+		quote.setForeground(DrawingGUI.TEXT_COLOR);
 
-		// set the colors of buttons
+		// set the colors of buttons and their texts
 		quizing.setHoverBackgroundColor(hover);
 		quizing.setPressedBackgroundColor(press);
+		quizing.setForeground(DrawingGUI.TEXT_COLOR);
+		
 		naming.setHoverBackgroundColor(hover);
 		naming.setPressedBackgroundColor(press);
+		naming.setForeground(DrawingGUI.TEXT_COLOR);
+		
 		drawing.setHoverBackgroundColor(hover);
 		drawing.setPressedBackgroundColor(press);
+		drawing.setForeground(DrawingGUI.TEXT_COLOR);
 
 		// set layouts
 		this.setLayout(layout);
@@ -93,7 +106,7 @@ public class WelcomeGUI extends JPanel {
 
 		// add components to this panel
 		this.add(buttons, BorderLayout.CENTER);
-		this.add(gif, BorderLayout.EAST);
+//		this.add(gif, BorderLayout.EAST);
 		this.add(quote, BorderLayout.SOUTH);
 		this.add(title, BorderLayout.NORTH);
 		this.setPreferredSize(new Dimension (OChem.width/2,OChem.height/2));

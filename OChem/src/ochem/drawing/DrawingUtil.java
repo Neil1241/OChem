@@ -36,6 +36,9 @@ public class DrawingUtil {
 	public static final Color DARK_BLUE = new Color(0, 0, 255);
 	public static final Color LIGHT_BLUE = new Color(51, 102, 255);
 	
+	//title
+	public static final Color TITLE_COLOR = new Color(53, 74, 141);
+	
 	//chain colors
 	public static final Color CHAIN_COLOR = new Color(44, 62, 80);
 	
@@ -66,6 +69,12 @@ public class DrawingUtil {
 	
 	//file locations
 	public static final String OXYGEN_LOCATION = "src/resources/Oxygen-Regular.ttf";
+	public static final String VOICE_ACTIVATED_LOCATION = "src/resources/VoiceActivatedBB_reg.otf";
+	public static final String ICON_LOCATION = "src/resources/OChem Logo 1.png";
+	
+	//naming GUI
+	public static final int STRING_WIDTH = (int) (62 * SCALE_RATIO);
+	public static final int ASCENT = (int) (81 * SCALE_RATIO);
 	
 	/*
 	 * Types of action to determine different drawing features

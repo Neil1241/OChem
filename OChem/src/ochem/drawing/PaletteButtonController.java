@@ -80,40 +80,40 @@ public class PaletteButtonController implements MouseListener {
 			nameAction();
 
 			// functional groups
-		} else if (text.equals("F")) { // fluorine
+		} else if (text.equals("Fluorine")) { // fluorine
 			fluoroAction();
 
-		} else if (text.equals("Cl")) { // chlorine
+		} else if (text.equals("Chlorine")) { // chlorine
 			chloroAction();
 
-		} else if (text.equals("Br")) { // bromine
+		} else if (text.equals("Bromine")) { // bromine
 			bromoAction();
 
-		} else if (text.equals("I")) { // iodine
+		} else if (text.equals("Iodine")) { // iodine
 			iodoAction();
 
-		} else if (text.equals("Al")) { // aldehyde
+		} else if (text.equals("Aldehyde")) { // aldehyde
 			aldehydeAction();
 
-		} else if (text.equals("Ke")) { // ketone
+		} else if (text.equals("Ketone")) { // ketone
 			ketoneAction();
 
-		} else if (text.equals("OH")) { // alcohol
+		} else if (text.equals("Alcohol")) { // alcohol
 			alcoholAction();
 
-		} else if (text.equals("CA")) { // carboxylic acid
+		} else if (text.equals("Acid")) { // carboxylic acid
 			acidAction();
 
-		} else if (text.equals("N")) { // amine
+		} else if (text.equals("Amine")) { // amine
 			amineAction();
 
-		} else if (text.equals("ON")) { // amide
+		} else if (text.equals("Amide")) { // amide
 			amideAction();
 
-		} else if (text.equals("O")) { // ether
+		} else if (text.equals("Ether")) { // ether
 			etherAction();
 
-		} else if (text.equals("OO")) { // ester
+		} else if (text.equals("Ester")) { // ester
 			esterAction();
 
 		} // if
@@ -355,7 +355,7 @@ public class PaletteButtonController implements MouseListener {
 			System.out.println(c.getMainChain().getBond());
 			String hold = OrganicUtil.nameFromCompound(c);
 			System.out.println(hold);
-			canvas.nameStep(hold);
+			canvas.setName(hold);
 			canvas.setCompound(c);
 		} // if
 	} // end nameAction
