@@ -314,8 +314,15 @@ public class OrganicUtil {
 					pre = random(1, 4);
 				sideChainType[i] = CHAIN[pre] + sideChainType[i];
 			} else if (sideChainType[i].equals("phenyl")) {
-				pre = 6;
-				phenyl = true;
+				// if the mainsize is greater than the side length, add the benzene side chain
+				// other wise add an alkyl
+				if (mainSize.length > 6) {
+					pre = 6;
+					phenyl = true;
+				} else {
+					sideChainType[i] = "yl";
+					pre = random(1, 4);
+				}
 			} else if (sideChainType[i].equals("oxy")) {
 				ether = true;
 				pre = -7;
@@ -414,7 +421,7 @@ public class OrganicUtil {
 		return (int) (Math.random() * range) + lowest;
 	}// end random
 
-	//method to run PASSed used for debugging
+	// method to run PASSed used for debugging
 	private static void pass() {
 		System.out.println("PASSED");
 	}
@@ -440,13 +447,13 @@ public class OrganicUtil {
 		return name;
 	}// end nameFromCompound
 
-	//converts the mainChain to a String
+	// converts the mainChain to a String
 	private static String mainToName(Chain main) {
-		String name = ""; //holds the main chain name
-		int[] prefixes = main.getNumOfGroups(); //holds the prefixes on the bondType and the functionalGroup
+		String name = ""; // holds the main chain name
+		int[] prefixes = main.getNumOfGroups(); // holds the prefixes on the bondType and the functionalGroup
 		ArrayList<String> endings = main.getEndings(); // gets the functionalEndings from the chain object
-		ArrayList<String> location = main.getFunctionalLocation(); //gets the locatoins
-		String hold = ""; //temporary variable to hold text
+		ArrayList<String> location = main.getFunctionalLocation(); // gets the locatoins
+		String hold = ""; // temporary variable to hold text
 
 		// add cyclo to the name if the main chain is a cyclo, return benzene if the
 		// compound is a benzene
@@ -456,7 +463,7 @@ public class OrganicUtil {
 			return "benzene";
 		} // end if
 
-		//add in the name of the chain along with any locations of functional bonds
+		// add in the name of the chain along with any locations of functional bonds
 		name += CHAIN[main.getSize() - 1];
 		if (prefixes[0] > 1) {
 			name += "-";
@@ -468,7 +475,7 @@ public class OrganicUtil {
 			name += "-" + location.get(0) + "-";
 		} // end if
 
-		//add the according bond lettering
+		// add the according bond lettering
 		if (main.getBond() == 1)
 			name += "an";
 		else if (main.getBond() == 2)
@@ -477,7 +484,7 @@ public class OrganicUtil {
 			name += "yn";
 		// end if
 
-		//saves the functionalGroups to the mainChain
+		// saves the functionalGroups to the mainChain
 		if (prefixes[1] > 1) {
 			name += "-";
 			for (int i = 0; i < prefixes[1]; i++)
@@ -488,21 +495,21 @@ public class OrganicUtil {
 			name += "-" + location.get(location.size() - 1) + "-";
 		} // end if
 
-		//get the appropriate endings
+		// get the appropriate endings
 		try {
 			if (endings.isEmpty()) {
 				name += "e";
 			} else {
 				if (endings.size() > prefixes[0])
 					hold = endings.get(endings.size() - 1);
-					else
+				else
 					hold = endings.get(0);
-					//end if
+				// end if
 				hold = hold.substring(0, hold.length() - 4);
 				if (hold.equals(FUNCTIONAL_NAMES[0]) || hold.equals(FUNCTIONAL_NAMES[1])
 						|| hold.equals(FUNCTIONAL_NAMES[2]))
 					name += "e";
-				//end if
+				// end if
 				else {
 					for (int i = 3; i < FUNCTIONAL_NAMES.length - 1; i++) {
 						if (hold.equalsIgnoreCase(FUNCTIONAL_NAMES[i])) {
@@ -515,14 +522,15 @@ public class OrganicUtil {
 						} // end if
 					} // end for
 				} // end if
-			}//end if
-		} catch (ArrayIndexOutOfBoundsException e) {}
+			} // end if
+		} catch (ArrayIndexOutOfBoundsException e) {
+		}
 
 		// return the mainchain name
 		return name;
 	}// end mainToName
 
-	//gets the prefix based on the number passed to it
+	// gets the prefix based on the number passed to it
 	private static String prefixFromNumber(int n) {
 		if (n < 2)
 			return "";
@@ -794,16 +802,24 @@ public class OrganicUtil {
 		// the compound
 		if (numOfGroups[1] > 0 || numOfGroups[0] > 0) {
 			String temp = "";
-			int majorityOver = 0;
-			for (int i = 0; i < numOfGroups[1]; i++) {
-				temp = endings.get(endings.size() - 1);
+			int majorityOverGroup = 0;
+			int majorityOverBond = 0;
+			for (int i = 1; i <= numOfGroups[1]; i++) {
+				temp = endings.get(endings.size() - i);
 				position = Integer.parseInt(temp.substring(temp.length() - 1));
 				if (position > mainSize / 2)
-					majorityOver++;
+					majorityOverGroup++;
+			}
+
+			for (int i = 0; i < numOfGroups[0]; i++) {
+				temp = endings.get(i);
+				position = Integer.parseInt(temp.substring(temp.length() - 1));
+				if (position > mainSize / 2)
+					majorityOverGroup++;
 			}
 
 			// if position is greater than half, invert the order
-			if (majorityOver > numOfGroups[1]) {
+			if (majorityOverGroup > numOfGroups[1] || majorityOverBond > numOfGroups[0]) {
 				int bond = c.getMainChain().getBond();
 				for (int i = 0; i < numOfGroups[0]; i++) {
 					String hold = endings.get(i).substring(temp.length() - 1);
@@ -857,7 +873,7 @@ public class OrganicUtil {
 		} // end if
 	}// end reorder
 
-	// takes the side chains sfrom Compound c and inverts them into Compound ordered
+	// takes the side chains from Compound c and inverts them into Compound ordered
 	// to be returned
 	private static Compound invertSides(Compound c, Compound ordered) {
 		Chain[] s = c.getSideChains();
